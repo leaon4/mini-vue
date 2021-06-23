@@ -1,9 +1,7 @@
-function component() {
-    const element = document.createElement('div');
+import { reactive } from './reactivity/reactive';
+import { effect } from "./reactivity/effect";
 
-    element.innerHTML = ['Hello', 'webpfdsfack'].join(' ')
-    console.log(element)
-    return element;
-}
-
-document.body.appendChild(component());
+const observed = window.observed = reactive({ count: 0 })
+effect(() => {
+    console.log('observed.count = ', observed.count);
+});
