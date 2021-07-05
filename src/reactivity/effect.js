@@ -1,7 +1,7 @@
 const effectStack = [];
 let activeEffect;
 
-export function effect(fn) {
+export function effect(fn, option = {}) {
     const effectFn = () => {
         try {
             effectStack.push(effectFn);
@@ -12,7 +12,10 @@ export function effect(fn) {
             activeEffect = effectStack[effectStack.length - 1];
         }
     }
-    effectFn();
+    if (!option.lazy) {
+        effectFn();
+    }
+    effectFn.scheduler = option.scheduler;
     return effectFn;
 }
 
@@ -44,6 +47,10 @@ export function trigger(target, key) {
         return;
     }
     dep.forEach(effectFn => {
-        effectFn();
+        if (effectFn.scheduler){
+            effectFn.scheduler();
+        } else {
+            effectFn();
+        }
     });
 }

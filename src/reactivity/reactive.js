@@ -1,4 +1,4 @@
-import { isObject } from '../utils';
+import { isObject, hasChanged } from '../utils';
 import { track, trigger } from './effect';
 
 const reactiveMap = new WeakMap();
@@ -23,8 +23,11 @@ export function reactive(target) {
             return isObject(res) ? reactive(res) : res;
         },
         set(target, key, value, receiver) {
+            const oldValue = target[key];
             const res = Reflect.set(target, key, value, receiver);
-            trigger(target, key, value);
+            if (hasChanged(value, oldValue)) {
+                trigger(target, key, value);
+            }
             return res;
         }
     });
