@@ -5,7 +5,6 @@ describe('reactive', () => {
     test('isReactive', () => {
         const original = { count: 0 };
         const observed = reactive(original);
-        // @ts-ignore
         expect(original.__isReactive).toBe(undefined);
         expect(observed.__isReactive).toBe(true);
     });
@@ -82,7 +81,7 @@ describe('effect', () => {
         expect(value).toBe(4);
     });
 
-    it('嵌套响应式对象', () => {
+    test('嵌套响应式对象', () => {
         let value
         const observed = reactive({ nested: { num: 0 } })
         effect(() => (value = observed.nested.num))
@@ -100,7 +99,6 @@ describe('effect', () => {
             value = observed.anotherValue;
         })
         expect(value).toBe(undefined);
-        // @ts-ignore 
         observed.anotherValue = 1;
         expect(value).toBe(1);
     });

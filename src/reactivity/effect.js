@@ -1,12 +1,15 @@
+const effectStack = [];
 let activeEffect;
 
 export function effect(fn) {
     const effectFn = () => {
         try {
+            effectStack.push(effectFn);
             activeEffect = effectFn;
             return fn();
         } finally {
-            activeEffect = undefined;
+            effectStack.pop();
+            activeEffect = effectStack[effectStack.length - 1];
         }
     }
     effectFn();
