@@ -15,7 +15,7 @@ export function reactive(target) {
     }
     const proxy = new Proxy(target, {
         get(target, key, receiver) {
-            if (key === __isReactive) {
+            if (key === '__isReactive') {
                 return true;
             }
             track(target, key);
@@ -35,6 +35,6 @@ export function reactive(target) {
     return proxy;
 }
 
-function isReactive(target) {
+export function isReactive(target) {
     return !!(target && target.__isReactive);
 }

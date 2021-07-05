@@ -9,12 +9,13 @@ export function ref(value) {
     return new RefImpl(value);
 }
 
-function isRef(value) {
+export function isRef(value) {
     return !!(value && value.__isRef);
 }
 
 class RefImpl {
     constructor(value) {
+        this.__isRef = true;
         this._value = convert(value);
     }
 
@@ -25,8 +26,8 @@ class RefImpl {
 
     set value(val) {
         if (hasChanged(val, this._value)) {
-            trigger(this, 'value');
             this._value = convert(val);
+            trigger(this, 'value');
         }
     }
 }

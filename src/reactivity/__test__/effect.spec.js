@@ -1,32 +1,6 @@
 import { effect } from "../effect";
 import { reactive } from "../reactive";
 
-describe('reactive', () => {
-    test('isReactive', () => {
-        const original = { count: 0 };
-        const observed = reactive(original);
-        expect(original.__isReactive).toBe(undefined);
-        expect(observed.__isReactive).toBe(true);
-    });
-    test('子对象也会被代理', () => {
-        const original = { obj: { count: 0 } };
-        const observed = reactive(original);
-        expect(observed.obj.__isReactive).toBe(true);
-    });
-    test('不会被代理两次', () => {
-        const original = { count: 0 };
-        const observed = reactive(original);
-        const observed2 = reactive(observed);
-        expect(observed).toBe(observed2);
-    });
-    test('重复设置会返回相同值', () => {
-        const original = { count: 0 };
-        const observed = reactive(original);
-        const observed2 = reactive(original);
-        expect(observed).toBe(observed2);
-    });
-})
-
 describe('effect', () => {
     test('basic use', () => {
         const observed = reactive({ count: 0 });
@@ -101,5 +75,58 @@ describe('effect', () => {
         expect(value).toBe(undefined);
         observed.anotherValue = 1;
         expect(value).toBe(1);
+    });
+
+    test('链式effect', () => {
+        const observed1 = reactive({ count: 0 });
+        const observed2 = reactive({});
+        let value;
+        effect(() => {
+            observed2.count = observed1.count;
+        });
+        effect(() => {
+            value = observed2.count;
+        });
+        expect(observed2.count).toBe(0);
+        expect(value).toBe(0);
+
+        observed1.count = 10;
+        expect(observed2.count).toBe(10);
+        expect(value).toBe(10);
+    });
+
+    test('嵌套effect', () => {
+        const nums = reactive({ num1: 0, num2: 10, num3: 100 });
+        const dummy = {};
+        const childSpy = jest.fn(() => dummy.num1 = nums.num1);
+        const childEffect = effect(childSpy);
+        const parentSpy = jest.fn(() => {
+            dummy.num2 = nums.num2;
+            childEffect();
+            dummy.num3 = nums.num3;
+        });
+        effect(parentSpy);
+
+        expect(dummy).toEqual({ num1: 0, num2: 10, num3: 100 });
+        expect(parentSpy).toHaveBeenCalledTimes(1);
+        expect(childSpy).toHaveBeenCalledTimes(2);
+
+        // parentSpy不会调用
+        nums.num1++;
+        expect(dummy).toEqual({ num1: 1, num2: 10, num3: 100 });
+        expect(parentSpy).toHaveBeenCalledTimes(1);
+        expect(childSpy).toHaveBeenCalledTimes(3);
+
+        // parentSpy和childSpy都会调用
+        nums.num2++;
+        expect(dummy).toEqual({ num1: 1, num2: 11, num3: 100 });
+        expect(parentSpy).toHaveBeenCalledTimes(2);
+        expect(childSpy).toHaveBeenCalledTimes(4);
+
+        // parentSpy和childSpy都会调用
+        nums.num3++;
+        expect(dummy).toEqual({ num1: 1, num2: 11, num3: 101 });
+        expect(parentSpy).toHaveBeenCalledTimes(3);
+        expect(childSpy).toHaveBeenCalledTimes(5);
     });
 });
