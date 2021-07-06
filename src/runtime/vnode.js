@@ -1,7 +1,7 @@
 import { isFunction, isObject } from '../utils'
 
-export const Text = Symbol('text');
-export const Fragment = Symbol('fragment');
+export const Text = Symbol('Text');
+export const Fragment = Symbol('Fragment');
 
 export const ShapeFlags = {
     ELEMENT: 1,
@@ -15,6 +15,13 @@ export const ShapeFlags = {
     CHILDREN: (1 << 5) | (1 << 6)
 };
 
+/**
+ * vnode有五种类型：dom元素，纯文本，Fragment，状态组件，函数组件
+ * @param {string | Text | Fragment | object | Function} type 
+ * @param {Record<string,any> | null} props 
+ * @param {string | array | null} children 
+ * @returns vnode
+ */
 export function h(type, props = null, children = null) {
     let shapeFlag = 0;
     if (typeof type === 'string') {
@@ -34,7 +41,7 @@ export function h(type, props = null, children = null) {
     } else if (Array.isArray(children)) {
         shapeFlag |= ShapeFlags.ARRAY_CHILDREN;
     }
-    
+
     return {
         type,
         props,

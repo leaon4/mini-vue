@@ -13,7 +13,7 @@ function mount(vnode, parent) {
     } else if (shapeFlag & ShapeFlags.FRAGMENT) {
         mountFragment(vnode, parent);
     } else if (shapeFlag & ShapeFlags.COMPONENT) {
-
+        mountComponent(vnode, parent);
     }
 }
 
@@ -74,4 +74,28 @@ function mountArrayChildren(children, parent) {
     children.forEach(child => {
         mount(child, parent);
     });
+}
+
+function mountComponent(vnode, parent) {
+    if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+        mountStatefulComponent(vnode, parent);
+    } else {
+
+    }
+}
+
+function mountStatefulComponent(vnode, parent) {
+    const { type: comp, props } = vnode;
+
+    const ctx = {}
+    if (props && comp.props) {
+        comp.props.forEach(key => {
+            if (key in props) {
+                ctx[key] = props[key]
+            }
+        });
+    }
+
+    const subtree = comp.render(ctx);
+    mount(subtree, parent);
 }
