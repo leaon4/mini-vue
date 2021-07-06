@@ -10,7 +10,7 @@ function mount(vnode, parent) {
         mountElement(vnode, parent);
     } else if (shapeFlag & ShapeFlags.TEXT) {
         mountTextNode(vnode, parent);
-    } else if (shapeFlag & ShapeFlags.Fragment) {
+    } else if (shapeFlag & ShapeFlags.FRAGMENT) {
         mountFragment(vnode, parent);
     } else if (shapeFlag & ShapeFlags.COMPONENT) {
 
@@ -22,7 +22,7 @@ function mountElement(vnode, parent) {
     const el = document.createElement(type);
 
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
-        mountTextNode(children, el);
+        mountTextNode(vnode, el);
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
         mountArrayChildren(children, el);
     }
@@ -61,8 +61,8 @@ function mountProps(el, props) {
     }
 }
 
-function mountTextNode(text, parent) {
-    const textNode = document.createTextNode(text);
+function mountTextNode(vnode, parent) {
+    const textNode = document.createTextNode(vnode.children);
     parent.appendChild(textNode);
 }
 
