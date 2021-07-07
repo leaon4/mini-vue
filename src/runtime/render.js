@@ -1,37 +1,33 @@
 import { h, Text, Fragment, ShapeFlags } from './vnode';
 
 export function render(vnode, container) {
-    mount(vnode, container);
-}
-
-function mount(vnode, parent) {
-    const { shapeFlag } = vnode;
-    if (shapeFlag & ShapeFlags.ELEMENT) {
-        mountElement(vnode, parent);
-    } else if (shapeFlag & ShapeFlags.TEXT) {
-        mountTextNode(vnode, parent);
-    } else if (shapeFlag & ShapeFlags.FRAGMENT) {
-        mountFragment(vnode, parent);
-    } else if (shapeFlag & ShapeFlags.COMPONENT) {
-        mountComponent(vnode, parent);
+    const prevVNode = container._vnode;
+    if (!vnode) {
+        if (prevVNode) {
+            unmount(prevVNode);
+        }
+    } else {
+        patch(prevVNode, vnode, container);
     }
+    container._vnode = vnode;
 }
 
-function mountElement(vnode, parent) {
-    const { type, props, children, shapeFlag } = vnode;
+function mountElement(vnode, container) {
+    const { type, props, shapeFlag, children } = vnode;
     const el = document.createElement(type);
 
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
-        mountTextNode(vnode, el);
+        el.textContent = children;
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-        mountArrayChildren(children, el);
+        mountChildren(children, el)
     }
 
     if (props) {
         mountProps(el, props);
     }
 
-    parent.appendChild(el);
+    vnode.el = el;
+    container.appendChild(el);
 }
 
 const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
@@ -61,30 +57,28 @@ function mountProps(el, props) {
     }
 }
 
-function mountTextNode(vnode, parent) {
+function mountTextNode(vnode, container) {
     const textNode = document.createTextNode(vnode.children);
-    parent.appendChild(textNode);
+    vnode.el = textNode;
+    container.appendChild(textNode);
 }
 
-function mountFragment(vnode, parent) {
-    mountArrayChildren(vnode.children, parent);
-}
-
-function mountArrayChildren(children, parent) {
+function mountChildren(children, container) {
     children.forEach(child => {
-        mount(child, parent);
+        patch(null, child, container);
     });
 }
 
-function mountComponent(vnode, parent) {
+// TODO
+function mountComponent(vnode, container) {
     if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-        mountStatefulComponent(vnode, parent);
+        mountStatefulComponent(vnode, container);
     } else {
 
     }
 }
 
-function mountStatefulComponent(vnode, parent) {
+function mountStatefulComponent(vnode, container) {
     const { type: comp, props } = vnode;
 
     const ctx = {}
@@ -97,5 +91,97 @@ function mountStatefulComponent(vnode, parent) {
     }
 
     const subtree = comp.render(ctx);
-    mount(subtree, parent);
+    patch(null, subtree, container);
+}
+
+function unmount(vnode) {
+    const { shapeFlag, el } = vnode;
+    if (shapeFlag & ShapeFlags.COMPONENT) {
+        unmountComponent(vnode);
+    } else if (shapeFlag & ShapeFlags.FRAGMENT) {
+        unmountFragment(vnode);
+    } else {
+        el.parentNode.removeChild(el);
+    }
+}
+
+// TODO
+function unmountComponent(vnode) {
+
+}
+
+function unmountFragment(vnode) {
+    let { el: cur, anchor: end } = vnode;
+    while (cur !== end) {
+        let next = cur.nextSibling;
+        cur.parentNode.removeChild(cur);
+        cur = next;
+    }
+    end.parentNode.removeChild(end);
+}
+
+function patch(n1, n2, container) {
+    if (n1 && !isSameVNodeType(n1, n2)) {
+        unmount(n1);
+        n1 = null;
+    }
+
+    const { shapeFlag } = n2;
+    if (shapeFlag & ShapeFlags.ELEMENT) {
+        processElement(n1, n2, container)
+    } else if (shapeFlag & ShapeFlags.TEXT) {
+        processText(n1, n2, container)
+    } else if (shapeFlag & ShapeFlags.FRAGMENT) {
+        processFragment(n1, n2, container)
+    } else if (shapeFlag & ShapeFlags.COMPONENT) {
+        processComponent(n1, n2, container)
+    }
+}
+
+function isSameVNodeType(n1, n2) {
+    return n1.type === n2.type;
+}
+
+function processElement(n1, n2, container) {
+    if (n1 == null) {
+        mountElement(n2, container);
+    } else {
+        patchElement(n1, n2, container);
+    }
+}
+
+function processFragment(n1, n2, container) {
+    if (n1 == null) {
+        const fragmentStartAnchor = n2.el = document.createTextNode('')
+        const fragmentEndAnchor = n2.anchor = document.createTextNode('')
+        container.appendChild(fragmentStartAnchor)
+        mountChildren(n2.children, container)
+        // 这里会不会有问题?
+        container.appendChild(fragmentEndAnchor)
+    } else {
+        patchChildren(n1, n2, container)
+    }
+}
+
+function processText(n1, n2, container) {
+    if (n1 == null) {
+        mountTextNode(n2, container)
+    } else {
+        n2.el = n1.el;
+        n2.el.textContent = n2.children;
+    }
+}
+
+// TODO
+function processComponent(n1, n2, container) {
+    if (n1 == null) {
+        mountComponent(n2, container);
+    } else {
+
+    }
+}
+
+// TODO
+function patchElement(n1, n2, container) {
+
 }

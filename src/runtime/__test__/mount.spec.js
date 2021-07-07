@@ -8,7 +8,6 @@ function getTag(el) {
 describe('mount', () => {
     test('mount div', () => {
         const root = document.createElement('div')
-        console.log(root.tagName)
         render(h('div'), root)
         expect(root.children.length).toBe(1)
         expect(getTag(root.children[0])).toBe('div')
@@ -16,10 +15,10 @@ describe('mount', () => {
 
     test('mount div with text child', () => {
         const root = document.createElement('div')
-        render(h('div', null, 'child text'), root)
+        render(h('p', null, 'child text'), root)
 
         expect(root.children.length).toBe(1)
-        expect(getTag(root.children[0])).toBe('div')
+        expect(getTag(root.children[0])).toBe('p')
 
         const textNode = root.children[0].firstChild;
         expect(textNode.nodeType).toBe(3);
