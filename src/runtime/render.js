@@ -168,6 +168,9 @@ function patchElement(n1, n2, container) {
 
 // TODO
 function patchProps(el, oldProps, newProps) {
+    if (oldProps === newProps) {
+        return;
+    }
     oldProps = oldProps || {};
     newProps = newProps || {};
     for (const key in newProps) {
@@ -204,7 +207,9 @@ function patchDomProp(el, key, prev, next) {
                 }
                 if (prev) {
                     for (const styleName in prev) {
-                        el.style[styleName] = '';
+                        if (next[styleName] == null) {
+                            el.style[styleName] = '';
+                        }
                     }
                 }
             }
@@ -212,15 +217,17 @@ function patchDomProp(el, key, prev, next) {
         default:
             if (key.startsWith('on')) {
                 // 事件
-                const eventName = key.slice(2).toLowerCase();
-                if (prev) {
-                    el.removeListener(eventName, prev);
-                }
-                if (next) {
-                    el.addEventListener(eventName, next);
+                if (prev !== next) {
+                    const eventName = key.slice(2).toLowerCase();
+                    if (prev) {
+                        el.removeEventListener(eventName, prev);
+                    }
+                    if (next) {
+                        el.addEventListener(eventName, next);
+                    }
                 }
             } else if (domPropsRE.test(key)) {
-                el[key] = next || '';
+                el[key] = next;
             } else {
                 if (next == null) {
                     el.removeAttribute(key)
