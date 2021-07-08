@@ -12,6 +12,25 @@ export function render(vnode, container) {
     container._vnode = vnode;
 }
 
+// n1可能为null，n2不可能为null
+function patch(n1, n2, container) {
+    if (n1 && !isSameVNodeType(n1, n2)) {
+        unmount(n1);
+        n1 = null;
+    }
+
+    const { shapeFlag } = n2;
+    if (shapeFlag & ShapeFlags.ELEMENT) {
+        processElement(n1, n2, container)
+    } else if (shapeFlag & ShapeFlags.TEXT) {
+        processText(n1, n2, container)
+    } else if (shapeFlag & ShapeFlags.FRAGMENT) {
+        processFragment(n1, n2, container)
+    } else if (shapeFlag & ShapeFlags.COMPONENT) {
+        processComponent(n1, n2, container)
+    }
+}
+
 function mountElement(vnode, container) {
     const { type, props, shapeFlag, children } = vnode;
     const el = document.createElement(type);
@@ -23,38 +42,11 @@ function mountElement(vnode, container) {
     }
 
     if (props) {
-        mountProps(el, props);
+        patchProps(el, null, props)
     }
 
     vnode.el = el;
     container.appendChild(el);
-}
-
-const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
-function mountProps(el, props) {
-    for (const key in props) {
-        const value = props[key]
-        switch (key) {
-            case 'class':
-                // 暂时认为class就是字符串
-                el.className = value;
-                break;
-            case 'style':
-                // style为对象
-                for (const styleName in value) {
-                    el.style[styleName] = value[styleName];
-                }
-                break;
-            default:
-                if (key.startsWith('on')) {
-                    el.addEventListener(key.slice(2).toLowerCase(), value)
-                } else if (domPropsRE.test(key)) {
-                    el[key] = value;
-                } else {
-                    el.setAttribute(key, value);
-                }
-        }
-    }
 }
 
 function mountTextNode(vnode, container) {
@@ -120,24 +112,6 @@ function unmountFragment(vnode) {
     end.parentNode.removeChild(end);
 }
 
-function patch(n1, n2, container) {
-    if (n1 && !isSameVNodeType(n1, n2)) {
-        unmount(n1);
-        n1 = null;
-    }
-
-    const { shapeFlag } = n2;
-    if (shapeFlag & ShapeFlags.ELEMENT) {
-        processElement(n1, n2, container)
-    } else if (shapeFlag & ShapeFlags.TEXT) {
-        processText(n1, n2, container)
-    } else if (shapeFlag & ShapeFlags.FRAGMENT) {
-        processFragment(n1, n2, container)
-    } else if (shapeFlag & ShapeFlags.COMPONENT) {
-        processComponent(n1, n2, container)
-    }
-}
-
 function isSameVNodeType(n1, n2) {
     return n1.type === n2.type;
 }
@@ -183,5 +157,82 @@ function processComponent(n1, n2, container) {
 
 // TODO
 function patchElement(n1, n2, container) {
+    n2.el = n1.el;
+    patchProps(n2.el, n1.props, n2.props)
+    patchChildren()
+    const { shapeFlag } = n2;
+    if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+
+    }
+}
+
+// TODO
+function patchProps(el, oldProps, newProps) {
+    oldProps = oldProps || {};
+    newProps = newProps || {};
+    for (const key in newProps) {
+        if (key === 'key') {
+            continue;
+        }
+        const prev = oldProps[key];
+        const next = newProps[key];
+        if (prev !== next) {
+            patchDomProp(el, key, prev, next)
+        }
+    }
+    for (const key in oldProps) {
+        if (key !== 'key' && !(key in newProps)) {
+            patchDomProp(el, key, oldProps[key], null)
+        }
+    }
+}
+
+const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
+function patchDomProp(el, key, prev, next) {
+    switch (key) {
+        case 'class':
+            // 暂时认为class就是字符串
+            el.className = next || '';
+            break;
+        case 'style':
+            // style为对象
+            if (!next) {
+                el.removeAttribute('style');
+            } else {
+                for (const styleName in next) {
+                    el.style[styleName] = next[styleName];
+                }
+                if (prev) {
+                    for (const styleName in prev) {
+                        el.style[styleName] = '';
+                    }
+                }
+            }
+            break;
+        default:
+            if (key.startsWith('on')) {
+                // 事件
+                const eventName = key.slice(2).toLowerCase();
+                if (prev) {
+                    el.removeListener(eventName, prev);
+                }
+                if (next) {
+                    el.addEventListener(eventName, next);
+                }
+            } else if (domPropsRE.test(key)) {
+                el[key] = next || '';
+            } else {
+                if (next == null) {
+                    el.removeAttribute(key)
+                } else {
+                    el.setAttribute(key, next);
+                }
+            }
+            break;
+    }
+}
+
+// TODO
+function patchChildren(n1, n2, container) {
 
 }
