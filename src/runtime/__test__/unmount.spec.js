@@ -91,7 +91,7 @@ describe('unmount from inner', () => {
         expect(root.innerHTML).toBe('<div><p></p></div>')
     })
 
-    // todo
+    // TODO
     test('unmount fragment', () => {
 
     })

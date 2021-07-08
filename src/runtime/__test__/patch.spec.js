@@ -159,4 +159,66 @@ describe('patch unkeyed nodes', () => {
         render(h('div', null, 'hello'), root)
         expect(root.children[0].textContent).toBe('hello')
     })
+
+    test('patch test 1', () => {
+        render(h('div', null, [
+            h('p', null, 'item1'),
+            h('p', null, 'item2'),
+        ]), root)
+        expect(root.innerHTML).toBe('<div><p>item1</p><p>item2</p></div>');
+
+        render(h('div', null, [
+            h('span', null, 'item3'),
+            h('p', null, 'item2'),
+        ]), root)
+        expect(root.innerHTML).toBe('<div><span>item3</span><p>item2</p></div>')
+    })
+
+    test('patch test', () => {
+        render(h('div', null, [
+            h('div', null, 'start'),
+            h('ul', null, [
+                h(Text, null, 'item0'),
+                h('li', null, [
+                    h('span', null, 'item1')
+                ]),
+                h('li', null, [
+                    h('span', null, 'item2'),
+                    h('span', null, 'item3'),
+                ]),
+                h('li', null, [
+                    h('span', null, 'item4'),
+                ]),
+                h(Text, null, 'item5')
+            ]),
+            h('div', null, 'end'),
+        ]), root)
+        expect(root.innerHTML).toBe('<div><div>start</div>' +
+            '<ul>item0<li><span>item1</span></li>' +
+            '<li><span>item2</span><span>item3</span></li>' +
+            '<li><span>item4</span></li>item5</ul>' +
+            '<div>end</div></div>');
+
+        // render(h('div', null, [
+        //     h('div', null, 'end'),
+        //     h('ul', null, [
+        //         h('li', null, [
+        //             h('span', null, [h(Text, null, 'item1')])
+        //         ]),
+        //         h('li', null, [
+        //             h('span', null, 'item3'),
+        //         ]),
+        //         h('li', null, [
+        //             h('p', null, 'item6'),
+        //             h('span', null, 'item8'),
+        //         ]),
+        //         h(Text, null, 'itemEnd')
+        //     ]),
+        // ]), root)
+        // expect(root.innerHTML).toBe('<div><div>end</div>' +
+        //     '<ul><li><span>item1</span></li>' +
+        //     '<li><span>item3</span></li>' +
+        //     '<li><p>item6</p><span>item8</span></li>' +
+        //     '</ul>itemEnd</div>');
+    })
 })
