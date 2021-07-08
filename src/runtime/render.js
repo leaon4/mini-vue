@@ -155,18 +155,12 @@ function processComponent(n1, n2, container) {
     }
 }
 
-// TODO
 function patchElement(n1, n2, container) {
     n2.el = n1.el;
     patchProps(n2.el, n1.props, n2.props)
-    patchChildren()
-    const { shapeFlag } = n2;
-    if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-
-    }
+    patchChildren(n1, n2, n2.el)
 }
 
-// TODO
 function patchProps(el, oldProps, newProps) {
     if (oldProps === newProps) {
         return;
@@ -239,7 +233,54 @@ function patchDomProp(el, key, prev, next) {
     }
 }
 
-// TODO
 function patchChildren(n1, n2, container) {
+    const { shapeFlag: prevShapeFlag, children: c1 } = n1;
+    const { shapeFlag, children: c2 } = n2;
 
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+        if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+            unmountChildren(c1);
+        }
+        if (c2 !== c1) {
+            container.textContent = c2;
+        }
+    } else {
+        // c2 is array or null
+        if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+            // c1 was array
+            if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+                // c2 is array
+                patchUnkeyedChildren(c1, c2, container);
+            } else {
+                // c2 is null
+                unmountChildren(c1);
+            }
+        } else {
+            // c1 was text or null
+            if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+                container.textContent = '';
+            }
+            if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+                mountChildren(c2, container);
+            }
+        }
+    }
+}
+
+function unmountChildren(children) {
+    children.forEach(child => unmount(child));
+}
+
+function patchUnkeyedChildren(c1, c2, container) {
+    const oldLength = c1.length;
+    const newLength = c2.length;
+    const commonLength = Math.min(oldLength, newLength);
+    for (let i = 0; i < commonLength; i++) {
+        patch(c1[i], c2[i], container);
+    }
+    if (newLength > oldLength) {
+        mountChildren(c2.slice(commonLength))
+    } else if (newLength < oldLength) {
+        unmountChildren(c1.slice(commonLength))
+    }
 }

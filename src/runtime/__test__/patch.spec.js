@@ -5,10 +5,14 @@ function getTag(el) {
     return el.tagName.toLowerCase();
 }
 
+let root;
+beforeEach(() => {
+    root = document.createElement('div');
+});
+
 describe('patch props', () => {
     test('patch class', () => {
         let el;
-        const root = document.createElement('div')
         render(h('div'), root)
         el = root.children[0]
         expect(el.className).toBeFalsy()
@@ -36,7 +40,6 @@ describe('patch props', () => {
 
     test('patch style', () => {
         let el;
-        const root = document.createElement('div')
         render(h('div'), root)
         el = root.children[0]
         expect(el.style.color).toBeFalsy()
@@ -77,7 +80,6 @@ describe('patch props', () => {
 
     test('patch props and attrs', () => {
         let el;
-        const root = document.createElement('div')
         render(h('div'), root)
         el = root.children[0]
         expect(el.id).toBeFalsy()
@@ -103,7 +105,6 @@ describe('patch props', () => {
 
     test('patch event', () => {
         let el, dummy = 0;
-        const root = document.createElement('div')
         render(h('div', { onClick: () => dummy++ }), root)
         el = root.children[0]
         el.click()
@@ -132,5 +133,30 @@ describe('patch props', () => {
         el.click()
         triggerMousedown();
         expect(dummy).toBe(12)
+    })
+})
+
+describe('patch unkeyed nodes', () => {
+    test('should patch previously empty children', () => {
+        render(h('div', null, []), root)
+        expect(root.children[0].textContent).toBeFalsy()
+
+        render(h('div', null, 'hello'), root)
+        expect(root.children[0].textContent).toBe('hello')
+    })
+
+    test('should patch previously null children', () => {
+        render(h('div'), root)
+
+        render(h('div', null, 'hello'), root)
+        expect(root.children[0].textContent).toBe('hello')
+    })
+
+    test('array children -> text children', () => {
+        render(h('div', null, [h('p')]), root)
+        expect(getTag(root.children[0].children[0])).toBe('p')
+
+        render(h('div', null, 'hello'), root)
+        expect(root.children[0].textContent).toBe('hello')
     })
 })
