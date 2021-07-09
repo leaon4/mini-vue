@@ -199,26 +199,26 @@ describe('patch unkeyed nodes', () => {
             '<li><span>item4</span></li>item5</ul>' +
             '<div>end</div></div>');
 
-        // render(h('div', null, [
-        //     h('div', null, 'end'),
-        //     h('ul', null, [
-        //         h('li', null, [
-        //             h('span', null, [h(Text, null, 'item1')])
-        //         ]),
-        //         h('li', null, [
-        //             h('span', null, 'item3'),
-        //         ]),
-        //         h('li', null, [
-        //             h('p', null, 'item6'),
-        //             h('span', null, 'item8'),
-        //         ]),
-        //         h(Text, null, 'itemEnd')
-        //     ]),
-        // ]), root)
-        // expect(root.innerHTML).toBe('<div><div>end</div>' +
-        //     '<ul><li><span>item1</span></li>' +
-        //     '<li><span>item3</span></li>' +
-        //     '<li><p>item6</p><span>item8</span></li>' +
-        //     '</ul>itemEnd</div>');
+        render(h('div', null, [
+            h('div', null, 'end'),
+            h('ul', null, [
+                h('li', null, [
+                    h('span', null, [h(Text, null, 'item1')])
+                ]),
+                h('li', null, [
+                    h('span', null, 'item3'),
+                ]),
+                h('li', null, [
+                    h('p', null, 'item6'),
+                    h('span', null, 'item8'),
+                ]),
+                h(Text, null, 'itemEnd')
+            ]),
+        ]), root)
+        expect(root.innerHTML).toBe('<div><div>end</div>' +
+            '<ul><li><span>item1</span></li>' +
+            '<li><span>item3</span></li>' +
+            '<li><p>item6</p><span>item8</span></li>' +
+            'itemEnd</ul></div>');
     })
 })
