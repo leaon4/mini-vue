@@ -13,31 +13,34 @@ export function render(vnode, container) {
 }
 
 // n1可能为null，n2不可能为null
-function patch(n1, n2, container) {
+function patch(n1, n2, container, anchor) {
     if (n1 && !isSameVNodeType(n1, n2)) {
+        anchor = (n1.anchor || n1.el).nextSibling;
         unmount(n1);
         n1 = null;
     }
 
     const { shapeFlag } = n2;
     if (shapeFlag & ShapeFlags.ELEMENT) {
-        processElement(n1, n2, container)
+        processElement(n1, n2, container, anchor)
     } else if (shapeFlag & ShapeFlags.TEXT) {
-        processText(n1, n2, container)
+        processText(n1, n2, container, anchor)
     } else if (shapeFlag & ShapeFlags.FRAGMENT) {
-        processFragment(n1, n2, container)
+        processFragment(n1, n2, container, anchor)
     } else if (shapeFlag & ShapeFlags.COMPONENT) {
-        processComponent(n1, n2, container)
+        processComponent(n1, n2, container, anchor)
     }
 }
 
-function mountElement(vnode, container) {
+function mountElement(vnode, container, anchor) {
     const { type, props, shapeFlag, children } = vnode;
     const el = document.createElement(type);
 
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
         el.textContent = children;
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // 这里不能传anchor。因为anchor限制的是当前的element
+        // 作为本element的children，不用指定anchor，append就行
         mountChildren(children, el)
     }
 
@@ -46,18 +49,18 @@ function mountElement(vnode, container) {
     }
 
     vnode.el = el;
-    container.appendChild(el);
+    container.insertBefore(el, anchor || null)
 }
 
-function mountTextNode(vnode, container) {
+function mountTextNode(vnode, container, anchor) {
     const textNode = document.createTextNode(vnode.children);
     vnode.el = textNode;
-    container.appendChild(textNode);
+    container.insertBefore(textNode, anchor || null)
 }
 
-function mountChildren(children, container) {
+function mountChildren(children, container, anchor) {
     children.forEach(child => {
-        patch(null, child, container);
+        patch(null, child, container, anchor);
     });
 }
 
@@ -116,30 +119,33 @@ function isSameVNodeType(n1, n2) {
     return n1.type === n2.type;
 }
 
-function processElement(n1, n2, container) {
+function processElement(n1, n2, container, anchor) {
     if (n1 == null) {
-        mountElement(n2, container);
+        mountElement(n2, container, anchor);
     } else {
-        patchElement(n1, n2, container);
+        patchElement(n1, n2);
     }
 }
 
-function processFragment(n1, n2, container) {
+function processFragment(n1, n2, container, anchor) {
+    const fragmentStartAnchor = n2.el = n1
+        ? n1.el
+        : document.createTextNode('')
+    const fragmentEndAnchor = n2.anchor = n1
+        ? n1.anchor
+        : document.createTextNode('')
     if (n1 == null) {
-        const fragmentStartAnchor = n2.el = document.createTextNode('')
-        const fragmentEndAnchor = n2.anchor = document.createTextNode('')
-        container.appendChild(fragmentStartAnchor)
-        mountChildren(n2.children, container)
-        // 这里会不会有问题?
-        container.appendChild(fragmentEndAnchor)
+        container.insertBefore(fragmentStartAnchor, anchor || null)
+        container.insertBefore(fragmentEndAnchor, anchor || null)
+        mountChildren(n2.children, container, fragmentEndAnchor)
     } else {
-        patchChildren(n1, n2, container)
+        patchChildren(n1, n2, container, fragmentEndAnchor)
     }
 }
 
-function processText(n1, n2, container) {
+function processText(n1, n2, container, anchor) {
     if (n1 == null) {
-        mountTextNode(n2, container)
+        mountTextNode(n2, container, anchor)
     } else {
         n2.el = n1.el;
         n2.el.textContent = n2.children;
@@ -147,15 +153,15 @@ function processText(n1, n2, container) {
 }
 
 // TODO
-function processComponent(n1, n2, container) {
+function processComponent(n1, n2, container, anchor) {
     if (n1 == null) {
-        mountComponent(n2, container);
+        mountComponent(n2, container, anchor);
     } else {
 
     }
 }
 
-function patchElement(n1, n2, container) {
+function patchElement(n1, n2) {
     n2.el = n1.el;
     patchProps(n2.el, n1.props, n2.props)
     patchChildren(n1, n2, n2.el)
@@ -233,7 +239,7 @@ function patchDomProp(el, key, prev, next) {
     }
 }
 
-function patchChildren(n1, n2, container) {
+function patchChildren(n1, n2, container, anchor) {
     const { shapeFlag: prevShapeFlag, children: c1 } = n1;
     const { shapeFlag, children: c2 } = n2;
 
@@ -250,7 +256,7 @@ function patchChildren(n1, n2, container) {
             // c1 was array
             if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
                 // c2 is array
-                patchUnkeyedChildren(c1, c2, container);
+                patchUnkeyedChildren(c1, c2, container, anchor);
             } else {
                 // c2 is null
                 unmountChildren(c1);
@@ -261,7 +267,7 @@ function patchChildren(n1, n2, container) {
                 container.textContent = '';
             }
             if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-                mountChildren(c2, container);
+                mountChildren(c2, container, anchor);
             }
         }
     }
@@ -271,15 +277,15 @@ function unmountChildren(children) {
     children.forEach(child => unmount(child));
 }
 
-function patchUnkeyedChildren(c1, c2, container) {
+function patchUnkeyedChildren(c1, c2, container, anchor) {
     const oldLength = c1.length;
     const newLength = c2.length;
     const commonLength = Math.min(oldLength, newLength);
     for (let i = 0; i < commonLength; i++) {
-        patch(c1[i], c2[i], container);
+        patch(c1[i], c2[i], container, anchor);
     }
     if (newLength > oldLength) {
-        mountChildren(c2.slice(commonLength))
+        mountChildren(c2.slice(commonLength), container, anchor)
     } else if (newLength < oldLength) {
         unmountChildren(c1.slice(commonLength))
     }

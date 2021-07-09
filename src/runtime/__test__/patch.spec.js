@@ -174,7 +174,7 @@ describe('patch unkeyed nodes', () => {
         expect(root.innerHTML).toBe('<div><span>item3</span><p>item2</p></div>')
     })
 
-    test('patch test', () => {
+    test('patch test 2', () => {
         render(h('div', null, [
             h('div', null, 'start'),
             h('ul', null, [
