@@ -256,7 +256,13 @@ function patchChildren(n1, n2, container, anchor) {
             // c1 was array
             if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
                 // c2 is array
-                patchUnkeyedChildren(c1, c2, container, anchor);
+                if (c1[0].key && c2[0].key) {
+                    // 简单认为头一个元素有key就都有key
+                    patchKeyedChildren(c1, c2, container, anchor);
+                } else {
+                    // console.warn('请添加一个key')
+                    patchUnkeyedChildren(c1, c2, container, anchor);
+                }
             } else {
                 // c2 is null
                 unmountChildren(c1);
@@ -288,5 +294,41 @@ function patchUnkeyedChildren(c1, c2, container, anchor) {
         mountChildren(c2.slice(commonLength), container, anchor)
     } else if (newLength < oldLength) {
         unmountChildren(c1.slice(commonLength))
+    }
+}
+
+// 不用考虑children是fragment的情况，因为fragment没有key
+// 而且平级的fragment间也没有上联合diff的必要
+function patchKeyedChildren(c1, c2, container, anchor) {
+    for (let i = 0; i < c2.length; i++) {
+        let lastIndex = 0;
+        let find = false;
+        for (let j = 0; j < c1.length; j++) {
+            const prev = c1[j];
+            const next = c2[i];
+            if (prev.key === next.key) {
+                find = true;
+                patch(prev, next, container, anchor);
+                if (j < lastIndex) {
+                    const curAnchor = c2[i - 1].el.nextSibling;
+                    container.insertBefore(next.el, curAnchor);
+                } else {
+                    lastIndex = j;
+                }
+                break;
+            }
+        }
+        if (!find) {
+            const curAnchor = i === 0
+                ? c1[0].el
+                : c2[i - 1].el.nextSibling;
+            patch(null, next, container, curAnchor)
+        }
+    }
+    for (let i = 0; i < c1.length; i++) {
+        const prev = c1[i];
+        if (!c2.find(next => next.key === prev.key)) {
+            unmount(prev);
+        }
     }
 }
