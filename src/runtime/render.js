@@ -256,8 +256,8 @@ function patchChildren(n1, n2, container, anchor) {
             // c1 was array
             if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
                 // c2 is array
-                if (c1[0].key && c2[0].key) {
-                    // 简单认为头一个元素有key就都有key
+                // 简单认为头一个元素有key就都有key
+                if (c1[0] && c1[0].key && c2[0] && c2[0].key) {
                     patchKeyedChildren(c1, c2, container, anchor);
                 } else {
                     // console.warn('请添加一个key')
@@ -300,12 +300,12 @@ function patchUnkeyedChildren(c1, c2, container, anchor) {
 // 不用考虑children是fragment的情况，因为fragment没有key
 // 而且平级的fragment间也没有上联合diff的必要
 function patchKeyedChildren(c1, c2, container, anchor) {
+    let lastIndex = 0;
     for (let i = 0; i < c2.length; i++) {
-        let lastIndex = 0;
+        const next = c2[i];
         let find = false;
         for (let j = 0; j < c1.length; j++) {
             const prev = c1[j];
-            const next = c2[i];
             if (prev.key === next.key) {
                 find = true;
                 patch(prev, next, container, anchor);
