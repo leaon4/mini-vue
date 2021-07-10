@@ -226,36 +226,139 @@ function patchUnkeyedChildren(c1, c2, container, anchor) {
     }
 }
 
-// 不用考虑children是fragment的情况，因为fragment没有key
-// 而且平级的fragment间也没有上联合diff的必要
-// 并假设没有重复key
 function patchKeyedChildren(c1, c2, container, anchor) {
-    const map = new Map();
-    c1.forEach((prev, j) => {
-        map.set(prev.key, { prev, j });
-    });
-    let lastIndex = 0;
-    for (let i = 0; i < c2.length; i++) {
-        const next = c2[i];
-        const curAnchor = i === 0
-            ? c1[0].el
-            : c2[i - 1].el.nextSibling;
-        if (map.has(next.key)) {
-            const { prev, j } = map.get(next.key);
-            patch(prev, next, container, anchor);
-            if (j < lastIndex) {
-                container.insertBefore(next.el, curAnchor);
+    let i = 0, e1 = c1.length - 1, e2 = c2.length - 1;
+    // 1.从左至右依次比对
+    // key的判断可能要换成isSameVNodetype
+    while (i <= e1 && i <= e2 && c1[i].key === c2[i].key) {
+        patch(c1[i], c2[i], container, anchor);
+        i++;
+    }
+
+    // 2.从右至左依次比对
+    while (i <= e1 && i <= e2 && c1[e1].key === c2[e2].key) {
+        patch(c1[e1], c2[e2], container, anchor);
+        e1--;
+        e2--;
+    }
+
+    if (i > e1) {
+        // 3.经过1、2直接将旧结点比对完，则剩下的新结点直接mount
+        for (let j = i; j <= e2; j++) {
+            const nextPos = e2 + 1;
+            const curAnchor = (c2[nextPos] && c2[nextPos].el) || anchor;
+            patch(null, c2[j], container, curAnchor);
+        }
+    } else if (i > e2) {
+        // 3.经过1、2直接将新结点比对完，则剩下的旧结点直接unmount
+        for (let j = i; j <= e1; j++) {
+            unmount(c1[j]);
+        }
+    } else {
+        // 4.采用传统diff算法，但不真的添加和移动，只做标记和删除
+        const map = new Map();
+        for (let j = i; j <= e1; j++) {
+            const prev = c1[j];
+            map.set(prev.key, { prev, j });
+        }
+        let maxIndex = 0;
+        let move = false;
+        let toMounted = [];
+        const source = new Array(e2 - i + 1).fill(-1);
+        for (let k = 0; k < e2 - i + 1; k++) {
+            const next = c2[k + i];
+            if (map.has(next.key)) {
+                const { prev, j } = map.get(next.key);
+                patch(prev, next, container, anchor);
+                if (j < maxIndex) {
+                    move = true;
+                } else {
+                    maxIndex = j;
+                }
+                source[k] = j;
+                map.delete(next.key);
             } else {
-                lastIndex = j;
+                // 将待新添加的节点放入toMounted
+                toMounted.push(k + i);
             }
-            map.delete(next.key);
-        } else {
-            patch(null, next, container, curAnchor)
+        }
+
+        // 先刪除多余旧节点
+        map.forEach(({ prev }) => {
+            unmount(prev);
+        })
+
+        if (move) {
+            // 6.需要移动，则采用新的最长上升子序列算法
+            const seq = getSequence(source);
+            let j = seq.length - 1;
+            for (let k = source.length - 1; k >= 0; k--) {
+                if (k === seq[j] && source[k] !== -1) {
+                    // 不用移动
+                    j--;
+                } else {
+                    const pos = k + i;
+                    const nextPos = pos + 1;
+                    const curAnchor = (c2[nextPos] && c2[nextPos].el) || anchor;
+                    if (source[k] === -1) {
+                        // mount
+                        patch(null, c2[pos], container, curAnchor);
+                    } else {
+                        // 移动
+                        container.insertBefore(c2[pos].el, curAnchor);
+                    }
+                }
+            }
+        } else if (toMounted.length) {
+            // 7.不需要移动，但还有未添加的元素
+            for (let k = toMounted.length - 1; k >= 0; k--) {
+                const pos = toMounted[k];
+                const nextPos = pos + 1;
+                const curAnchor = (c2[nextPos] && c2[nextPos].el) || anchor;
+                patch(null, c2[pos], container, curAnchor);
+            }
         }
     }
-    map.forEach(({ prev }) => {
-        if (!c2.find(next => next.key === prev.key)) {
-            unmount(prev);
+}
+
+// https://en.wikipedia.org/wiki/Longest_increasing_subsequence
+function getSequence(arr) {
+    const p = arr.slice()
+    const result = [0]
+    let i, j, u, v, c
+    const len = arr.length
+    for (i = 0; i < len; i++) {
+        const arrI = arr[i]
+        if (arrI !== 0) {
+            j = result[result.length - 1]
+            if (arr[j] < arrI) {
+                p[i] = j
+                result.push(i)
+                continue
+            }
+            u = 0
+            v = result.length - 1
+            while (u < v) {
+                c = ((u + v) / 2) | 0
+                if (arr[result[c]] < arrI) {
+                    u = c + 1
+                } else {
+                    v = c
+                }
+            }
+            if (arrI < arr[result[u]]) {
+                if (u > 0) {
+                    p[i] = result[u - 1]
+                }
+                result[u] = i
+            }
         }
-    })
+    }
+    u = result.length
+    v = result[u - 1]
+    while (u-- > 0) {
+        result[u] = v
+        v = p[v]
+    }
+    return result
 }

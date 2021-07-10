@@ -1,6 +1,6 @@
 // 原始版本
 function patchKeyedChildren(c1, c2, container, anchor) {
-    let lastIndex = 0;
+    let maxIndex = 0;
     for (let i = 0; i < c2.length; i++) {
         const next = c2[i];
         let find = false;
@@ -9,11 +9,11 @@ function patchKeyedChildren(c1, c2, container, anchor) {
             if (prev.key === next.key) {
                 find = true;
                 patch(prev, next, container, anchor);
-                if (j < lastIndex) {
+                if (j < maxIndex) {
                     const curAnchor = c2[i - 1].el.nextSibling;
                     container.insertBefore(next.el, curAnchor);
                 } else {
-                    lastIndex = j;
+                    maxIndex = j;
                 }
                 break;
             }
@@ -36,7 +36,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 
 // 这个版本可以兼容没有key的情况。但没有意义
 function patchKeyedChildren(c1, c2, container, anchor) {
-    let lastIndex = 0;
+    let maxIndex = 0;
     for (let i = 0; i < c2.length; i++) {
         const next = c2[i];
         if (next.key == null) {
@@ -55,11 +55,11 @@ function patchKeyedChildren(c1, c2, container, anchor) {
             if (prev.key === next.key) {
                 find = true;
                 patch(prev, next, container, anchor);
-                if (j < lastIndex) {
+                if (j < maxIndex) {
                     const curAnchor = c2[i - 1].el.nextSibling;
                     container.insertBefore(next.el, curAnchor);
                 } else {
-                    lastIndex = j;
+                    maxIndex = j;
                 }
                 break;
             }
@@ -88,7 +88,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
     c1.forEach((prev, j) => {
         map.set(prev.key, { prev, j });
     });
-    let lastIndex = 0;
+    let maxIndex = 0;
     for (let i = 0; i < c2.length; i++) {
         const next = c2[i];
         const curAnchor = i === 0
@@ -97,10 +97,10 @@ function patchKeyedChildren(c1, c2, container, anchor) {
         if (map.has(next.key)) {
             const { prev, j } = map.get(next.key);
             patch(prev, next, container, anchor);
-            if (j < lastIndex) {
+            if (j < maxIndex) {
                 container.insertBefore(next.el, curAnchor);
             } else {
-                lastIndex = j;
+                maxIndex = j;
             }
             map.delete(next.key);
         } else {
@@ -108,8 +108,6 @@ function patchKeyedChildren(c1, c2, container, anchor) {
         }
     }
     map.forEach(({ prev }) => {
-        if (!c2.find(next => next.key === prev.key)) {
-            unmount(prev);
-        }
+        unmount(prev);
     })
 }
