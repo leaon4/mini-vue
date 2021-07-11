@@ -321,44 +321,40 @@ function patchKeyedChildren(c1, c2, container, anchor) {
     }
 }
 
-// https://en.wikipedia.org/wiki/Longest_increasing_subsequence
-function getSequence(arr) {
-    const p = arr.slice()
-    const result = [0]
-    let i, j, u, v, c
-    const len = arr.length
-    for (i = 0; i < len; i++) {
-        const arrI = arr[i]
-        if (arrI !== 0) {
-            j = result[result.length - 1]
-            if (arr[j] < arrI) {
-                p[i] = j
-                result.push(i)
-                continue
-            }
-            u = 0
-            v = result.length - 1
-            while (u < v) {
-                c = ((u + v) / 2) | 0
-                if (arr[result[c]] < arrI) {
-                    u = c + 1
+function getSequence(nums) {
+    let result = [];
+    let position = []
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] === -1) {
+            continue;
+        }
+        // result[result.length - 1]可能为undefined，此时nums[i] > undefined为false
+        if (nums[i] > result[result.length - 1]) {
+            result.push(nums[i]);
+            position.push(result.length - 1)
+        } else {
+            let l = 0, r = result.length - 1;
+            while (l <= r) {
+                let mid = ~~((l + r) / 2);
+                if (nums[i] > result[mid]) {
+                    l = mid + 1;
+                } else if (nums[i] < result[mid]) {
+                    r = mid - 1;
                 } else {
-                    v = c
+                    l = mid;
+                    break;
                 }
             }
-            if (arrI < arr[result[u]]) {
-                if (u > 0) {
-                    p[i] = result[u - 1]
-                }
-                result[u] = i
-            }
+            result[l] = nums[i]
+            position.push(l)
         }
     }
-    u = result.length
-    v = result[u - 1]
-    while (u-- > 0) {
-        result[u] = v
-        v = p[v]
+    let cur = result.length - 1;
+    // 这里复用了result，它本身已经没用了
+    for (let i = position.length; i >= 0 && cur >= 0; i--) {
+        if (position[i] === cur) {
+            result[cur--] = i;
+        }
     }
-    return result
-}
+    return result;
+};

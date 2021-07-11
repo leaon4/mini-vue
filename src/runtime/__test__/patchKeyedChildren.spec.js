@@ -40,6 +40,15 @@ describe('renderer: keyed children', () => {
         expect(serialize(elm.children[2])).toBe('<span>3</span>')
     })
 
+    test('reverse and append', () => {
+        elm = renderChildren([1, 2])
+        expect(elm.children.length).toBe(2)
+
+        elm = renderChildren([2, 1, 3])
+        expect(elm.children.length).toBe(3)
+        expect(inner(elm)).toBe('<span>2</span><span>1</span><span>3</span>')
+    })
+
     test('prepend', () => {
         elm = renderChildren([4, 5])
         expect(elm.children.length).toBe(2)
