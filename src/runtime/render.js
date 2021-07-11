@@ -244,9 +244,9 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 
     if (i > e1) {
         // 3.经过1、2直接将旧结点比对完，则剩下的新结点直接mount
+        const nextPos = e2 + 1;
+        const curAnchor = (c2[nextPos] && c2[nextPos].el) || anchor;
         for (let j = i; j <= e2; j++) {
-            const nextPos = e2 + 1;
-            const curAnchor = (c2[nextPos] && c2[nextPos].el) || anchor;
             patch(null, c2[j], container, curAnchor);
         }
     } else if (i > e2) {
@@ -351,7 +351,7 @@ function getSequence(nums) {
     }
     let cur = result.length - 1;
     // 这里复用了result，它本身已经没用了
-    for (let i = position.length; i >= 0 && cur >= 0; i--) {
+    for (let i = position.length - 1; i >= 0 && cur >= 0; i--) {
         if (position[i] === cur) {
             result[cur--] = i;
         }

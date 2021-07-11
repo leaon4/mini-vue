@@ -204,7 +204,7 @@ function lengthOfLIS(nums) {
 };
 
 // 最终版，略过-1
-function lengthOfLIS(nums) {
+function getSequence(nums) {
     let result = [];
     let position = []
     for (let i = 0; i < nums.length; i++) {
@@ -234,7 +234,7 @@ function lengthOfLIS(nums) {
     }
     let cur = result.length - 1;
     // 这里复用了result，它本身已经没用了
-    for (let i = position.length; i >= 0 && cur >= 0; i--) {
+    for (let i = position.length - 1; i >= 0 && cur >= 0; i--) {
         if (position[i] === cur) {
             result[cur--] = i;
         }
