@@ -304,7 +304,9 @@ describe('update component trigger by self', () => {
         lastName.value = 'b';
         expect(root.innerHTML).toBe('<div>a b</div>');
     });
+})
 
+describe('update component trigger by others', () => {
     it('should update an Component tag which is already mounted', () => {
         const Comp1 = {
             render: () => {
@@ -323,7 +325,7 @@ describe('update component trigger by self', () => {
         expect(root.innerHTML).toBe('<span>foo</span>')
 
         const Comp3 = {
-            render: () => {
+            render: (ctx) => {
                 return h('p', null, 'bar')
             }
         }
@@ -331,37 +333,217 @@ describe('update component trigger by self', () => {
         expect(root.innerHTML).toBe('<p>bar</p>')
     })
 
-    // TODO: 可能需要watchEffect?
-    // test('normal effect', () => {
-    //     const firstName = ref('james');
-    //     const lastName = ref('bond');
-    //     const Comp = {
-    //         setup() {
-    //             let fullName;
-    //             effect(() => {
-    //                 fullName = `${firstName.value} ${lastName.value}`;
-    //             });
-    //             return {
-    //                 fullName
-    //             }
-    //         },
-    //         render(ctx) {
-    //             return h('div', null, ctx.fullName);
-    //         }
-    //     }
-    //     render(h(Comp), root)
-    //     expect(root.innerHTML).toBe('<div>james bond</div>');
+    test('same component with diffrent props', () => {
+        const Comp = {
+            props: ['text'],
+            render: (ctx) => {
+                return h('p', null, ctx.text)
+            }
+        }
+        render(h(Comp, { text: 'bar' }), root)
+        expect(root.innerHTML).toBe('<p>bar</p>')
 
-    //     firstName.value = 'a';
-    //     expect(root.innerHTML).toBe('<div>a bond</div>');
+        render(h(Comp, { text: 'baz' }), root)
+        expect(root.innerHTML).toBe('<p>baz</p>')
+    })
 
-    //     lastName.value = 'b';
-    //     expect(root.innerHTML).toBe('<div>a b</div>');
-    // });
-})
+    test('element and component switch', () => {
+        render(h('div', null, [
+            h('div', null, 'child')
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<div>child</div>')
 
-describe('renderer: component', () => {
-    /* test('should update parent(hoc) component host el when child component self update', async () => {
+        const Comp = {
+            render() {
+                return h('p', null, 'comp')
+            }
+        }
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<p>comp</p>')
+
+        render(h('div', null, [
+            h('div', null, 'child')
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<div>child</div>')
+
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<p>comp</p>')
+    })
+
+    test('component and text switch', () => {
+        render(h('div', null, [
+            h(Text, null, 'child')
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('child')
+
+        const Comp = {
+            render() {
+                return h('p', null, 'comp')
+            }
+        }
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<p>comp</p>')
+
+        render(h('div', null, [
+            h(Text, null, 'child')
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('child')
+
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<p>comp</p>')
+    })
+
+    test('component and fragment switch', () => {
+        render(h('div', null, [
+            h(Fragment, null, [h('h1'), h(Text, null, 'child')])
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<h1></h1>child')
+
+        const Comp = {
+            render() {
+                return h('p', null, 'comp')
+            }
+        }
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<p>comp</p>')
+
+        render(h('div', null, [
+            h(Fragment, null, [h('h1'), h(Text, null, 'child')])
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<h1></h1>child')
+
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.children[0].innerHTML).toBe('<p>comp</p>')
+    })
+
+    test('parent element of component change', () => {
+        const Comp = {
+            props: ['text'],
+            render(ctx) {
+                return h('p', null, ctx.text)
+            }
+        }
+
+        render(h('div', null, [
+            h(Comp)
+        ]), root);
+        expect(root.innerHTML).toBe('<div><p></p></div>')
+
+        render(h('h1', null, [
+            h(Comp, { text: 'text' })
+        ]), root);
+        expect(root.innerHTML).toBe('<h1><p>text</p></h1>')
+    })
+
+    test('parent props update make child update', () => {
+        const text = ref('text');
+        const id = 'id';
+        const Parent = {
+            render() {
+                return h(Child, { text: text.value, id: id.value })
+            }
+        };
+
+        const Child = {
+            props: ['text'],
+            render(ctx) {
+                return h('div', null, ctx.text);
+            }
+        }
+
+        render(h(Parent), root);
+        expect(root.innerHTML).toBe('<div id="id">text</div>')
+
+        text.value = 'foo';
+        expect(root.innerHTML).toBe('<div id="id">foo</div>')
+
+        id.value = 'bar;'
+        expect(root.innerHTML).toBe('<div id="bar">foo</div>')
+    })
+
+    test('child will not update when props have not change', () => {
+        const text = ref('text');
+        const id = 'id';
+        const anotherText = ref('a')
+        const Parent = {
+            render() {
+                return [
+                    h(Text, null, anotherText.value),
+                    h(Child, { text: text.value, id: id.value })
+                ];
+            }
+        };
+
+        let renderCount = 0;
+        const Child = {
+            props: ['text'],
+            render(ctx) {
+                renderCount++;
+                return h('div', null, ctx.text);
+            }
+        }
+
+        render(h(Parent), root);
+        expect(root.innerHTML).toBe('a<div id="id">text</div>')
+        expect(renderCount).toBe(1)
+
+        anotherText.value = 'b';
+        expect(root.innerHTML).toBe('b<div id="id">text</div>')
+        expect(renderCount).toBe(1)
+    })
+
+    test('switch child', () => {
+        const Parent = {
+            setup() {
+                const toggle = ref(true);
+                const click = () => {
+                    toggle.value = !toggle.value;
+                }
+                return {
+                    counter,
+                    click
+                }
+            },
+            render(ctx) {
+                return [
+                    ctx.toggle.value ? h(Child1) : h(Child2),
+                    h('button', { onClick: ctx.click }, 'click'),
+                ];
+            }
+        };
+
+        const Child1 = {
+            render() {
+                return h('div')
+            }
+        }
+
+        const Child2 = {
+            render() {
+                return h('p')
+            }
+        }
+
+        render(h(Parent), root);
+        expect(root.innerHTML).toBe('<div></div><button>click</button>')
+
+        root.child[1].click();
+        expect(root.innerHTML).toBe('<p></p><button>click</button>')
+    })
+
+    test('should update parent(hoc) component host el when child component self update', async () => {
         const value = ref(true)
         let parentVnode
         let childVnode1
@@ -382,32 +564,12 @@ describe('renderer: component', () => {
             }
         }
 
-        const root = nodeOps.createElement('div')
         render(h(Parent), root)
-        expect(serializeInner(root)).toBe(`<div></div>`)
-        expect(parentVnode!.el).toBe(childVnode1!.el)
+        expect(root.innerHTML).toBe(`<div></div>`)
+        expect(parentVnode.el).toBe(childVnode1.el)
 
         value.value = false
-        await nextTick()
-        expect(serializeInner(root)).toBe(`<span></span>`)
-        expect(parentVnode!.el).toBe(childVnode2!.el)
-    }) */
-
-    // it('should update an Component tag which is already mounted', () => {
-    //     const Comp1 = {
-    //         render: () => {
-    //             return h('div', null, 'foo')
-    //         }
-    //     }
-    //     render(h(Comp1), root)
-    //     expect(root.innerHTML).toBe('<div>foo</div>')
-
-    //     const Comp2 = {
-    //         render: () => {
-    //             return h('span', null, 'foo')
-    //         }
-    //     }
-    //     render(h(Comp2), root)
-    //     expect(root.innerHTML).toBe('<span>foo</span>')
-    // })
+        expect(root.innerHTML).toBe(`<span></span>`)
+        expect(parentVnode.el).toBe(childVnode2.el)
+    })
 })
