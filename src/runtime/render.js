@@ -66,16 +66,7 @@ function mountChildren(children, container, anchor) {
     });
 }
 
-// TODO
 function mountComponent(vnode, container, anchor) {
-    if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-        mountStatefulComponent(vnode, container, anchor);
-    } else {
-
-    }
-}
-
-function mountStatefulComponent(vnode, container, anchor) {
     const { type: originalComp, props: vnodeProps } = vnode;
 
     const instance = {
