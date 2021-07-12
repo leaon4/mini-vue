@@ -101,12 +101,12 @@ function mountStatefulComponent(vnode, container, anchor) {
         ...instance.props,// 解构后应该没有响应式了
         ...instance.setupState
     });
-    const subtree = instance.subtree = normalizeVNode(originalComp.render(instance.ctx));
-    subtree.props = {
-        ...subtree.props,
+    const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
+    subTree.props = {
+        ...subTree.props,
         ...instance.attrs
     };
-    patch(null, subtree, container, anchor);
+    patch(null, subTree, container, anchor);
     vnode.component = instance;
 }
 
@@ -121,9 +121,9 @@ function unmount(vnode) {
     }
 }
 
-// TODO
 function unmountComponent(vnode) {
-
+    const { component } = vnode;
+    unmount(component.subTree);
 }
 
 function unmountFragment(vnode) {

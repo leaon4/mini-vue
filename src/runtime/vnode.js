@@ -49,7 +49,8 @@ export function h(type, props = null, children = null) {
         shapeFlag,
         el: null,
         anchor: null,
-        key: props && props.key || null
+        key: props && props.key || null,
+        component: null,
     };
 }
 
