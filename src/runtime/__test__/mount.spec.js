@@ -169,9 +169,8 @@ describe('mount', () => {
         const root = document.createElement('div')
         const Comp = {
             props: ['foo'],
-            // 使用this太tricky，不实现了。改为传参
             render(ctx) {
-                // ctx即是this
+                // ctx即是this，省略this实现
                 return h('div', null, ctx.foo)
             }
         }

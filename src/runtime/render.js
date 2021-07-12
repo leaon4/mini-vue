@@ -1,5 +1,6 @@
 import { h, Text, Fragment, ShapeFlags } from './vnode';
 import { patchProps } from './patchProps';
+import { reactive } from '../reactivity'
 
 export function render(vnode, container) {
     const prevVNode = container._vnode;
@@ -66,28 +67,47 @@ function mountChildren(children, container, anchor) {
 }
 
 // TODO
-function mountComponent(vnode, container) {
+function mountComponent(vnode, container, anchor) {
     if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-        mountStatefulComponent(vnode, container);
+        mountStatefulComponent(vnode, container, anchor);
     } else {
 
     }
 }
 
-function mountStatefulComponent(vnode, container) {
-    const { type: comp, props } = vnode;
+function mountStatefulComponent(vnode, container, anchor) {
+    const { type: originalComp, props: vnodeProps } = vnode;
 
-    const ctx = {}
-    if (props && comp.props) {
-        comp.props.forEach(key => {
-            if (key in props) {
-                ctx[key] = props[key]
-            }
-        });
+    const instance = {
+        // type: originalComp, // 和vue3一致，但暂时没用
+        props: {},
+        attrs: {},
+        setupState: null,
+        ctx: null,
+        // 源码：instance.setupState = proxyRefs(setupResult)
+    };
+
+    for (const key in vnodeProps) {
+        if (originalComp.props && originalComp.props.includes(key)) {
+            instance.props[key] = vnodeProps[key];
+        } else {
+            instance.attrs[key] = vnodeProps[key];
+        }
     }
 
-    const subtree = comp.render(ctx);
-    patch(null, subtree, container);
+    instance.props = reactive(instance.props);
+    instance.setupState = originalComp.setup?.(instance.props, { attrs: instance.attrs });
+    instance.ctx = reactive({
+        ...instance.props,// 解构后应该没有响应式了
+        ...instance.setupState
+    });
+    const subtree = instance.subtree = originalComp.render(instance.ctx);
+    subtree.props = {
+        ...subtree.props,
+        ...instance.attrs
+    };
+    patch(null, subtree, container, anchor);
+    vnode.component = instance;
 }
 
 function unmount(vnode) {
