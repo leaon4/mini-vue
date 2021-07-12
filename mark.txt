@@ -9,6 +9,8 @@
 
 4.props为什么要shallowReactive?
 
+5.列表的props到底可不可以直接改
+
 todo:
 .unref
 .添加，for in，数组都还没有响应式

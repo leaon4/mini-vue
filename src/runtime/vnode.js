@@ -58,9 +58,10 @@ export function h(type, props = null, children = null) {
         children,
         shapeFlag,
         el: null,
-        anchor: null,
+        anchor: null, // fragment专有
         key: props && props.key || null,
-        component: null,
+        component: null, // 组件的instance
+        next: null,// 组件更新时，把新vnode暂放在这里
     };
 }
 

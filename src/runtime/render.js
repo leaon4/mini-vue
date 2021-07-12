@@ -66,8 +66,21 @@ function mountChildren(children, container, anchor) {
     });
 }
 
-function mountComponent(vnode, container, anchor) {
+function updateComponentProps(instance, vnode) {
     const { type: originalComp, props: vnodeProps } = vnode;
+    for (const key in vnodeProps) {
+        if (originalComp.props && originalComp.props.includes(key)) {
+            instance.props[key] = vnodeProps[key];
+        } else {
+            instance.attrs[key] = vnodeProps[key];
+        }
+    }
+    // toThink: props源码是shallowReactive，确实需要吗?
+    instance.props = reactive(instance.props);
+}
+
+function mountComponent(vnode, container, anchor) {
+    const { type: originalComp } = vnode;
 
     const instance = {
         // type: originalComp, // 和vue3一致，但暂时没用
@@ -80,16 +93,8 @@ function mountComponent(vnode, container, anchor) {
         isMounted: false,
     };
 
-    for (const key in vnodeProps) {
-        if (originalComp.props && originalComp.props.includes(key)) {
-            instance.props[key] = vnodeProps[key];
-        } else {
-            instance.attrs[key] = vnodeProps[key];
-        }
-    }
+    updateComponentProps(instance, vnode);
 
-    // toThink: props源码是shallowReactive，确实需要吗?
-    instance.props = reactive(instance.props);
     instance.setupState = originalComp.setup?.(instance.props, { attrs: instance.attrs });
 
     // toThink: ctx需要响应式吗?
@@ -113,6 +118,19 @@ function mountComponent(vnode, container, anchor) {
             vnode.el = subTree.el;
         } else {
             // update
+
+            // instance.next存在，代表是被动更新。否则是主动更新
+            if (instance.next) {
+                vnode = instance.next;
+                instance.next = null;
+                instance.props = reactive(instance.props);
+                updateComponentProps(instance, vnode);
+                instance.ctx = {
+                    ...instance.props,
+                    ...instance.setupState
+                };
+            }
+
             const prev = instance.subTree;
             const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
             if (Object.keys(instance.attrs)) {
@@ -121,8 +139,9 @@ function mountComponent(vnode, container, anchor) {
                     ...instance.attrs
                 };
             }
-            // TODO: el的交接，container, anchor的问题
+            // anchor may have changed if it's in a fragment
             patch(prev, subTree, container, anchor);
+            vnode.el = subTree.el;
         }
     })
     vnode.component = instance;
@@ -130,6 +149,7 @@ function mountComponent(vnode, container, anchor) {
 
 function updateComponent(n1, n2) {
     n2.component = n1.component;
+    n2.component.next = n2;
     n2.component.update();
 }
 
