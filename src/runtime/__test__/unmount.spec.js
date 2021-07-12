@@ -91,8 +91,13 @@ describe('unmount from inner', () => {
         expect(root.innerHTML).toBe('<div><p></p></div>')
     })
 
-    // TODO
     test('unmount fragment', () => {
+        render(h('div', null, [
+            h(Fragment, null, [h('h1'), h('h2'), h('h3')])
+        ]), root);
+        expect(root.innerHTML).toBe('<div><h1></h1><h2></h2><h3></h3></div>')
 
+        render(h('div'), root);
+        expect(root.innerHTML).toBe('<div></div>')
     })
 })

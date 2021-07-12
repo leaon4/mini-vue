@@ -52,3 +52,13 @@ export function h(type, props = null, children = null) {
         key: props && props.key || null
     };
 }
+
+export function normalizeVNode(result) {
+    if (isObject(result)) {
+        return result;
+    }
+    if (Array.isArray(result)) {
+        return h(Fragment, null, result);
+    }
+    return h(Text, null, result);
+}

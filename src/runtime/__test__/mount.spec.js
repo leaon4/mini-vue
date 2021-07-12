@@ -150,35 +150,4 @@ describe('mount', () => {
         expect(div.name).toBe(undefined)
         expect(div.getAttribute('name')).toBe('b')
     })
-
-    test('mount component 1', () => {
-        const root = document.createElement('div')
-        const Comp = {
-            render() {
-                return h('div')
-            }
-        }
-        const vnode = h(Comp)
-        render(vnode, root)
-
-        const el = root.children[0]
-        expect(getTag(el)).toBe('div')
-    })
-
-    test('mount component 2', () => {
-        const root = document.createElement('div')
-        const Comp = {
-            props: ['foo'],
-            render(ctx) {
-                // ctx即是this，省略this实现
-                return h('div', null, ctx.foo)
-            }
-        }
-        const vnode = h(Comp, { foo: 'foo' })
-        render(vnode, root)
-
-        const el = root.children[0]
-        expect(el.firstChild.textContent).toBe('foo')
-    })
-
 })

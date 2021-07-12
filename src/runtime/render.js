@@ -1,4 +1,4 @@
-import { h, Text, Fragment, ShapeFlags } from './vnode';
+import { h, Text, Fragment, ShapeFlags, normalizeVNode } from './vnode';
 import { patchProps } from './patchProps';
 import { reactive } from '../reactivity'
 
@@ -101,7 +101,7 @@ function mountStatefulComponent(vnode, container, anchor) {
         ...instance.props,// 解构后应该没有响应式了
         ...instance.setupState
     });
-    const subtree = instance.subtree = originalComp.render(instance.ctx);
+    const subtree = instance.subtree = normalizeVNode(originalComp.render(instance.ctx));
     subtree.props = {
         ...subtree.props,
         ...instance.attrs

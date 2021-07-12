@@ -1,10 +1,103 @@
 import { render } from "../render";
 import { h, Text, Fragment } from '../vnode';
+import { ref, reactive, effect } from '../../reactivity';
 
 let root;
 beforeEach(() => {
     root = document.createElement('div');
 });
+
+describe('mount component', () => {
+    test('mount simple component', () => {
+        const Comp = {
+            render() {
+                return h('div')
+            }
+        }
+        render(h(Comp), root)
+        expect(root.innerHTML).toBe('<div></div>')
+    })
+
+    test('mount component with props', () => {
+        let foo, bar;
+        const Comp = {
+            props: ['foo'],
+            render(ctx) {
+                foo = ctx.foo;
+                bar = ctx.bar;
+                // ctx即是this，省略this实现
+                return h('div', null, ctx.foo)
+            }
+        }
+        render(h(Comp, { foo: 'foo', bar: 'bar' }), root)
+        expect(root.innerHTML).toBe('<div bar="bar">foo</div>')
+        expect(foo).toBe('foo')
+        expect(bar).toBeUndefined()
+    })
+
+    it('should create an Component with props', () => {
+        const Comp = {
+            render: () => {
+                return h('div')
+            }
+        }
+        render(h(Comp, { id: 'foo', class: 'bar' }), root)
+        expect(root.innerHTML).toBe(`<div id="foo" class="bar"></div>`)
+    })
+
+    it('should create an Component with direct text children', () => {
+        const Comp = {
+            render: () => {
+                return h('div', null, 'test')
+            }
+        }
+        render(h(Comp, { id: 'foo', class: 'bar' }), root)
+        expect(root.innerHTML).toBe(`<div id="foo" class="bar">test</div>`)
+    })
+
+    it('should expose return values to template render context', () => {
+        const Comp = {
+            setup() {
+                return {
+                    // TODO unref
+                    // ref should auto-unwrap
+                    ref: ref('foo'),
+                    // object exposed as-is
+                    object: reactive({ msg: 'bar' }),
+                    // primitive value exposed as-is
+                    value: 'baz'
+                }
+            },
+            render(ctx) {
+                return `${ctx.ref.value} ${ctx.object.msg} ${ctx.value}`
+            }
+        }
+        render(h(Comp), root)
+        expect(root.innerHTML).toBe(`foo bar baz`)
+    })
+
+    // it('setup result with event', () => {
+    //     const Comp = {
+    //         setup() {
+    //             const counter = ref(0);
+    //             const click = () => {
+    //                 counter.value++;
+    //             }
+    //             return {
+    //                 counter,
+    //                 click
+    //             }
+    //         },
+    //         render(ctx) {
+    //             return h('div', { onClick: ctx.click }, ctx.counter.value);
+    //         }
+    //     }
+    //     render(h(Comp), root)
+    //     expect(root.innerHTML).toBe('<div>0</div>')
+    //     root.children[0].click();
+
+    // })
+})
 
 describe('renderer: component', () => {
     /* test('should update parent(hoc) component host el when child component self update', async () => {
@@ -38,26 +131,6 @@ describe('renderer: component', () => {
         expect(serializeInner(root)).toBe(`<span></span>`)
         expect(parentVnode!.el).toBe(childVnode2!.el)
     }) */
-
-    it('should create an Component with props', () => {
-        const Comp = {
-            render: () => {
-                return h('div')
-            }
-        }
-        render(h(Comp, { id: 'foo', class: 'bar' }), root)
-        expect(root.innerHTML).toBe(`<div id="foo" class="bar"></div>`)
-    })
-
-    it('should create an Component with direct text children', () => {
-        const Comp = {
-            render: () => {
-                return h('div', null, 'test')
-            }
-        }
-        render(h(Comp, { id: 'foo', class: 'bar' }), root)
-        expect(root.innerHTML).toBe(`<div id="foo" class="bar">test</div>`)
-    })
 
     // it('should update an Component tag which is already mounted', () => {
     //     const Comp1 = {
