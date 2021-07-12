@@ -1,6 +1,6 @@
 import { render } from "../render";
 import { h, Text, Fragment } from '../vnode';
-import { ref, reactive, effect } from '../../reactivity';
+import { ref, reactive, effect, computed } from '../../reactivity';
 
 let root;
 beforeEach(() => {
@@ -194,7 +194,7 @@ describe('unmount component', () => {
 })
 
 describe('update component trigger by self', () => {
-    it('setup result with event and update', () => {
+    test('setup result with event and update', () => {
         const Comp = {
             setup() {
                 const counter = ref(0);
@@ -218,6 +218,146 @@ describe('update component trigger by self', () => {
         root.children[0].click();
         expect(root.innerHTML).toBe('<div>3</div>')
     })
+
+    test('reactive child, style and class', () => {
+        const observed = reactive({
+            child: 'child',
+            class: 'a',
+            style: {
+                color: 'red'
+            }
+        });
+        const Comp = {
+            setup() {
+                return {
+                    observed
+                }
+            },
+            render(ctx) {
+                return h('div', {
+                    class: ctx.observed.class,
+                    style: ctx.observed.style
+                }, ctx.observed.child);
+            }
+        }
+        render(h(Comp), root)
+        expect(root.innerHTML).toBe('<div class="a" style="color: red;">child</div>');
+
+        observed.class = 'b';
+        expect(root.innerHTML).toBe('<div class="b" style="color: red;">child</div>');
+
+        observed.style.color = 'blue';
+        expect(root.innerHTML).toBe('<div class="b" style="color: blue;">child</div>');
+
+        observed.child = '';
+        expect(root.innerHTML).toBe('<div class="b" style="color: blue;"></div>');
+    })
+
+    test('observed props', () => {
+        const observed = reactive({
+            child: 'child',
+            class: 'a',
+            style: {
+                color: 'red'
+            }
+        });
+        const Comp = {
+            render() {
+                return h('div', observed);
+            }
+        }
+        render(h(Comp), root)
+        expect(root.innerHTML).toBe('<div child="child" class="a" style="color: red;"></div>');
+
+        observed.class = 'b';
+        expect(root.innerHTML).toBe('<div child="child" class="b" style="color: red;"></div>');
+
+        observed.style.color = 'blue';
+        expect(root.innerHTML).toBe('<div child="child" class="b" style="color: blue;"></div>');
+
+        observed.child = '';
+        expect(root.innerHTML).toBe('<div child="" class="b" style="color: blue;"></div>');
+    });
+
+    test('computed and ref props', () => {
+        const firstName = ref('james');
+        const lastName = ref('bond');
+        const Comp = {
+            setup() {
+                const fullName = computed(() => {
+                    return `${firstName.value} ${lastName.value}`;
+                });
+                return {
+                    fullName
+                }
+            },
+            render(ctx) {
+                return h('div', null, ctx.fullName.value);
+            }
+        }
+        render(h(Comp), root)
+        expect(root.innerHTML).toBe('<div>james bond</div>');
+
+        firstName.value = 'a';
+        expect(root.innerHTML).toBe('<div>a bond</div>');
+
+        lastName.value = 'b';
+        expect(root.innerHTML).toBe('<div>a b</div>');
+    });
+
+    it('should update an Component tag which is already mounted', () => {
+        const Comp1 = {
+            render: () => {
+                return h('div', null, 'foo')
+            }
+        }
+        render(h(Comp1), root)
+        expect(root.innerHTML).toBe('<div>foo</div>')
+
+        const Comp2 = {
+            render: () => {
+                return h('span', null, 'foo')
+            }
+        }
+        render(h(Comp2), root)
+        expect(root.innerHTML).toBe('<span>foo</span>')
+
+        const Comp3 = {
+            render: () => {
+                return h('p', null, 'bar')
+            }
+        }
+        render(h(Comp3), root)
+        expect(root.innerHTML).toBe('<p>bar</p>')
+    })
+
+    // TODO: 可能需要watchEffect?
+    // test('normal effect', () => {
+    //     const firstName = ref('james');
+    //     const lastName = ref('bond');
+    //     const Comp = {
+    //         setup() {
+    //             let fullName;
+    //             effect(() => {
+    //                 fullName = `${firstName.value} ${lastName.value}`;
+    //             });
+    //             return {
+    //                 fullName
+    //             }
+    //         },
+    //         render(ctx) {
+    //             return h('div', null, ctx.fullName);
+    //         }
+    //     }
+    //     render(h(Comp), root)
+    //     expect(root.innerHTML).toBe('<div>james bond</div>');
+
+    //     firstName.value = 'a';
+    //     expect(root.innerHTML).toBe('<div>a bond</div>');
+
+    //     lastName.value = 'b';
+    //     expect(root.innerHTML).toBe('<div>a b</div>');
+    // });
 })
 
 describe('renderer: component', () => {

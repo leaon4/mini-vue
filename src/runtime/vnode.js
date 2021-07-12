@@ -1,4 +1,5 @@
 import { isFunction, isObject } from '../utils'
+import { isReactive } from '../reactivity';
 
 export const Text = Symbol('Text');
 export const Fragment = Symbol('Fragment');
@@ -37,6 +38,18 @@ export function h(type, props = null, children = null) {
         children = children.toString();
     } else if (Array.isArray(children)) {
         shapeFlag |= ShapeFlags.ARRAY_CHILDREN;
+    }
+
+    if (props) {
+        // for reactive or proxy objects, we need to clone it to enable mutation.
+        if (isReactive(props)) {
+            props = Object.assign({}, props);
+        }
+        // reactive state objects need to be cloned since they are likely to be
+        // mutated
+        if (isReactive(props.style)) {
+            props.style = Object.assign({}, props.style);
+        }
     }
 
     return {

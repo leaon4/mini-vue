@@ -88,30 +88,40 @@ function mountComponent(vnode, container, anchor) {
         }
     }
 
+    // toThink: props源码是shallowReactive，确实需要吗?
     instance.props = reactive(instance.props);
     instance.setupState = originalComp.setup?.(instance.props, { attrs: instance.attrs });
-    instance.ctx = reactive({
+
+    // toThink: ctx需要响应式吗?
+    instance.ctx = {
         ...instance.props,// 解构后应该没有响应式了
         ...instance.setupState
-    });
+    };
+
     instance.update = effect(() => {
         if (!instance.isMounted) {
             // mount
             const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
-            subTree.props = {
-                ...subTree.props,
-                ...instance.attrs
-            };
+            if (Object.keys(instance.attrs)) {
+                subTree.props = {
+                    ...subTree.props,
+                    ...instance.attrs
+                };
+            }
             patch(null, subTree, container, anchor);
             instance.isMounted = true;
+            vnode.el = subTree.el;
         } else {
             // update
             const prev = instance.subTree;
             const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
-            subTree.props = {
-                ...subTree.props,
-                ...instance.attrs
-            };
+            if (Object.keys(instance.attrs)) {
+                subTree.props = {
+                    ...subTree.props,
+                    ...instance.attrs
+                };
+            }
+            // TODO: el的交接，container, anchor的问题
             patch(prev, subTree, container, anchor);
         }
     })
