@@ -32,8 +32,9 @@ export function h(type, props = null, children = null) {
         shapeFlag = ShapeFlags.COMPONENT;
     }
 
-    if (typeof children === 'string') {
+    if (typeof children === 'string' || typeof children === 'number') {
         shapeFlag |= ShapeFlags.TEXT_CHILDREN;
+        children = children.toString();
     } else if (Array.isArray(children)) {
         shapeFlag |= ShapeFlags.ARRAY_CHILDREN;
     }
@@ -51,11 +52,11 @@ export function h(type, props = null, children = null) {
 }
 
 export function normalizeVNode(result) {
-    if (isObject(result)) {
-        return result;
-    }
     if (Array.isArray(result)) {
         return h(Fragment, null, result);
     }
-    return h(Text, null, result);
+    if (isObject(result)) {
+        return result;
+    }
+    return h(Text, null, result.toString());
 }

@@ -1,6 +1,6 @@
 import { h, Text, Fragment, ShapeFlags, normalizeVNode } from './vnode';
 import { patchProps } from './patchProps';
-import { reactive } from '../reactivity'
+import { reactive, effect } from '../reactivity'
 
 export function render(vnode, container) {
     const prevVNode = container._vnode;
@@ -76,6 +76,8 @@ function mountComponent(vnode, container, anchor) {
         setupState: null,
         ctx: null,
         // 源码：instance.setupState = proxyRefs(setupResult)
+        update: null,
+        isMounted: false,
     };
 
     for (const key in vnodeProps) {
@@ -92,13 +94,33 @@ function mountComponent(vnode, container, anchor) {
         ...instance.props,// 解构后应该没有响应式了
         ...instance.setupState
     });
-    const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
-    subTree.props = {
-        ...subTree.props,
-        ...instance.attrs
-    };
-    patch(null, subTree, container, anchor);
+    instance.update = effect(() => {
+        if (!instance.isMounted) {
+            // mount
+            const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
+            subTree.props = {
+                ...subTree.props,
+                ...instance.attrs
+            };
+            patch(null, subTree, container, anchor);
+            instance.isMounted = true;
+        } else {
+            // update
+            const prev = instance.subTree;
+            const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
+            subTree.props = {
+                ...subTree.props,
+                ...instance.attrs
+            };
+            patch(prev, subTree, container, anchor);
+        }
+    })
     vnode.component = instance;
+}
+
+function updateComponent(n1, n2) {
+    n2.component = n1.component;
+    n2.component.update();
 }
 
 function unmount(vnode) {
@@ -164,12 +186,11 @@ function processText(n1, n2, container, anchor) {
     }
 }
 
-// TODO
 function processComponent(n1, n2, container, anchor) {
     if (n1 == null) {
         mountComponent(n2, container, anchor);
     } else {
-
+        updateComponent(n1, n2);
     }
 }
 
