@@ -1,6 +1,7 @@
 import { render } from "../render";
 import { h, Text, Fragment } from '../vnode';
 import { ref, reactive, effect, computed } from '../../reactivity';
+import { nextTick } from '../scheduler'
 
 let root;
 beforeEach(() => {
@@ -194,7 +195,7 @@ describe('unmount component', () => {
 })
 
 describe('update component trigger by self', () => {
-    test('setup result with event and update', () => {
+    test('setup result with event and update', async () => {
         const Comp = {
             setup() {
                 const counter = ref(0);
@@ -212,14 +213,18 @@ describe('update component trigger by self', () => {
         }
         render(h(Comp), root)
         expect(root.innerHTML).toBe('<div>0</div>')
+
         root.children[0].click();
+        await nextTick()
         expect(root.innerHTML).toBe('<div>1</div>')
+
         root.children[0].click();
         root.children[0].click();
+        await nextTick()
         expect(root.innerHTML).toBe('<div>3</div>')
     })
 
-    test('reactive child, style and class', () => {
+    test('reactive child, style and class', async () => {
         const observed = reactive({
             child: 'child',
             class: 'a',
@@ -244,16 +249,19 @@ describe('update component trigger by self', () => {
         expect(root.innerHTML).toBe('<div class="a" style="color: red;">child</div>');
 
         observed.class = 'b';
+        await nextTick()
         expect(root.innerHTML).toBe('<div class="b" style="color: red;">child</div>');
 
         observed.style.color = 'blue';
+        await nextTick()
         expect(root.innerHTML).toBe('<div class="b" style="color: blue;">child</div>');
 
         observed.child = '';
+        await nextTick()
         expect(root.innerHTML).toBe('<div class="b" style="color: blue;"></div>');
     })
 
-    test('observed props', () => {
+    test('observed props', async () => {
         const observed = reactive({
             child: 'child',
             class: 'a',
@@ -270,16 +278,19 @@ describe('update component trigger by self', () => {
         expect(root.innerHTML).toBe('<div child="child" class="a" style="color: red;"></div>');
 
         observed.class = 'b';
+        await nextTick()
         expect(root.innerHTML).toBe('<div child="child" class="b" style="color: red;"></div>');
 
         observed.style.color = 'blue';
+        await nextTick()
         expect(root.innerHTML).toBe('<div child="child" class="b" style="color: blue;"></div>');
 
         observed.child = '';
+        await nextTick()
         expect(root.innerHTML).toBe('<div child="" class="b" style="color: blue;"></div>');
     });
 
-    test('computed and ref props', () => {
+    test('computed and ref props', async () => {
         const firstName = ref('james');
         const lastName = ref('bond');
         const Comp = {
@@ -299,9 +310,11 @@ describe('update component trigger by self', () => {
         expect(root.innerHTML).toBe('<div>james bond</div>');
 
         firstName.value = 'a';
+        await nextTick()
         expect(root.innerHTML).toBe('<div>a bond</div>');
 
         lastName.value = 'b';
+        await nextTick()
         expect(root.innerHTML).toBe('<div>a b</div>');
     });
 })
@@ -325,7 +338,7 @@ describe('update component trigger by others', () => {
         expect(root.innerHTML).toBe('<span>foo</span>')
 
         const Comp3 = {
-            render: (ctx) => {
+            render: () => {
                 return h('p', null, 'bar')
             }
         }
@@ -447,7 +460,7 @@ describe('update component trigger by others', () => {
         expect(root.innerHTML).toBe('<h1><p>text</p></h1>')
     })
 
-    test('parent props update make child update', () => {
+    test('parent props update make child update', async () => {
         const text = ref('text');
         const id = ref('id');
         const Parent = {
@@ -467,13 +480,15 @@ describe('update component trigger by others', () => {
         expect(root.innerHTML).toBe('<div id="id">text</div>')
 
         text.value = 'foo';
+        await nextTick()
         expect(root.innerHTML).toBe('<div id="id">foo</div>')
 
         id.value = 'bar';
+        await nextTick()
         expect(root.innerHTML).toBe('<div id="bar">foo</div>')
     })
 
-    test('child will not update when props have not change', () => {
+    test('child will not update when props have not change', async () => {
         const text = ref('text');
         const id = ref('id');
         const anotherText = ref('a')
@@ -500,12 +515,13 @@ describe('update component trigger by others', () => {
         expect(renderCount).toBe(1)
 
         anotherText.value = 'b';
+        await nextTick()
         expect(root.innerHTML).toBe('b<div id="id">text</div>')
         // TODO: shouldComponentUpdate
         // expect(renderCount).toBe(1)
     })
 
-    test('switch child', () => {
+    test('switch child', async () => {
         const Parent = {
             setup() {
                 const toggle = ref(true);
@@ -541,6 +557,7 @@ describe('update component trigger by others', () => {
         expect(root.innerHTML).toBe('<div></div><button>click</button>')
 
         root.children[1].click();
+        await nextTick()
         expect(root.innerHTML).toBe('<p></p><button>click</button>')
     })
 
@@ -570,6 +587,7 @@ describe('update component trigger by others', () => {
         expect(parentVnode.el).toBe(childVnode1.el)
 
         value.value = false
+        await nextTick()
         expect(root.innerHTML).toBe(`<span></span>`)
         expect(parentVnode.el).toBe(childVnode2.el)
     })

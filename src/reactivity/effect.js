@@ -47,8 +47,8 @@ export function trigger(target, key) {
         return;
     }
     dep.forEach(effectFn => {
-        if (effectFn.scheduler){
-            effectFn.scheduler();
+        if (effectFn.scheduler) {
+            effectFn.scheduler(effectFn);
         } else {
             effectFn();
         }

@@ -46,7 +46,7 @@ describe('scheduler', () => {
         const spy = jest.fn()
         const Comp = createComp(spy)
         render(h(Comp), root)
-        expect(spy).toHaveReturnedTimes(2)
+        expect(spy).toHaveReturnedTimes(1)
 
         const div = root.children[0]
         const syncBtn = root.children[1]
@@ -88,7 +88,7 @@ describe('scheduler', () => {
         const spy1 = jest.fn()
         const spy2 = jest.fn()
         const ref1 = ref(0)
-        const ref1 = ref(10)
+        const ref2 = ref(10)
         const Comp1 = {
             render() {
                 spy1()
@@ -122,7 +122,7 @@ describe('scheduler', () => {
         const spy1 = jest.fn()
         const spy2 = jest.fn()
         const ref1 = ref(0)
-        const ref1 = ref(10)
+        const ref2 = ref(10)
         const Parent = {
             render() {
                 spy1()
