@@ -1,0 +1,142 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`compiler: parse Element self closing multiple tag 1`] = `
+Object {
+  "cached": 0,
+  "children": Array [
+    Object {
+      "children": Array [],
+      "codegenNode": undefined,
+      "isSelfClosing": true,
+      "props": Array [
+        Object {
+          "arg": Object {
+            "constType": "CAN_STRINGIFY",
+            "content": "class",
+            "isStatic": true,
+            "type": "SIMPLE_EXPRESSION",
+          },
+          "exp": Object {
+            "constType": "NOT_CONSTANT",
+            "content": "{ some: condition }",
+            "isStatic": false,
+            "type": "SIMPLE_EXPRESSION",
+          },
+          "name": "bind",
+          "type": "DIRECTIVE",
+        },
+      ],
+      "tag": "div",
+      "tagType": "ELEMENT",
+      "type": "ELEMENT",
+    },
+    Object {
+      "content": " ",
+      "type": "TEXT",
+    },
+    Object {
+      "children": Array [],
+      "codegenNode": undefined,
+      "isSelfClosing": true,
+      "props": Array [
+        Object {
+          "arg": Object {
+            "constType": "CAN_STRINGIFY",
+            "content": "style",
+            "isStatic": true,
+            "type": "SIMPLE_EXPRESSION",
+          },
+          "exp": Object {
+            "constType": "NOT_CONSTANT",
+            "content": "{ color: 'red' }",
+            "isStatic": false,
+            "type": "SIMPLE_EXPRESSION",
+          },
+          "name": "bind",
+          "type": "DIRECTIVE",
+        },
+      ],
+      "tag": "p",
+      "tagType": "ELEMENT",
+      "type": "ELEMENT",
+    },
+  ],
+  "codegenNode": undefined,
+  "components": Array [],
+  "directives": Array [],
+  "helpers": Array [],
+  "hoists": Array [],
+  "imports": Array [],
+  "temps": 0,
+  "type": "ROOT",
+}
+`;
+
+exports[`compiler: parse Element valid html 1`] = `
+Object {
+  "cached": 0,
+  "children": Array [
+    Object {
+      "children": Array [
+        Object {
+          "children": Array [],
+          "codegenNode": undefined,
+          "isSelfClosing": true,
+          "props": Array [
+            Object {
+              "arg": Object {
+                "constType": "CAN_STRINGIFY",
+                "content": "style",
+                "isStatic": true,
+                "type": "SIMPLE_EXPRESSION",
+              },
+              "exp": Object {
+                "constType": "NOT_CONSTANT",
+                "content": "{ color: 'red' }",
+                "isStatic": false,
+                "type": "SIMPLE_EXPRESSION",
+              },
+              "name": "bind",
+              "type": "DIRECTIVE",
+            },
+          ],
+          "tag": "p",
+          "tagType": "ELEMENT",
+          "type": "ELEMENT",
+        },
+      ],
+      "codegenNode": undefined,
+      "isSelfClosing": false,
+      "props": Array [
+        Object {
+          "arg": Object {
+            "constType": "CAN_STRINGIFY",
+            "content": "class",
+            "isStatic": true,
+            "type": "SIMPLE_EXPRESSION",
+          },
+          "exp": Object {
+            "constType": "NOT_CONSTANT",
+            "content": "{ some: condition }",
+            "isStatic": false,
+            "type": "SIMPLE_EXPRESSION",
+          },
+          "name": "bind",
+          "type": "DIRECTIVE",
+        },
+      ],
+      "tag": "div",
+      "tagType": "ELEMENT",
+      "type": "ELEMENT",
+    },
+  ],
+  "codegenNode": undefined,
+  "components": Array [],
+  "directives": Array [],
+  "helpers": Array [],
+  "hoists": Array [],
+  "imports": Array [],
+  "temps": 0,
+  "type": "ROOT",
+}
+`;
