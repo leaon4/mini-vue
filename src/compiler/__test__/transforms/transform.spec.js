@@ -1,28 +1,14 @@
-import {
-    CompilerOptions,
-    baseParse as parse,
-    transform,
-    NodeTypes,
-    generate,
-    ForNode,
-    ElementNode
-} from '../../src'
-import { transformFor } from '../../src/transforms/vFor'
+import { baseParse as parse, NodeTypes, transform } from '../../index'
 import { transformText } from '../../src/transforms/transformText'
-import { transformExpression } from '../../src/transforms/transformExpression'
 import { transformElement } from '../../src/transforms/transformElement'
-import { CREATE_TEXT } from '../../src/runtimeHelpers'
-import { genFlagText } from '../testUtils'
-import { PatchFlags } from '@vue/shared'
 
+import { CREATE_TEXT } from '../../src/runtimeHelpers'
 import { TO_DISPLAY_STRING, H, TEXT, FRAGMENT } from '../../runtimeHelpers'
 
 function transformWithTextOpt(template, options = {}) {
     const ast = parse(template)
     transform(ast, {
         nodeTransforms: [
-            transformFor,
-            ...(options.prefixIdentifiers ? [transformExpression] : []),
             transformElement,
             transformText
         ],
@@ -167,7 +153,7 @@ describe('compiler: transform text', () => {
             }
         })
         expect(root.children[4].type).toBe(NodeTypes.ELEMENT)
-        
+
         expect(root.helpers.length).toBe(4);
         expect(root.helpers).toEqual([TO_DISPLAY_STRING, H, TEXT, FRAGMENT])
     })

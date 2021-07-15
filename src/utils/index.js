@@ -1,9 +1,21 @@
-export function isObject(raw) {
-    return typeof raw === 'object' && raw !== null;
+export function isObject(value) {
+    return typeof value === 'object' && value !== null;
 }
 
-export function isFunction(raw) {
-    return typeof raw === 'function';
+export function isFunction(value) {
+    return typeof value === 'function';
+}
+
+export function isArray(value) {
+    return Array.isArray(value);
+}
+
+export function isString(value) {
+    return typeof value === 'string';
+}
+
+export function isNumber(value) {
+    return typeof value === 'number'
 }
 
 export function hasChanged(value, oldValue) {
