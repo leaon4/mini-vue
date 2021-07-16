@@ -1,7 +1,8 @@
-import { isArray } from '../utils'
-import { NodeTypes } from './ast'
+import { isArray, isString } from '../utils'
+import { NodeTypes, createVNodeCall } from './ast'
 import {
-    TO_DISPLAY_STRING
+    TO_DISPLAY_STRING,
+    FRAGMENT
 } from './runtimeHelpers'
 
 function createTransformContext(root, {
@@ -16,8 +17,8 @@ function createTransformContext(root, {
         // state
         root,
         helpers: new Map(),
-        // components: new Set(),
-        // directives: new Set(),
+        components: new Set(),
+        directives: new Set(),
         // hoists: [],
         // imports: [],
         // constantCache: new Map(),
@@ -83,24 +84,47 @@ function createTransformContext(root, {
     return context
 }
 
+function createRootCodegen(root, context) {
+    const { children } = root
+    if (children.length === 1) {
+        const child = children[0]
+        if (isSingleElementRoot(root, child) && child.codegenNode) {
+            root.codegenNode = child.codegenNode
+        } else {
+            root.codegenNode = child
+        }
+    } else if (children.length > 1) {
+        root.codegenNode = createVNodeCall(
+            context,
+            context.helper(FRAGMENT),
+            undefined,
+            root.children,
+        )
+    } else {
+        // no children = noop. codegen will return null.
+    }
+}
+
+export function isSingleElementRoot(root, child) {
+    const { children } = root
+    return (
+        children.length === 1 &&
+        child.type === NodeTypes.ELEMENT
+    )
+}
+
 export function transform(root, options) {
     const context = createTransformContext(root, options)
     traverseNode(root, context)
 
-    if (!options.ssr) {
-        createRootCodegen(root, context)
-    }
+    createRootCodegen(root, context)
     // finalize meta information
     root.helpers = [...context.helpers.keys()]
     root.components = [...context.components]
     root.directives = [...context.directives]
-    root.imports = context.imports
-    root.hoists = context.hoists
-    root.temps = context.temps
-    root.cached = context.cached
 }
 
-function traverseNode(node, context) {
+export function traverseNode(node, context) {
     context.currentNode = node
     // apply transform plugins
     const { nodeTransforms } = context
@@ -126,11 +150,8 @@ function traverseNode(node, context) {
     switch (node.type) {
         case NodeTypes.INTERPOLATION:
             // no need to traverse, but we need to inject toString helper
-            if (!context.ssr) {
-                context.helper(TO_DISPLAY_STRING)
-            }
+            context.helper(TO_DISPLAY_STRING)
             break
-
         // for container types, further traverse downwards
         case NodeTypes.IF:
             for (let i = 0; i < node.branches.length; i++) {
@@ -150,5 +171,43 @@ function traverseNode(node, context) {
     let i = exitFns.length
     while (i--) {
         exitFns[i]()
+    }
+}
+
+export function traverseChildren(parent, context) {
+    let i = 0
+    const nodeRemoved = () => {
+        i--
+    }
+    for (; i < parent.children.length; i++) {
+        const child = parent.children[i]
+        if (isString(child)) {
+            console.warn('isString')
+            continue
+        }
+        context.parent = parent
+        context.childIndex = i
+        context.onNodeRemoved = nodeRemoved
+        traverseNode(child, context)
+    }
+}
+
+export function createStructuralDirectiveTransform(name, fn) {
+    const matches = isString(name)
+        ? (n) => n === name
+        : (n) => name.test(n)
+
+    return (node, context) => {
+        if (node.type === NodeTypes.ELEMENT) {
+            const { props } = node
+            for (let i = 0; i < props.length; i++) {
+                const prop = props[i]
+                if (prop.type === NodeTypes.DIRECTIVE && matches(prop.name)) {
+                    props.splice(i, 1)
+                    i--
+                    return fn(node, prop, context)
+                }
+            }
+        }
     }
 }

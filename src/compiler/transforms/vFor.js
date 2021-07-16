@@ -152,7 +152,6 @@ export function parseForExpression(input, context) {
     let valueContent = LHS.trim()
         .replace(stripParensRE, '')
         .trim()
-    const trimmedOffset = LHS.indexOf(valueContent)
 
     const iteratorMatch = valueContent.match(forIteratorRE)
     if (iteratorMatch) {
@@ -160,7 +159,6 @@ export function parseForExpression(input, context) {
 
         const keyContent = iteratorMatch[1].trim()
         if (keyContent) {
-            keyOffset = exp.indexOf(keyContent, trimmedOffset + valueContent.length)
             result.key = createSimpleExpression(keyContent, false)
         }
 
