@@ -54,18 +54,13 @@ function traverseChildren(node) {
 }
 
 function resolveElementASTNode(node, parent) {
-    let forNode = pluckDirective(node.directives, 'for');
-    if (forNode) {
-        const { exp } = forNode;
-        const [args, source] = exp.content.split(/\sin\s|\sof\s/);
-        return `h(Fragment, null, renderList(${source.trim()}, ${args.trim()} => ${resolveElement(node)}))`
-    }
-
     let ifNode = pluckDirective(node.directives, 'if')
         || pluckDirective(node.directives, 'else-if');
 
     if (ifNode) {
-        const consequent = resolveElement(node);
+        // 递归必须用resolveElementASTNode，因为一个元素可能有多个指令
+        // 所以处理指令时，移除当下指令也是必须的
+        const consequent = resolveElementASTNode(node, parent);
         let alternate;
         if (parent) {
             const { children } = parent;
@@ -80,7 +75,7 @@ function resolveElementASTNode(node, parent) {
                 if (sibling.type === NodeTypes.ELEMENT) {
                     let elseNode = children[i];
                     if (pluckDirective(sibling.directives, 'else')) {
-                        alternate = resolveElement(elseNode);
+                        alternate = resolveElementASTNode(elseNode, parent);
                         children.splice(i, 1);
                     } else if (pluckDirective(sibling.directives, 'else-if', false)) {
                         alternate = resolveElementASTNode(elseNode, parent);
@@ -93,6 +88,14 @@ function resolveElementASTNode(node, parent) {
         const { exp } = ifNode;
         return `${exp.content} ? ${consequent} : ${alternate || createTextVNode('')}`
     }
+
+    let forNode = pluckDirective(node.directives, 'for');
+    if (forNode) {
+        const { exp } = forNode;
+        const [args, source] = exp.content.split(/\sin\s|\sof\s/);
+        return `h(Fragment, null, renderList(${source.trim()}, ${args.trim()} => ${resolveElementASTNode(node)}))`
+    }
+
     return resolveElement(node);
 }
 
@@ -104,8 +107,8 @@ function resolveElement(node) {
     return `h("${node.tag}")`
 }
 
-// 貌似可以不remove
-function pluckDirective(directives, name, remove = false) {
+// 可以不remove吗？不可以
+function pluckDirective(directives, name, remove = true) {
     const index = directives.findIndex(dir => dir.name === name)
     const dir = directives[index];
     if (remove && index > -1) {
