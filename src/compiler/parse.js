@@ -37,13 +37,39 @@ function parseChildren(context) {
     }
 
     // 缩减空白
-    nodes.forEach(node => {
-        if (node.type === NodeTypes.TEXT) {
-            node.content = node.content.replace(/[\t\r\n\f ]+/g, ' ')
-        }
-    });
+    // nodes.forEach(node => {
+    //     if (node.type === NodeTypes.TEXT) {
+    //         node.content = node.content.replace(/[\t\r\n\f ]+/g, ' ')
+    //     }
+    // });
+    // return nodes;
 
-    return nodes
+    let removedWhitespace = false
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i]
+        if (node.type === NodeTypes.TEXT) {
+            // 全是空白的节点
+            if (!/[^\t\r\n\f ]/.test(node.content)) {
+                const prev = nodes[i - 1]
+                const next = nodes[i + 1]
+                if (!prev || !next ||
+                    (prev.type === NodeTypes.ELEMENT &&
+                        next.type === NodeTypes.ELEMENT &&
+                        /[\r\n]/.test(node.content))
+                ) {
+                    removedWhitespace = true
+                    nodes[i] = null
+                } else {
+                    // Otherwise, the whitespace is condensed into a single space
+                    node.content = ' '
+                }
+            } else {
+                node.content = node.content.replace(/[\t\r\n\f ]+/g, ' ')
+            }
+        }
+    }
+
+    return removedWhitespace ? nodes.filter(Boolean) : nodes
 }
 
 function isEnd(context) {

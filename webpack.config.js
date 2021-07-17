@@ -13,7 +13,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'mini-vue3',
+            template: './src/index.html'
         }),
     ],
     devServer: {

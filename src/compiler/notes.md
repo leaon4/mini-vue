@@ -5,7 +5,7 @@
 ```javascript
 {
   type: NodeTypes.ROOT,
-  children,
+  children: [],
   helpers: [],
   components: [],
   directives: [],
