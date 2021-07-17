@@ -10,17 +10,15 @@
     <title>Document</title>
 </head>
 
-<body>
+<body>  
     <div id="template">
-        <div>
-            <div>1</div>
-            <div>2</div>
-            <ul>
-                <li>a</li>
-                <li>b</li>
-                <li>c</li>
-            </ul>
+        <div v-if="ok">ff</div>
+        <div v-else>
+            <h1 v-if="f"></h1>
+            <h2 v-else></h2>
+            <h4></h4>
         </div>
+        <h3></h3>
     </div>
     <hr>
     <div id="codes"></div>

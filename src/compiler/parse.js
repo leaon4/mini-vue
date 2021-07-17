@@ -154,7 +154,7 @@ function parseTag(context) {
     advanceSpaces(context)
 
     // Attributes.
-    let props = parseAttributes(context)
+    let { props, directives } = parseAttributes(context)
 
     // Tag close.
     let isSelfClosing = context.source.startsWith('/>')
@@ -170,6 +170,7 @@ function parseTag(context) {
         tag,
         tagType,
         props,
+        directives,
         isSelfClosing,
         children: [],
         codegenNode: undefined // to be created during transform phase
@@ -192,17 +193,22 @@ function advanceSpaces(context) {
 }
 
 function parseAttributes(context) {
-    const props = []
+    const props = [];
+    const directives = [];
     while (
         context.source.length &&
         !context.source.startsWith('>') &&
         !context.source.startsWith('/>')
     ) {
         const attr = parseAttribute(context)
-        props.push(attr)
+        if (attr.type === NodeTypes.ATTRIBUTE) {
+            props.push(attr);
+        } else {
+            directives.push(attr);
+        }
         advanceSpaces(context)
     }
-    return props
+    return { props, directives }
 }
 
 function parseAttribute(context) {

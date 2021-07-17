@@ -59,6 +59,7 @@
   tag: string, // 标签名,
   tagType: ElementTypes, // 是组件还是原生元素,
   props: [], // 属性节点数组,
+  directives: [], // 指令数组
   isSelfClosing: boolean, // 是否是自闭合标签,
   children: [],
   codegenNode: undefined // to be created during transform phase
