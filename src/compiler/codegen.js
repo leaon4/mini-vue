@@ -54,6 +54,13 @@ function traverseChildren(node) {
 }
 
 function resolveElementASTNode(node, parent) {
+    let forNode = pluckDirective(node.directives, 'for');
+    if (forNode) {
+        const { exp } = forNode;
+        const [args, source] = exp.content.split(/\sin\s|\sof\s/);
+        return `h(Fragment, null, renderList(${source.trim()}, ${args.trim()} => ${resolveElement(node)}))`
+    }
+
     let ifNode = pluckDirective(node.directives, 'if')
         || pluckDirective(node.directives, 'else-if');
 
@@ -97,7 +104,8 @@ function resolveElement(node) {
     return `h("${node.tag}")`
 }
 
-function pluckDirective(directives, name, remove = true) {
+// 貌似可以不remove
+function pluckDirective(directives, name, remove = false) {
     const index = directives.findIndex(dir => dir.name === name)
     const dir = directives[index];
     if (remove && index > -1) {
@@ -107,5 +115,5 @@ function pluckDirective(directives, name, remove = true) {
 }
 
 function createTextVNode(content) {
-    return `h(TEXT, null, "${content}")`
+    return `h(Text, null, "${content}")`
 }

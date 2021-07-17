@@ -13,6 +13,8 @@
 
 6.substr slice
 
+7.正则的\r\n\t\f空格  为什么不以用\s替代?
+
 todo:
 .unref
 .添加，for in，数组都还没有响应式
