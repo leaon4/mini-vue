@@ -10,15 +10,22 @@
     <title>Document</title>
 </head>
 
-<body>  
+<body>
     <div id="template">
         <div v-if="ok">ff</div>
-        <div v-else>
-            <h1 v-if="f"></h1>
-            <h2 v-else></h2>
-            <h4></h4>
+        <div v-else-if="hehe">
+            <h1 v-if="a"></h1>
+            <h2 v-else-if="b"></h2>
+            <h3 v-if="c"></h3>
+            <h4 v-else-if="d">d</h4>
+            <h4 v-else-if="e">e</h4>
+            <h4 v-else-if="f">f</h4>
+            <h4 v-else-if="g">g</h4>
+            <h5 v-else>
+                <div>hello world</div>
+            </h5>
         </div>
-        <h3></h3>
+        <h3 v-else></h3>
     </div>
     <hr>
     <div id="codes"></div>
