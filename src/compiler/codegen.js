@@ -29,8 +29,6 @@ function traverseNode(node, parent) {
             return createTextVNode(node);
         case NodeTypes.INTERPOLATION:
             return createTextVNode(node.content);
-        default:
-            break;
     }
 }
 
@@ -94,7 +92,7 @@ function resolveElementASTNode(node, parent) {
             }
         }
         const { exp } = ifNode;
-        return `${exp.content} ? ${consequent} : ${alternate || createTextVNode({})}`
+        return `${exp.content} ? ${consequent} : ${alternate || createTextVNode()}`
     }
 
     let forNode = pluckDirective(node.directives, 'for');
@@ -108,21 +106,47 @@ function resolveElementASTNode(node, parent) {
 }
 
 function resolveElement(node) {
-    const { children, props } = node
+    const { children, props, directives } = node
 
-    let propStr = null;
-    if (props.length) {
-        propStr = `{ ${props} }`
-    }
+    const propArr = [
+        ...props.map(prop => {
+            return `${prop.name}: ${createText(prop.value)}`
+        }),
+        ...directives.map(dir => {
+            const content = dir.arg?.content;
+            switch (dir.name) {
+                case 'bind':
+                    return `${content}: ${createText(dir.exp)}`
+                case 'on':
+                    const eventName = `on${content[0].toUpperCase()}${content.slice(1)}`;
+                    let exp = dir.exp.content;
+
+                    // 以括号结尾，并且不含'=>'的情况，如 @click="foo()"
+                    // 当然，判断很不严谨
+                    if (/\([^\)]*?\)$/.test(exp) && !exp.includes('=>')){
+                        exp = `$event => (${exp})`
+                    }
+                    return `${eventName}: ${exp}`
+            }
+        })
+    ];
+
+    const propStr = propArr.length
+        ? `{ ${propArr.join(', ')} }`
+        : 'null';
 
     if (!children.length) {
-        return `h("${node.tag}")`
+        if (!propArr.length) {
+            return `h("${node.tag}")`;
+        }
+        return `h("${node.tag}", ${propStr})`
     }
+
     let result = traverseChildren(node);
     if (children.length > 1 || children[0].type === NodeTypes.ELEMENT) {
         result = `[${result}]`
     }
-    return `h("${node.tag}", null, ${result})`
+    return `h("${node.tag}", ${propStr}, ${result})`
 }
 
 // 可以不remove吗？不可以
@@ -136,9 +160,13 @@ function pluckDirective(directives, name, remove = true) {
 }
 
 // node只接收text和simpleExpresstion
-function createTextVNode({ content = '', isStatic = true }) {
-    let child = isStatic
+function createTextVNode(node) {
+    let child = createText(node)
+    return `h(Text, null, ${child})`
+}
+
+function createText({ content = '', isStatic = true } = {}) {
+    return isStatic
         ? JSON.stringify(content)
         : content
-    return `h(Text, null, ${child})`
 }

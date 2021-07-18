@@ -58,6 +58,15 @@ describe('compiler: integration tests', () => {
         //     expect(code).toBe('h("Foo")');
         // })
 
+        test('static props', () => {
+            const code = baseCompile(`<div id="foo" class="bar" />`);
+            expect(code).toBe('h("div", { id: "foo", class: "bar" })');
+        })
+
+        test('props + children', () => {
+            const code = baseCompile(`<div id="foo"><span/></div>`);
+            expect(code).toBe('h("div", { id: "foo" }, [h("span")])');
+        })
     })
 
     describe('v-if', () => {
@@ -164,6 +173,11 @@ describe('compiler: integration tests', () => {
             expect(code).toBe('h(Fragment, null, renderList(items, (value, key, index) => h("span")))');
         })
 
+        test('with key', () => {
+            const code = baseCompile('<span v-for="item in items" :key="item.id" />');
+            expect(code).toBe('h(Fragment, null, renderList(items, item => h("span", { key: item.id })))');
+        })
+
         // 不支持
         /* test('skipped key', () => {
             const code = baseCompile('<span v-for="(value,,index) in items" />');
@@ -180,8 +194,37 @@ describe('compiler: integration tests', () => {
             expect(code).toBe('ok ? h(Fragment, null, renderList(list, i => h("div"))) : h(Text, null, "")');
         })
     })
-})
 
-function creatTextCode(content) {
-    return `h(Text, null, ${content})`
-}
+    describe('v-bind, v-on', () => {
+        test('v-bind', () => {
+            const code = baseCompile('<div v-bind:id="id" :class="a" />');
+            expect(code).toBe('h("div", { id: id, class: a })');
+        })
+
+        test('v-on', () => {
+            const code = baseCompile('<div v-on:click="onClick" @mousedown="onMouseDown" />');
+            expect(code).toBe('h("div", { onClick: onClick, onMousedown: onMouseDown })');
+        })
+
+        test('inline statement', () => {
+            const code = baseCompile('<div @click="foo($event, id)"/>');
+            expect(code).toBe('h("div", { onClick: $event => (foo($event, id)) })');
+        })
+
+        test('inline statement2', () => {
+            const code = baseCompile('<div @click="() => i++"/>');
+            expect(code).toBe('h("div", { onClick: () => i++ })');
+        })
+
+        test('compound', () => {
+            const code = baseCompile(`
+            <div :class="class"
+                @click="foo"
+                style="color: red"
+                v-for="item in items"
+                v-if="ok" />
+            `);
+            expect(code).toBe('ok ? h(Fragment, null, renderList(items, item => h("div", { style: "color: red", class: class, onClick: foo }))) : h(Text, null, "")');
+        })
+    })
+})

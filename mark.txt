@@ -22,6 +22,13 @@ todo:
 .unref
 .添加，for in，数组都还没有响应式
 .codegen里节点的删除可能可以用标记删除，性能更高
-
+.component
+.v-model
+.v-for:key
 
 transform 近1000行！
+
+
+feature:
+. v-on 只支持 @click="foo", @click="foo($event,id):两种
+. 不支持class, style动静合并
