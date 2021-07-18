@@ -24,6 +24,5 @@ export function createRoot(children) {
         imports: [],
         cached: 0,
         temps: 0,
-        codegenNode: undefined,
     }
 }

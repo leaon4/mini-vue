@@ -14,7 +14,11 @@ function traverseNode(node, parent) {
     switch (node.type) {
         case NodeTypes.ROOT:
             if (node.children.length > 1) {
-                return traverseChildren(node)
+                let result = traverseChildren(node)
+                if (node.children.length > 1) {
+                    return `[${result}]`
+                }
+                return result;
             } else if (node.children.length === 1) {
                 return traverseNode(node.children[0], node)
             }
@@ -23,6 +27,8 @@ function traverseNode(node, parent) {
             return resolveElementASTNode(node, parent);
         case NodeTypes.TEXT:
             return createTextVNode(node.content);
+        case NodeTypes.INTERPOLATION:
+            return `h(Text, null, ${node.content.content})`;
         default:
             break;
     }
@@ -50,7 +56,11 @@ function traverseChildren(node) {
         results.push(traverseNode(child, node));
     }
 
-    return `[${results.join(', ')}]`
+    return results.join(', ')
+    // child有可能被删除，因此results仍然可能只有一个
+    // return results.length > 1
+    //     ? `[${results.join(', ')}]`
+    //     : results[0]
 }
 
 function resolveElementASTNode(node, parent) {
@@ -100,11 +110,15 @@ function resolveElementASTNode(node, parent) {
 }
 
 function resolveElement(node) {
-    let result = traverseChildren(node);
-    if (result) {
-        return `h("${node.tag}", null, ${result})`
+    const { children } = node
+    if (!children.length) {
+        return `h("${node.tag}")`
     }
-    return `h("${node.tag}")`
+    let result = traverseChildren(node);
+    if (children.length > 1 || children[0].type === NodeTypes.ELEMENT) {
+        result = `[${result}]`
+    }
+    return `h("${node.tag}", null, ${result})`
 }
 
 // 可以不remove吗？不可以

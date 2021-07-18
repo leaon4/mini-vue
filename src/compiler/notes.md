@@ -13,7 +13,6 @@
   imports: [],
   cached: 0,
   temps: 0,
-  codegenNode: undefined,
 }
 ```
 
@@ -62,7 +61,6 @@
   directives: [], // 指令数组
   isSelfClosing: boolean, // 是否是自闭合标签,
   children: [],
-  codegenNode: undefined // to be created during transform phase
 }
 ```
 

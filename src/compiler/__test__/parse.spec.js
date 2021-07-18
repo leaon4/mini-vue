@@ -145,7 +145,6 @@ describe('compiler: parse', () => {
             const ast = baseParse('<p>{{msg}}</p>')
             const element = ast.children[0]
             const interpolation = element.children[0]
-
             expect(interpolation).toStrictEqual({
                 type: NodeTypes.INTERPOLATION,
                 content: {
@@ -166,7 +165,6 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
                 props: [],
                 directives: [],
                 isSelfClosing: false,
@@ -187,7 +185,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [],
                 directives: [],
                 isSelfClosing: false,
@@ -203,7 +201,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [],
                 directives: [],
                 isSelfClosing: true,
@@ -219,7 +217,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'img',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [],
                 directives: [],
                 isSelfClosing: false,
@@ -257,7 +255,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [
                     {
                         type: NodeTypes.ATTRIBUTE,
@@ -279,7 +277,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [
                     {
                         type: NodeTypes.ATTRIBUTE,
@@ -304,7 +302,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [
                     {
                         type: NodeTypes.ATTRIBUTE,
@@ -329,7 +327,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [
                     {
                         type: NodeTypes.ATTRIBUTE,
@@ -354,7 +352,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [
                     {
                         type: NodeTypes.ATTRIBUTE,
@@ -379,7 +377,7 @@ describe('compiler: parse', () => {
                 type: NodeTypes.ELEMENT,
                 tag: 'div',
                 tagType: ElementTypes.ELEMENT,
-                codegenNode: undefined,
+
                 props: [
                     {
                         type: NodeTypes.ATTRIBUTE,

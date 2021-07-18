@@ -16,10 +16,12 @@
 7.正则的\r\n\t\f空格  为什么不用\s替代?
 因为&nbsp;并不是空字符串，而是String.fromCharCode(160)，这个字符包含在\s中，却是希望不被压缩的
 
+8.必须用with，不能简单添加ctx前缀的原因
+
 todo:
 .unref
 .添加，for in，数组都还没有响应式
-
+.codegen里节点的删除可能可以用标记删除，性能更高
 
 
 transform 近1000行！

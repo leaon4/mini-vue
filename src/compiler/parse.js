@@ -173,7 +173,6 @@ function parseTag(context) {
         directives,
         isSelfClosing,
         children: [],
-        codegenNode: undefined // to be created during transform phase
     }
 }
 
