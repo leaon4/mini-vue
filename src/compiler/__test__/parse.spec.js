@@ -168,6 +168,7 @@ describe('compiler: parse', () => {
                 tagType: ElementTypes.ELEMENT,
                 codegenNode: undefined,
                 props: [],
+                directives: [],
                 isSelfClosing: false,
                 children: [
                     {
@@ -188,6 +189,7 @@ describe('compiler: parse', () => {
                 tagType: ElementTypes.ELEMENT,
                 codegenNode: undefined,
                 props: [],
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -203,7 +205,7 @@ describe('compiler: parse', () => {
                 tagType: ElementTypes.ELEMENT,
                 codegenNode: undefined,
                 props: [],
-
+                directives: [],
                 isSelfClosing: true,
                 children: [],
             })
@@ -219,7 +221,7 @@ describe('compiler: parse', () => {
                 tagType: ElementTypes.ELEMENT,
                 codegenNode: undefined,
                 props: [],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -263,7 +265,7 @@ describe('compiler: parse', () => {
                         value: undefined,
                     }
                 ],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -288,7 +290,7 @@ describe('compiler: parse', () => {
                         },
                     }
                 ],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -313,7 +315,7 @@ describe('compiler: parse', () => {
                         },
                     }
                 ],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -338,7 +340,7 @@ describe('compiler: parse', () => {
                         },
                     }
                 ],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -363,7 +365,7 @@ describe('compiler: parse', () => {
                         },
                     }
                 ],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -409,7 +411,7 @@ describe('compiler: parse', () => {
                         },
                     }
                 ],
-
+                directives: [],
                 isSelfClosing: false,
                 children: [],
             })
@@ -417,7 +419,7 @@ describe('compiler: parse', () => {
 
         test('directive with no value', () => {
             const ast = baseParse('<div v-if/>')
-            const directive = (ast.children[0]).props[0]
+            const directive = (ast.children[0]).directives[0]
 
             expect(directive).toStrictEqual({
                 type: NodeTypes.DIRECTIVE,
@@ -429,7 +431,7 @@ describe('compiler: parse', () => {
 
         test('directive with value', () => {
             const ast = baseParse('<div v-if="a"/>')
-            const directive = (ast.children[0]).props[0]
+            const directive = (ast.children[0]).directives[0]
 
             expect(directive).toStrictEqual({
                 type: NodeTypes.DIRECTIVE,
@@ -445,7 +447,7 @@ describe('compiler: parse', () => {
 
         test('directive with argument', () => {
             const ast = baseParse('<div v-on:click/>')
-            const directive = (ast.children[0]).props[0]
+            const directive = (ast.children[0]).directives[0]
 
             expect(directive).toStrictEqual({
                 type: NodeTypes.DIRECTIVE,
@@ -461,7 +463,7 @@ describe('compiler: parse', () => {
 
         test('v-bind shorthand', () => {
             const ast = baseParse('<div :a="b" />')
-            const directive = (ast.children[0]).props[0]
+            const directive = (ast.children[0]).directives[0]
 
             expect(directive).toStrictEqual({
                 type: NodeTypes.DIRECTIVE,
@@ -481,7 +483,7 @@ describe('compiler: parse', () => {
 
         test('v-on shorthand', () => {
             const ast = baseParse('<div @a="b" />')
-            const directive = (ast.children[0]).props[0]
+            const directive = (ast.children[0]).directives[0]
 
             expect(directive).toStrictEqual({
                 type: NodeTypes.DIRECTIVE,
@@ -525,9 +527,9 @@ describe('compiler: parse', () => {
 
             expect(ast).toMatchSnapshot()
 
-            expect(ast.children).toHaveLength(3)
+            expect(ast.children).toHaveLength(2)
             expect(ast.children[0]).toMatchObject({ tag: 'div' })
-            expect(ast.children[2]).toMatchObject({ tag: 'p' })
+            expect(ast.children[1]).toMatchObject({ tag: 'p' })
         })
 
         test('valid html', () => {
@@ -544,8 +546,8 @@ describe('compiler: parse', () => {
             expect(el).toMatchObject({
                 tag: 'div'
             })
-            expect(el.children).toHaveLength(3)
-            expect(el.children[1]).toMatchObject({
+            expect(el.children).toHaveLength(1)
+            expect(el.children[0]).toMatchObject({
                 tag: 'p'
             })
         })
@@ -554,8 +556,8 @@ describe('compiler: parse', () => {
     describe('whitespace management when adopting strategy condense', () => {
         it('should remove whitespaces w/ newline between elements', () => {
             const ast = baseParse(`<div/> \n <div/> \n <div/>`)
-            expect(ast.children.length).toBe(5)
-            expect(ast.children[1].content).toBe(' ')
+            expect(ast.children.length).toBe(3)
+            expect(ast.children[1].type).toBe(NodeTypes.ELEMENT)
         })
 
         it('should NOT remove whitespaces w/ newline between interpolations', () => {
