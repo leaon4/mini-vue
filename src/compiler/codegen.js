@@ -26,9 +26,9 @@ function traverseNode(node, parent) {
         case NodeTypes.ELEMENT:
             return resolveElementASTNode(node, parent);
         case NodeTypes.TEXT:
-            return createTextVNode(node.content);
+            return createTextVNode(node);
         case NodeTypes.INTERPOLATION:
-            return `h(Text, null, ${node.content.content})`;
+            return createTextVNode(node.content);
         default:
             break;
     }
@@ -43,9 +43,11 @@ function traverseChildren(node) {
     if (children.length === 1) {
         const child = children[0];
         if (child.type === NodeTypes.TEXT) {
+            // isStatic = true，静态加引号
             return JSON.stringify(child.content);
         }
         if (child.type === NodeTypes.INTERPOLATION) {
+            // isStatic = false，动态不加引号
             return child.content.content
         }
     }
@@ -57,10 +59,6 @@ function traverseChildren(node) {
     }
 
     return results.join(', ')
-    // child有可能被删除，因此results仍然可能只有一个
-    // return results.length > 1
-    //     ? `[${results.join(', ')}]`
-    //     : results[0]
 }
 
 function resolveElementASTNode(node, parent) {
@@ -96,7 +94,7 @@ function resolveElementASTNode(node, parent) {
             }
         }
         const { exp } = ifNode;
-        return `${exp.content} ? ${consequent} : ${alternate || createTextVNode('')}`
+        return `${exp.content} ? ${consequent} : ${alternate || createTextVNode({})}`
     }
 
     let forNode = pluckDirective(node.directives, 'for');
@@ -110,7 +108,13 @@ function resolveElementASTNode(node, parent) {
 }
 
 function resolveElement(node) {
-    const { children } = node
+    const { children, props } = node
+
+    let propStr = null;
+    if (props.length) {
+        propStr = `{ ${props} }`
+    }
+
     if (!children.length) {
         return `h("${node.tag}")`
     }
@@ -131,6 +135,10 @@ function pluckDirective(directives, name, remove = true) {
     return dir;
 }
 
-function createTextVNode(content) {
-    return `h(Text, null, "${content}")`
+// node只接收text和simpleExpresstion
+function createTextVNode({ content = '', isStatic = true }) {
+    let child = isStatic
+        ? JSON.stringify(content)
+        : content
+    return `h(Text, null, ${child})`
 }

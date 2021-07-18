@@ -200,6 +200,11 @@ function parseAttributes(context) {
         !context.source.startsWith('/>')
     ) {
         const attr = parseAttribute(context)
+        // if (attr.type === NodeTypes.DIRECTIVE && attr.name === 'if' || attr.name === 'for'){
+        //     directives.push(attr);
+        // } else {
+        //     props.push(attr);
+        // }
         if (attr.type === NodeTypes.ATTRIBUTE) {
             props.push(attr);
         } else {
