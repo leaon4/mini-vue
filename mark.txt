@@ -13,7 +13,8 @@
 
 6.substr slice
 
-7.正则的\r\n\t\f空格  为什么不以用\s替代?
+7.正则的\r\n\t\f空格  为什么不用\s替代?
+因为&nbsp;并不是空字符串，而是String.fromCharCode(160)，这个字符包含在\s中，却是希望不被压缩的
 
 todo:
 .unref
