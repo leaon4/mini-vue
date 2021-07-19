@@ -1,5 +1,5 @@
 import { NodeTypes, ElementTypes } from '../ast'
-import { generate } from '../codegen'
+import { generateReturns as generate } from '../codegen'
 
 function createAst(node) {
     return {

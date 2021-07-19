@@ -18,13 +18,15 @@
 
 8.必须用with，不能简单添加ctx前缀的原因
 
+9.为什么生成的渲染函数要加下划线?
+
 todo:
 .unref
 .添加，for in，数组都还没有响应式
-.codegen里节点的删除可能可以用标记删除，性能更高
 .component
 .v-model
-.v-for:key
+.属性无值的情况
+.import运行时
 
 transform 近1000行！
 

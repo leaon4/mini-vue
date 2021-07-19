@@ -1,6 +1,9 @@
-import { h } from '../../runtime'
-import { NodeTypes, ElementTypes } from '../ast'
-import { baseCompile } from '../compile'
+import { generateReturns } from '../codegen'
+import { baseParse } from '../parse';
+function baseCompile(template) {
+    const ast = baseParse(template)
+    return generateReturns(ast)
+}
 
 
 describe('compiler: integration tests', () => {
