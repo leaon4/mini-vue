@@ -22,3 +22,4 @@ export const isNativeTag = makeMap(HTML_TAGS)
 
 export { baseParse } from './parse'
 export { NodeTypes } from './ast'
+export { baseCompile } from './compile'

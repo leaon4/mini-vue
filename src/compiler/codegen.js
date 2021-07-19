@@ -4,12 +4,9 @@ import { NodeTypes } from './ast'
 export function generate(ast) {
     const returns = traverseNode(ast);
     const code = `
-return function render(ctx) {
-  with (ctx) {
-    const { h } = Vue
-
+with (ctx) {
+    const { h, Text, Fragment } = MiniVue
     return ${returns}
-  }
 }`
     return code;
 }

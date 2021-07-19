@@ -1,6 +1,7 @@
 import { reactive, effect } from '../reactivity'
 import { normalizeVNode } from './vnode';
 import { queueJob } from './scheduler';
+import { baseCompile } from '../compiler'
 
 function updateComponentProps(instance, vnode) {
     const { type: originalComp, props: vnodeProps } = vnode;
@@ -32,6 +33,10 @@ export function mountComponent(vnode, container, anchor, patch) {
     updateComponentProps(instance, vnode);
 
     instance.setupState = originalComp.setup?.(instance.props, { attrs: instance.attrs });
+
+    if (!originalComp.render && originalComp.template) {
+        originalComp.render = new Function('ctx', baseCompile(originalComp.template));
+    }
 
     // toThink: ctx需要响应式吗?
     instance.ctx = {

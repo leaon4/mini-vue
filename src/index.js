@@ -1,14 +1,35 @@
 import { baseCompile as compile } from "./compiler/compile";
-import { render, h } from "./runtime";
+import { createApp, render, h, Text, Fragment } from "./runtime";
+import { reactive, ref } from './reactivity';
 
-const root = document.getElementById("template");
-let template = root.innerHTML;
-root.textContent = template;
+window.MiniVue = {
+    createApp,
+    h,
+    Text,
+    Fragment
+};
 
-const result = compile(template.trim());
+// const root = document.getElementById("template");
+// let template = root.innerHTML;
+// root.textContent = template;
 
-console.log(result);
+// const result = compile(template.trim());
 
-document.getElementById("codes").innerHTML = result;
+// console.log(result);
+
+// document.getElementById("codes").innerHTML = result;
 
 // render(h('div', null, []), root)
+
+
+
+createApp({
+    setup() {
+        const counter = ref(0)
+        const click = () => counter.value++
+        return {
+            counter,
+            click
+        }
+    }
+}).mount('#app')
