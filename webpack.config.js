@@ -3,19 +3,21 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    // devtool: false,
-    devtool: 'inline-cheap-source-map',
+    devtool: false,
+    // devtool: 'inline-cheap-source-map',
     entry: './src/index.js',
     output: {
-        filename: 'main.js',
+        filename: 'mini-vue.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
+        library: 'MiniVue',
+        libraryTarget: 'var'
     },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: './src/index.html'
-        }),
-    ],
+    // plugins: [
+    //     new HtmlWebpackPlugin({
+    //         template: './src/index.html'
+    //     }),
+    // ],
     devServer: {
         contentBase: './dist',
     },
