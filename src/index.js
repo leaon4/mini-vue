@@ -1,12 +1,13 @@
 import { baseCompile as compile } from "./compiler/compile";
-import { createApp, render, h, Text, Fragment } from "./runtime";
+import { createApp, render, h, Text, Fragment, renderList } from "./runtime";
 import { reactive, ref } from './reactivity';
 
 window.MiniVue = {
     createApp,
     h,
     Text,
-    Fragment
+    Fragment,
+    renderList
 };
 
 // const root = document.getElementById("template");
@@ -22,7 +23,7 @@ window.MiniVue = {
 // render(h('div', null, []), root)
 
 
-
+console.log(1)
 createApp({
     setup() {
         const counter = ref(0)
