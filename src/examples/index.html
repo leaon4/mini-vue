@@ -10,21 +10,12 @@
     <title>Document</title>
     <script src="../../dist/mini-vue.js"></script>
 </head>
-
+<script type="text/x-template" id="item-template">
+    <div>{{text}}</div>
+</script>
 <body>
-    <select name="" id="">
-        <option value="a">a</option>
-        <option value="b" selected>b</option>
-        <option value="c">c</option>
-    </select>
-
     <div id="app">
-        <select name="" id="">
-            <option value="a">a</option>
-            <option value="b" selected>b</option>
-            <option value="c">c</option>
-        </select>
-        <div v-for="item in {a:'a',b:'b'}">{{item}}</div>
+        <child></child>
         <div>counter: {{counter.value}}</div>
         <button id="a"
             class="b"

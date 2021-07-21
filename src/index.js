@@ -1,5 +1,5 @@
 import { baseCompile as compile } from "./compiler/compile";
-import { createApp, render, h, Text, Fragment, renderList } from "./runtime";
+import { createApp, render, h, Text, Fragment, renderList, resolveComponent } from "./runtime";
 import { reactive, ref, computed, effect } from './reactivity';
 
 window.MiniVue = {
@@ -9,6 +9,7 @@ window.MiniVue = {
     Text,
     Fragment,
     renderList,
+    resolveComponent,
     reactive,
     ref,
     computed,

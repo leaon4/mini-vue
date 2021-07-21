@@ -1,11 +1,11 @@
 import { isString, isArray } from '../utils';
-import { NodeTypes } from './ast'
+import { ElementTypes, NodeTypes } from './ast'
 
 export function generate(ast) {
     const returns = traverseNode(ast);
     const code = `
 with (ctx) {
-    const { h, Text, Fragment, renderList } = MiniVue
+    const { h, Text, Fragment, renderList, resolveComponent } = MiniVue
     return ${returns}
 }`
     return code;
@@ -119,6 +119,10 @@ function resolveElementASTNode(node, parent) {
 function resolveElement(node) {
     const { children, props, directives } = node
 
+    const tag = node.tagType === ElementTypes.ELEMENT
+        ? `"${node.tag}"`
+        : `resolveComponent("${node.tag}")`;
+
     const propArr = [
         ...props.map(prop => {
             return `${prop.name}: ${createText(prop.value)}`
@@ -148,16 +152,16 @@ function resolveElement(node) {
 
     if (!children.length) {
         if (!propArr.length) {
-            return `h("${node.tag}")`;
+            return `h(${tag})`;
         }
-        return `h("${node.tag}", ${propStr})`
+        return `h(${tag}, ${propStr})`
     }
 
     let result = traverseChildren(node);
     if (children.length > 1 || children[0].type === NodeTypes.ELEMENT) {
         result = `[${result}]`
     }
-    return `h("${node.tag}", ${propStr}, ${result})`
+    return `h(${tag}, ${propStr}, ${result})`
 }
 
 // 可以不remove吗？不可以

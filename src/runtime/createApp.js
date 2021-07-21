@@ -1,8 +1,10 @@
 import { render } from './render'
-import { isFunction } from '../utils';
+import { isFunction, camelize, capitalize } from '../utils';
 import { h } from './vnode'
 
+let components;
 export function createApp(rootComponent) {
+    components = rootComponent.components || {};
     const app = {
         mount(rootContainer) {
             if (typeof rootContainer === 'string') {
@@ -18,4 +20,13 @@ export function createApp(rootComponent) {
         }
     };
     return app;
+}
+
+export function resolveComponent(name) {
+    return (
+        components &&
+        (components[name] ||
+            components[camelize(name)] ||
+            components[capitalize(camelize(name))])
+    )
 }
