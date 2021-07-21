@@ -1,5 +1,4 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -10,15 +9,11 @@ module.exports = {
         filename: 'mini-vue.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
-        library: 'MiniVue',
-        libraryTarget: 'var'
+        // library: 'MiniVue',
+        // libraryTarget: 'umd'
     },
-    // plugins: [
-    //     new HtmlWebpackPlugin({
-    //         template: './src/index.html'
-    //     }),
-    // ],
     devServer: {
-        contentBase: './dist',
+        contentBase: './src/examples',
+        publicPath: '/dist',
     },
 };

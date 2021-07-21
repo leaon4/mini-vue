@@ -8,14 +8,10 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="../../dist/mini-vue.js"></script>
 </head>
 
 <body>
-    <!-- <div id="template">
-        <div @click="$event => (i++)"></div>
-    </div>
-    <hr>
-    <div id="codes"></div> -->
     <div id="app">
         <div v-for="item in {a:'a',b:'b'}">{{item}}</div>
         <div>counter: {{counter.value}}</div>
@@ -23,6 +19,7 @@
             class="b"
             @click="click">click</button>
     </div>
+    <script src="index.js"></script>
 </body>
 
 </html>
