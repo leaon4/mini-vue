@@ -134,6 +134,21 @@ describe('patch props', () => {
         triggerMousedown();
         expect(dummy).toBe(12)
     })
+
+    test('disabled', () => {
+        render(h('input'), root);
+        const input = root.children[0];
+        expect(input.disabled).toBe(false);
+
+        render(h('input', { disabled: '' }), root);
+        expect(input.disabled).toBe(true);
+
+        render(h('input', { disabled: false }), root);
+        expect(input.disabled).toBe(false);
+
+        render(h('input', { disabled: true }), root);
+        expect(input.disabled).toBe(true);
+    })
 })
 
 describe('patch unkeyed nodes', () => {

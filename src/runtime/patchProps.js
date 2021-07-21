@@ -60,7 +60,9 @@ function patchDomProp(el, key, prev, next) {
             } else if (domPropsRE.test(key)) {
                 el[key] = next;
             } else {
-                if (next == null) {
+                if (next == null || next === false) {
+                    // 例如disabled，设置''时，应该为true。
+                    // 但设置为其他falsy值如false时，应该为flase
                     el.removeAttribute(key)
                 } else {
                     el.setAttribute(key, next);

@@ -13,6 +13,7 @@
 
 <body>
     <div id="app">
+        <input type="text" :disabled="true">
         <div v-for="item in {a:'a',b:'b'}">{{item}}</div>
         <div>counter: {{counter.value}}</div>
         <button id="a"

@@ -26,7 +26,6 @@ todo:
 .component
 .v-model
 .属性无值的情况
-.import运行时
 
 transform 近1000行！
 

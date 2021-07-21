@@ -36,6 +36,7 @@ export function mountComponent(vnode, container, anchor, patch) {
 
     if (!originalComp.render && originalComp.template) {
         originalComp.render = new Function('ctx', baseCompile(originalComp.template));
+        console.log(originalComp.render)
     }
 
     // toThink: ctx需要响应式吗?
