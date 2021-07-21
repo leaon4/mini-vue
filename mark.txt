@@ -25,7 +25,6 @@ todo:
 .添加，for in，数组都还没有响应式
 .component
 .v-model
-.属性无值的情况
 
 transform 近1000行！
 

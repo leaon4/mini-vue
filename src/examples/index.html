@@ -12,8 +12,18 @@
 </head>
 
 <body>
+    <select name="" id="">
+        <option value="a">a</option>
+        <option value="b" selected>b</option>
+        <option value="c">c</option>
+    </select>
+
     <div id="app">
-        <input type="text" :disabled="true">
+        <select name="" id="">
+            <option value="a">a</option>
+            <option value="b" selected>b</option>
+            <option value="c">c</option>
+        </select>
         <div v-for="item in {a:'a',b:'b'}">{{item}}</div>
         <div>counter: {{counter.value}}</div>
         <button id="a"

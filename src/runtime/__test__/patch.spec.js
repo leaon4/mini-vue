@@ -149,6 +149,49 @@ describe('patch props', () => {
         render(h('input', { disabled: true }), root);
         expect(input.disabled).toBe(true);
     })
+
+    test('checked', () => {
+        render(h('input', { type: 'checkbox' }), root);
+        const input = root.children[0];
+        expect(input.checked).toBe(false);
+
+        render(h('input', { type: 'checkbox', checked: '' }), root);
+        expect(input.checked).toBe(true);
+
+        render(h('input', { type: 'checkbox', checked: false }), root);
+
+        expect(input.checked).toBe(false);
+
+        render(h('input', { type: 'checkbox', checked: true }), root);
+        expect(input.checked).toBe(true);
+    })
+
+    test('selected', () => {
+        render(h('select', null, [
+            h('option', { value: 'a' }, 'a'),
+            h('option', { value: 'b' }, 'b')
+        ]), root);
+        const select = root.children[0];
+        expect(select.value).toBe('a');
+
+        render(h('select', null, [
+            h('option', { value: 'a' }, 'a'),
+            h('option', { value: 'b', selected: '' }, 'b')
+        ]), root);
+        expect(select.value).toBe('b');
+
+        render(h('select', null, [
+            h('option', { value: 'a' }, 'a'),
+            h('option', { value: 'b', selected: false }, 'b')
+        ]), root);
+        expect(select.value).toBe('a');
+
+        render(h('select', null, [
+            h('option', { value: 'a' }, 'a'),
+            h('option', { value: 'b', selected: true }, 'b')
+        ]), root);
+        expect(select.value).toBe('b');
+    })
 })
 
 describe('patch unkeyed nodes', () => {
