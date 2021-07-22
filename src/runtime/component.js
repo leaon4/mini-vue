@@ -35,7 +35,12 @@ export function mountComponent(vnode, container, anchor, patch) {
     instance.setupState = originalComp.setup?.(instance.props, { attrs: instance.attrs });
 
     if (!originalComp.render && originalComp.template) {
-        originalComp.render = new Function('ctx', baseCompile(originalComp.template));
+        let { template } = originalComp;
+        if (template[0] === '#') {
+            const el = document.querySelector(template)
+            template = el ? el.innerHTML : ``
+        }
+        originalComp.render = new Function('ctx', baseCompile(template));
         console.log(originalComp.render)
     }
 

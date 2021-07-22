@@ -164,7 +164,6 @@ function parseTag(context) {
     let tagType = isComponent(tag, context)
         ? ElementTypes.COMPONENT
         : ElementTypes.ELEMENT
-    console.log(tagType,tag)
 
     return {
         type: NodeTypes.ELEMENT,
