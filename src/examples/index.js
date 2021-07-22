@@ -4,8 +4,9 @@ const child = {
     name: 'Child',
     template: document.getElementById('item-template').innerHTML,
     setup() {
+        const model = ref('text')
         return {
-            text: 'i am child component'
+            model,
         }
     }
 }

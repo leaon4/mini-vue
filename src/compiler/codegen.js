@@ -123,6 +123,40 @@ function resolveElement(node) {
         ? `"${node.tag}"`
         : `resolveComponent("${node.tag}")`;
 
+    const vModel = pluckDirective(directives, 'model');
+    if (vModel) {
+        switch (node.tag) {
+            case 'input':
+                directives.push({
+                    type: NodeTypes.DIRECTIVE,
+                    name: 'bind',
+                    exp: vModel.exp,
+                    arg: {
+                        type: NodeTypes.SIMPLE_EXPRESSION,
+                        content: 'value',
+                        isStatic: true,
+                    }
+                }, {
+                    type: NodeTypes.DIRECTIVE,
+                    name: 'on',
+                    exp: {
+                        type: NodeTypes.SIMPLE_EXPRESSION,
+                        content: `$event => ${vModel.exp.content} = $event.target.value`,
+                        isStatic: true,
+                    },
+                    arg: {
+                        type: NodeTypes.SIMPLE_EXPRESSION,
+                        content: 'input',
+                        isStatic: true,
+                    }
+                });
+                break;
+
+            default:
+                break;
+        }
+    }
+
     const propArr = [
         ...props.map(prop => {
             return `${prop.name}: ${createText(prop.value)}`
@@ -141,7 +175,7 @@ function resolveElement(node) {
                     if (/\([^\)]*?\)$/.test(exp) && !exp.includes('=>')) {
                         exp = `$event => (${exp})`
                     }
-                    return `${eventName}: ${exp}`
+                    return `${eventName}: ${exp}`;
             }
         })
     ];

@@ -10,9 +10,12 @@
     <title>Document</title>
     <script src="../../dist/mini-vue.js"></script>
 </head>
-<script type="text/x-template" id="item-template">
-    <div>{{text}}</div>
+<script type="text/x-template"
+    id="item-template">
+    <div>{{model.value}}</div>
+    <input v-model="model.value" />
 </script>
+
 <body>
     <div id="app">
         <child></child>
