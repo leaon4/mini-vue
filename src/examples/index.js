@@ -1,12 +1,17 @@
-const { createApp, ref } = MiniVue;
+
+const { createApp, ref, reactive } = MiniVue;
 
 const child = {
     name: 'Child',
     template: document.getElementById('item-template').innerHTML,
     setup() {
-        const model = ref('text')
+        const text = ref('text');
+        const model = reactive({
+            radio: 'second'
+        })
         return {
-            model,
+            text,
+            model
         }
     }
 }
@@ -24,3 +29,6 @@ createApp({
         }
     }
 }).mount('#app')
+function aa(params) {
+    alert(5)
+}

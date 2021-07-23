@@ -27,6 +27,7 @@ todo:
 .template
 .v-model
 .watchEffect
+.原生事件
 
 feature:
 . v-on 只支持 @click="foo", @click="foo($event,id):两种

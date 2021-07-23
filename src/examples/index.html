@@ -12,8 +12,15 @@
 </head>
 <script type="text/x-template"
     id="item-template">
-    <div>{{model.value}}</div>
-    <input v-model="model.value" />
+    <div>
+        <div>{{text.value}}</div>
+        <input type="text" v-model="text.value">
+    </div>
+    <div>
+        <div>{{model.radio}}</div>
+        <input type="radio" name="radio" value="first" :checked="model.radio === 'first'" @change="$event => model.radio = $event.target.value"/>
+        <input type="radio" name="radio" value="second" :checked="model.radio === 'second'" @change="$event => model.radio = $event.target.value"/>
+    </div>
 </script>
 
 <body>

@@ -5,7 +5,7 @@ export function generate(ast) {
     const returns = traverseNode(ast);
     const code = `
 with (ctx) {
-    const { h, Text, Fragment, renderList, resolveComponent } = MiniVue
+    const { h, Text, Fragment, renderList, resolveComponent, withModel } = MiniVue
     return ${returns}
 }`
     return code;
@@ -71,8 +71,8 @@ function traverseChildren(node) {
 }
 
 function resolveElementASTNode(node, parent) {
-    let ifNode = pluckDirective(node.directives, 'if')
-        || pluckDirective(node.directives, 'else-if');
+    let ifNode = pluck(node.directives, 'if')
+        || pluck(node.directives, 'else-if');
 
     if (ifNode) {
         // 递归必须用resolveElementASTNode，因为一个元素可能有多个指令
@@ -91,10 +91,10 @@ function resolveElementASTNode(node, parent) {
                 }
                 if (sibling.type === NodeTypes.ELEMENT) {
                     let elseNode = children[i];
-                    if (pluckDirective(sibling.directives, 'else')) {
+                    if (pluck(sibling.directives, 'else')) {
                         alternate = resolveElementASTNode(elseNode, parent);
                         children.splice(i, 1);
-                    } else if (pluckDirective(sibling.directives, 'else-if', false)) {
+                    } else if (pluck(sibling.directives, 'else-if', false)) {
                         alternate = resolveElementASTNode(elseNode, parent);
                         children.splice(i, 1);
                     }
@@ -106,7 +106,7 @@ function resolveElementASTNode(node, parent) {
         return `${exp.content} ? ${consequent} : ${alternate || createTextVNode()}`
     }
 
-    let forNode = pluckDirective(node.directives, 'for');
+    let forNode = pluck(node.directives, 'for');
     if (forNode) {
         const { exp } = forNode;
         const [args, source] = exp.content.split(/\sin\s|\sof\s/);
@@ -123,39 +123,32 @@ function resolveElement(node) {
         ? `"${node.tag}"`
         : `resolveComponent("${node.tag}")`;
 
-    const vModel = pluckDirective(directives, 'model');
-    if (vModel) {
-        switch (node.tag) {
-            case 'input':
-                directives.push({
-                    type: NodeTypes.DIRECTIVE,
-                    name: 'bind',
-                    exp: vModel.exp,
-                    arg: {
-                        type: NodeTypes.SIMPLE_EXPRESSION,
-                        content: 'value',
-                        isStatic: true,
-                    }
-                }, {
-                    type: NodeTypes.DIRECTIVE,
-                    name: 'on',
-                    exp: {
-                        type: NodeTypes.SIMPLE_EXPRESSION,
-                        content: `$event => ${vModel.exp.content} = $event.target.value`,
-                        isStatic: true,
-                    },
-                    arg: {
-                        type: NodeTypes.SIMPLE_EXPRESSION,
-                        content: 'input',
-                        isStatic: true,
-                    }
-                });
-                break;
-
-            default:
-                break;
-        }
-    }
+    const vModel = pluck(directives, 'model');
+    // if (vModel && node.tag === 'input') {
+    //     directives.push({
+    //         type: NodeTypes.DIRECTIVE,
+    //         name: 'bind',
+    //         exp: vModel.exp,
+    //         arg: {
+    //             type: NodeTypes.SIMPLE_EXPRESSION,
+    //             content: 'value',
+    //             isStatic: true,
+    //         }
+    //     }, {
+    //         type: NodeTypes.DIRECTIVE,
+    //         name: 'on',
+    //         exp: {
+    //             type: NodeTypes.SIMPLE_EXPRESSION,
+    //             content: `$event => ${vModel.exp.content} = $event.target.value`,
+    //             isStatic: true,
+    //         },
+    //         arg: {
+    //             type: NodeTypes.SIMPLE_EXPRESSION,
+    //             content: 'input',
+    //             isStatic: true,
+    //         }
+    //     });
+    // }
 
     const propArr = [
         ...props.map(prop => {
@@ -180,9 +173,15 @@ function resolveElement(node) {
         })
     ];
 
-    const propStr = propArr.length
+    let propStr = propArr.length
         ? `{ ${propArr.join(', ')} }`
         : 'null';
+
+    if (vModel) {
+        const getter = `() => ${createText(vModel.exp)}`;
+        const setter = `e => ${createText(vModel.exp)} = e.target.value`;
+        propStr = `withModel(${tag}, ${propStr}, ${getter}, ${setter})`
+    }
 
     if (!children.length) {
         if (!propArr.length) {
@@ -199,7 +198,7 @@ function resolveElement(node) {
 }
 
 // 可以不remove吗？不可以
-function pluckDirective(directives, name, remove = true) {
+function pluck(directives, name, remove = true) {
     const index = directives.findIndex(dir => dir.name === name)
     const dir = directives[index];
     if (remove && index > -1) {
