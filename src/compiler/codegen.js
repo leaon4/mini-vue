@@ -179,7 +179,7 @@ function resolveElement(node) {
 
     if (vModel) {
         const getter = `() => ${createText(vModel.exp)}`;
-        const setter = `e => ${createText(vModel.exp)} = e.target.value`;
+        const setter = `value => ${createText(vModel.exp)} = value`;
         propStr = `withModel(${tag}, ${propStr}, ${getter}, ${setter})`
     }
 
@@ -190,11 +190,11 @@ function resolveElement(node) {
         return `h(${tag}, ${propStr})`
     }
 
-    let result = traverseChildren(node);
+    let childrenStr = traverseChildren(node);
     if (children.length > 1 || children[0].type === NodeTypes.ELEMENT) {
-        result = `[${result}]`
+        childrenStr = `[${childrenStr}]`
     }
-    return `h(${tag}, ${propStr}, ${result})`
+    return `h(${tag}, ${propStr}, ${childrenStr})`
 }
 
 // 可以不remove吗？不可以

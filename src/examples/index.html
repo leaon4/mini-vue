@@ -10,28 +10,9 @@
     <title>Document</title>
     <script src="../../dist/mini-vue.js"></script>
 </head>
-<script type="text/x-template"
-    id="item-template">
-    <div>
-        <div>{{text.value}}</div>
-        <input type="text" v-model="text.value">
-    </div>
-    <div>
-        <div>{{model.radio}}</div>
-        <input type="radio" name="radio" value="first" :checked="model.radio === 'first'" @change="$event => model.radio = $event.target.value"/>
-        <input type="radio" name="radio" value="second" :checked="model.radio === 'second'" @change="$event => model.radio = $event.target.value"/>
-    </div>
-</script>
 
 <body>
-    <div id="app">
-        <child></child>
-        <div>counter: {{counter.value}}</div>
-        <button id="a"
-            class="b"
-            @click="click">click</button>
-    </div>
-    <script src="index.js"></script>
+
 </body>
 
 </html>
