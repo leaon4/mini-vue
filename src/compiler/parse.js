@@ -1,3 +1,4 @@
+import { camelize } from "../utils";
 import { NodeTypes, createRoot, ElementTypes } from "./ast";
 import { isVoidTag, isNativeTag } from './index'
 
@@ -251,7 +252,7 @@ function parseAttribute(context) {
         if (argContent) {
             arg = {
                 type: NodeTypes.SIMPLE_EXPRESSION,
-                content: argContent,
+                content: camelize(argContent),
                 isStatic: true,
             }
         }
