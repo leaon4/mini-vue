@@ -27,7 +27,11 @@ window.init = () => {
         console.clear()
         try {
             const errors = []
-            const compileFn = baseCompile
+            const compileFn = (source)=>{
+                return format(
+                    baseCompile(source)
+                )
+            }
             const start = performance.now()
             const code = compileFn(source)
             console.log(`Compiled in ${(performance.now() - start).toFixed(2)}ms.`)
@@ -36,7 +40,7 @@ window.init = () => {
                 `@vue/compiler-dom`,
                 errors.filter(e => e.loc).map(formatError)
             )
-            lastSuccessfulCode = code + `\n\n// Check the console for the AST`
+            lastSuccessfulCode = code
         } catch (e) {
             lastSuccessfulCode = `/* ERROR: ${e.message
                 } (see console for more info) */`
@@ -63,6 +67,7 @@ window.init = () => {
         const res = compileCode(src)
         if (res) {
             output.setValue(res)
+            output.trigger("editor", "editor.action.formatDocument");
         }
     }
 
