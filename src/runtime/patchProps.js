@@ -58,7 +58,7 @@ function patchDomProp(el, key, prev, next) {
                     }
                 }
             } else if (domPropsRE.test(key)) {
-                if (next === '') {
+                if (next === '' && typeof el[key] === 'boolean') {
                     next = true;
                 }
                 el[key] = next;

@@ -27,6 +27,8 @@ todo:
 .template
 .watchEffect
 .清理base打头的东西
+.清理todo,tothink
+.style lint
 
 feature:
 . v-on 只支持 @click="foo", @click="foo($event,id):两种

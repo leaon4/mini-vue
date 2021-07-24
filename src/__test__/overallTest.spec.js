@@ -36,6 +36,10 @@ describe('v-model', () => {
         model.text = 'te'
         await nextTick()
         expect(input.value).toBe('te')
+
+        model.text = ''
+        await nextTick()
+        expect(input.value).toBe('')
     })
 
     test('input[type = radio]', async () => {

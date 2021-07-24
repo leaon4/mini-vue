@@ -13,8 +13,8 @@
 
 <body>
     <div id="app">
-        <button onclick="aa()"
-            @click="bb()">click</button>
+        <input type="text"
+            v-model="text">
     </div>
     <script>
         const {
@@ -24,18 +24,11 @@
 
         createApp({
             setup() {
-                const bb = () => {
-                    console.log('bb')
-                }
                 return {
-                    bb
+                    text: ''
                 }
             }
         }).mount('#app')
-
-        function aa() {
-            console.log('aa')
-        }
     </script>
 </body>
 
