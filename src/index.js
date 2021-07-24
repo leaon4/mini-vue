@@ -16,4 +16,5 @@ export const MiniVue = window.MiniVue = {
     ref,
     computed,
     effect,
+    compile,
 };

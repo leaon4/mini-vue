@@ -26,6 +26,7 @@ todo:
 .添加，for in，还没有响应式
 .template
 .watchEffect
+.清理base打头的东西
 
 feature:
 . v-on 只支持 @click="foo", @click="foo($event,id):两种
