@@ -124,31 +124,6 @@ function resolveElement(node) {
         : `resolveComponent("${node.tag}")`;
 
     const vModel = pluck(directives, 'model');
-    // if (vModel && node.tag === 'input') {
-    //     directives.push({
-    //         type: NodeTypes.DIRECTIVE,
-    //         name: 'bind',
-    //         exp: vModel.exp,
-    //         arg: {
-    //             type: NodeTypes.SIMPLE_EXPRESSION,
-    //             content: 'value',
-    //             isStatic: true,
-    //         }
-    //     }, {
-    //         type: NodeTypes.DIRECTIVE,
-    //         name: 'on',
-    //         exp: {
-    //             type: NodeTypes.SIMPLE_EXPRESSION,
-    //             content: `$event => ${vModel.exp.content} = $event.target.value`,
-    //             isStatic: true,
-    //         },
-    //         arg: {
-    //             type: NodeTypes.SIMPLE_EXPRESSION,
-    //             content: 'input',
-    //             isStatic: true,
-    //         }
-    //     });
-    // }
 
     const propArr = [
         ...props.map(prop => {
@@ -184,7 +159,7 @@ function resolveElement(node) {
     }
 
     if (!children.length) {
-        if (!propArr.length) {
+        if (propStr === 'null') {
             return `h(${tag})`;
         }
         return `h(${tag}, ${propStr})`

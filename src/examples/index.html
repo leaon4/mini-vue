@@ -12,7 +12,30 @@
 </head>
 
 <body>
-
+    <script>
+        const {
+            reactive,
+            createApp
+        } = MiniVue;
+        const root = document.body;
+        const template = `
+            <div>{{model.radio}}</div>
+            <input name="radio" type="radio" value="first" v-model="model.radio" />
+            <input name="radio" type="radio" value="second" v-model="model.radio" />
+        `;
+        const model = reactive({
+            radio: 'second'
+        });
+        createApp({
+            template: template.trim(),
+            setup() {
+                return {
+                    model
+                }
+            }
+        }).mount(root);
+        const [div, r1, r2] = root.children;
+    </script>
 </body>
 
 </html>

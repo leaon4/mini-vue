@@ -1,8 +1,8 @@
 import { baseCompile as compile } from "./compiler/compile";
-import { createApp, render, h, Text, Fragment, renderList, resolveComponent, withModel } from "./runtime";
+import { createApp, render, h, Text, Fragment, renderList, resolveComponent, withModel, nextTick } from "./runtime";
 import { reactive, ref, computed, effect } from './reactivity';
 
-window.MiniVue = {
+export const MiniVue = window.MiniVue = {
     createApp,
     render,
     h,
@@ -11,6 +11,7 @@ window.MiniVue = {
     renderList,
     resolveComponent,
     withModel,
+    nextTick,
     reactive,
     ref,
     computed,

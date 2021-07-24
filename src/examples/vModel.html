@@ -58,13 +58,13 @@
             ref,
             reactive
         } = MiniVue;
+        const model = reactive({
+            text: 'text',
+            radio: 'second',
+            checkbox: ['one', 'three'],
+        })
         createApp({
             setup() {
-                const model = reactive({
-                    text: 'text',
-                    radio: 'second',
-                    checkbox: ['one', 'three'],
-                })
                 return {
                     model
                 }

@@ -21,6 +21,7 @@ export function patchProps(el, oldProps, newProps) {
     }
 }
 
+const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
 function patchDomProp(el, key, prev, next) {
     switch (key) {
         case 'class':
@@ -56,6 +57,11 @@ function patchDomProp(el, key, prev, next) {
                         el.addEventListener(eventName, next);
                     }
                 }
+            } else if (domPropsRE.test(key)) {
+                if (next === '') {
+                    next = true;
+                }
+                el[key] = next;
             } else {
                 if (next == null || next === false) {
                     // 例如disabled，设置''时，应该为true。

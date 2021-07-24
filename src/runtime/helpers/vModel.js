@@ -1,4 +1,4 @@
-export function withModel(tag, props, getter, setter, options) {
+export function withModel(tag, props, getter, setter) {
     props = props || {}
     if (tag === 'input') {
         switch (props.type) {

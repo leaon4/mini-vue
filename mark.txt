@@ -25,7 +25,6 @@
 todo:
 .添加，for in，还没有响应式
 .template
-.v-model
 .watchEffect
 .原生事件
 
@@ -33,3 +32,4 @@ feature:
 . v-on 只支持 @click="foo", @click="foo($event,id):两种
 . 不支持class, style动静合并
 . 没有unref，模板内所有ref也必须写value
+. v-model不支持select，不支持component
