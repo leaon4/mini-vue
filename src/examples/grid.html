@@ -29,7 +29,8 @@
 <script>
     const {
         reactive,
-        computed
+        computed,
+        ref
     } = MiniVue
 
     const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
@@ -89,11 +90,11 @@
 <div id="demo">
     <form id="search">
         Search <input name="query"
-            v-model="searchQuery">
+            v-model="searchQuery.value">
     </form>
     <demo-grid :data="gridData"
         :columns="gridColumns"
-        :filter-key="searchQuery">
+        :filter-key="searchQuery.value">
     </demo-grid>
 </div>
 <!-- App script -->
@@ -104,7 +105,10 @@
         },
         setup() {
             return {
-                searchQuery: '',
+                // 不同于原版，这里需要用ref
+                // 可能是因为v-model机制不同，原版修改的是经过props响应化后的响应式对象，
+                // 而这里修改的是普通值，因此要显示定义为ref
+                searchQuery: ref(''),
                 gridColumns: ['name', 'power'],
                 gridData: [{
                         name: 'Chuck Norris',
