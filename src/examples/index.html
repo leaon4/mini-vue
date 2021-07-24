@@ -12,29 +12,30 @@
 </head>
 
 <body>
+    <div id="app">
+        <button onclick="aa()"
+            @click="bb()">click</button>
+    </div>
     <script>
         const {
             reactive,
             createApp
         } = MiniVue;
-        const root = document.body;
-        const template = `
-            <div>{{model.radio}}</div>
-            <input name="radio" type="radio" value="first" v-model="model.radio" />
-            <input name="radio" type="radio" value="second" v-model="model.radio" />
-        `;
-        const model = reactive({
-            radio: 'second'
-        });
+
         createApp({
-            template: template.trim(),
             setup() {
+                const bb = () => {
+                    console.log('bb')
+                }
                 return {
-                    model
+                    bb
                 }
             }
-        }).mount(root);
-        const [div, r1, r2] = root.children;
+        }).mount('#app')
+
+        function aa() {
+            console.log('aa')
+        }
     </script>
 </body>
 

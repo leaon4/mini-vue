@@ -46,7 +46,7 @@ function patchDomProp(el, key, prev, next) {
             }
             break;
         default:
-            if (key.startsWith('on')) {
+            if (/^on[^a-z]/.test(key)) {
                 // 事件
                 if (prev !== next) {
                     const eventName = key.slice(2).toLowerCase();

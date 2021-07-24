@@ -137,3 +137,23 @@ describe('v-model', () => {
         expect(c3.checked).toBe(false)
     })
 })
+
+test('native event with vue event', () => {
+    const template = `
+        <button onclick="nativeEvent()" @click="vueEvent">click</button>
+    `;
+    window.nativeEvent = jest.fn();
+    const vueEvent = jest.fn();
+    createApp({
+        template: template.trim(),
+        setup() {
+            return {
+                vueEvent
+            }
+        }
+    }).mount(root);
+
+    root.children[0].click()
+    expect(window.nativeEvent).toHaveBeenCalledTimes(1)
+    expect(vueEvent).toHaveBeenCalledTimes(1)
+})
