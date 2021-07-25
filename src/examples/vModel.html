@@ -51,6 +51,12 @@
                 v-model="model.checkbox">three
         </label>
         <hr>
+        <div>{{model.singleCheckbox.toString()}}</div>
+        <label>
+            <input type="checkbox"
+                v-model="model.singleCheckbox">singleCheckbox
+        </label>
+        <hr>
     </div>
     <script>
         const {
@@ -62,6 +68,7 @@
             text: 'text',
             radio: 'second',
             checkbox: ['one', 'three'],
+            singleCheckbox: true,
         })
         createApp({
             setup() {

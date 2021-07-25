@@ -80,7 +80,7 @@ describe('v-model', () => {
         expect(r2.checked).toBe(true)
     })
 
-    test('input[type = checkbox]', async () => {
+    test('input[type = checkbox], bind array value', async () => {
         const template = `
             <div>{{model.checkbox.toString()}}</div>
             <input name="checkbox" type="checkbox" value="one" v-model="model.checkbox" />
@@ -116,8 +116,6 @@ describe('v-model', () => {
 
         c1.click()
         c3.click()
-        // 真实web中，直接click有效，但在这里必须要补个dispatchEvent
-        // const e = new Event('change')
         c1.dispatchEvent(e);
         c3.dispatchEvent(e);
         await nextTick()
@@ -139,6 +137,40 @@ describe('v-model', () => {
         expect(c1.checked).toBe(true)
         expect(c2.checked).toBe(false)
         expect(c3.checked).toBe(false)
+    })
+
+    test('input[type = checkbox], bind boolean value', async () => {
+        const template = `
+            <div>{{model.checkbox.toString()}}</div>
+            <input type="checkbox" v-model="model.checkbox" />
+        `;
+        const model = reactive({
+            checkbox: true
+        });
+        createApp({
+            template: template.trim(),
+            setup() {
+                return {
+                    model
+                }
+            }
+        }).mount(root);
+        const [div, c1] = root.children;
+        expect(div.textContent).toBe('true')
+        expect(c1.checked).toBe(true)
+
+        c1.click()
+        // 真实web中，直接click有效，但在这里必须要补个dispatchEvent
+        const e = new Event('change')
+        c1.dispatchEvent(e);
+        await nextTick()
+        expect(div.textContent).toBe('false')
+        expect(c1.checked).toBe(false)
+
+        model.checkbox = true
+        await nextTick()
+        expect(div.textContent).toBe('true')
+        expect(c1.checked).toBe(true)
     })
 })
 
@@ -178,7 +210,7 @@ test('v-html', async () => {
     const div = root.children[0]
     expect(div.innerHTML).toBe('hello')
 
-    output.value='<ul><li>a</li></ul>'
+    output.value = '<ul><li>a</li></ul>'
     await nextTick()
     expect(div.innerHTML).toBe('<ul><li>a</li></ul>')
 })
