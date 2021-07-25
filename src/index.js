@@ -1,4 +1,4 @@
-import { baseCompile as compile } from './compiler/compile';
+import { compile } from './compiler/compile';
 import {
     createApp,
     render,

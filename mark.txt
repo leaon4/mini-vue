@@ -23,15 +23,12 @@
 10.ctx需要reactive吗
 
 todo:
-.添加，for in，还没有响应式
-.template
 .watchEffect                       不做了，effect基本能替代
-.清理base打头的东西
-.清理todo,tothink
-.style lint
 
 feature:
 . v-on 只支持 @click="foo", @click="foo($event,id):两种
 . 不支持class, style动静合并
 . 没有unref，模板内所有ref也必须写value
 . v-model不支持select，不支持component
+.添加，for in，还没有响应式
+.template

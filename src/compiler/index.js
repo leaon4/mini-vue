@@ -22,6 +22,6 @@ function makeMap(str) {
 export const isVoidTag = makeMap(VOID_TAGS);
 export const isNativeTag = makeMap(HTML_TAGS);
 
-export { baseParse } from './parse';
+export { parse } from './parse';
 export { NodeTypes } from './ast';
-export { baseCompile } from './compile';
+export { compile } from './compile';

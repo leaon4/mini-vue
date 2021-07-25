@@ -1,48 +1,48 @@
 import { generateReturns } from '../codegen';
-import { baseParse } from '../parse';
-function baseCompile(template) {
-    const ast = baseParse(template);
+import { parse } from '../parse';
+function compile(template) {
+    const ast = parse(template);
     return generateReturns(ast);
 }
 
 describe('compiler: integration tests', () => {
     describe('text and interpolation', () => {
         test('simple text', () => {
-            const code = baseCompile('foo');
+            const code = compile('foo');
             expect(code).toBe('h(Text, null, "foo")');
         });
 
         test('no consecutive text', () => {
-            const code = baseCompile('{{ foo }}');
+            const code = compile('{{ foo }}');
             expect(code).toBe('h(Text, null, foo)');
         });
 
         test('expression', () => {
-            const code = baseCompile('{{ foo + bar }}');
+            const code = compile('{{ foo + bar }}');
             expect(code).toBe('h(Text, null, foo + bar)');
         });
 
         test('consecutive text', () => {
-            const code = baseCompile('{{ foo }} bar {{ baz }}');
+            const code = compile('{{ foo }} bar {{ baz }}');
             expect(code).toBe(
                 '[h(Text, null, foo), h(Text, null, " bar "), h(Text, null, baz)]'
             );
         });
 
         test('consecutive text between elements', () => {
-            const code = baseCompile('<div/>{{ foo }} bar {{ baz }}<div/>');
+            const code = compile('<div/>{{ foo }} bar {{ baz }}<div/>');
             expect(code).toBe(
                 '[h("div"), h(Text, null, foo), h(Text, null, " bar "), h(Text, null, baz), h("div")]'
             );
         });
 
         test('text between elements (static)', () => {
-            const code = baseCompile('<div/>hello<div/>');
+            const code = compile('<div/>hello<div/>');
             expect(code).toBe('[h("div"), h(Text, null, "hello"), h("div")]');
         });
 
         test('consecutive text mixed with elements', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<div/>{{ foo }} bar {{ baz }}<div/>hello<div/>'
             );
             expect(code).toBe(
@@ -54,34 +54,34 @@ describe('compiler: integration tests', () => {
 
     describe('element', () => {
         test('single element', () => {
-            const code = baseCompile('<p/>');
+            const code = compile('<p/>');
             expect(code).toBe('h("p")');
         });
 
         test('with text child', () => {
-            const code = baseCompile('<div>fine</div>');
+            const code = compile('<div>fine</div>');
             expect(code).toBe('h("div", null, "fine")');
         });
 
         // test('import + resolve component', () => {
-        //     const code = baseCompile('<Foo/>');
+        //     const code = compile('<Foo/>');
         //     expect(code).toBe('h("Foo")');
         // })
 
         test('static props', () => {
-            const code = baseCompile(`<div id="foo" class="bar" />`);
+            const code = compile(`<div id="foo" class="bar" />`);
             expect(code).toBe('h("div", { id: "foo", class: "bar" })');
         });
 
         test('props + children', () => {
-            const code = baseCompile(`<div id="foo"><span/></div>`);
+            const code = compile(`<div id="foo"><span/></div>`);
             expect(code).toBe('h("div", { id: "foo" }, [h("span")])');
         });
     });
 
     describe('v-if', () => {
         test('basic v-if', () => {
-            const code = baseCompile('<div v-if="ok"/>');
+            const code = compile('<div v-if="ok"/>');
             expect(code).toBe('ok ? h("div") : h(Text, null, "")');
         });
 
@@ -98,19 +98,19 @@ describe('compiler: integration tests', () => {
         // })
 
         test('v-if + v-else', () => {
-            const code = baseCompile('<div v-if="ok"/><p v-else/>');
+            const code = compile('<div v-if="ok"/><p v-else/>');
             expect(code).toBe('ok ? h("div") : h("p")');
         });
 
         test('v-if + v-else-if', () => {
-            const code = baseCompile('<div v-if="ok"/><p v-else-if="orNot"/>');
+            const code = compile('<div v-if="ok"/><p v-else-if="orNot"/>');
             expect(code).toBe(
                 'ok ? h("div") : orNot ? h("p") : h(Text, null, "")'
             );
         });
 
         test('v-if + v-else-if + v-else', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<div v-if="ok"/><p v-else-if="orNot"/><h1 v-else>fine</h1>'
             );
             expect(code).toBe(
@@ -119,14 +119,14 @@ describe('compiler: integration tests', () => {
         });
 
         test('with spaces between branches', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<div v-if="ok"/> <p v-else-if="no"/> <span v-else/>'
             );
             expect(code).toBe('ok ? h("div") : no ? h("p") : h("span")');
         });
 
         test('nested', () => {
-            const code = baseCompile(
+            const code = compile(
                 `
                 <div v-if="ok">ok</div>
                 <div v-else-if="foo">
@@ -171,14 +171,14 @@ describe('compiler: integration tests', () => {
 
     describe('v-for', () => {
         test('number expression', () => {
-            const code = baseCompile('<span v-for="index in 5" />');
+            const code = compile('<span v-for="index in 5" />');
             expect(code).toBe(
                 'h(Fragment, null, renderList(5, index => h("span")))'
             );
         });
 
         test('object de-structured value', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<span v-for="({ id, value }) in items" />'
             );
             expect(code).toBe(
@@ -187,7 +187,7 @@ describe('compiler: integration tests', () => {
         });
 
         test('array de-structured value', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<span v-for="([ id, value ]) in items" />'
             );
             expect(code).toBe(
@@ -196,14 +196,14 @@ describe('compiler: integration tests', () => {
         });
 
         test('value and key', () => {
-            const code = baseCompile('<span v-for="(item, key) in items" />');
+            const code = compile('<span v-for="(item, key) in items" />');
             expect(code).toBe(
                 'h(Fragment, null, renderList(items, (item, key) => h("span")))'
             );
         });
 
         test('value, key and index', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<span v-for="(value, key, index) in items" />'
             );
             expect(code).toBe(
@@ -212,7 +212,7 @@ describe('compiler: integration tests', () => {
         });
 
         test('with key', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<span v-for="item in items" :key="item.id" />'
             );
             expect(code).toBe(
@@ -222,12 +222,12 @@ describe('compiler: integration tests', () => {
 
         // 不支持
         /* test('skipped key', () => {
-            const code = baseCompile('<span v-for="(value,,index) in items" />');
+            const code = compile('<span v-for="(value,,index) in items" />');
             expect(code).toBe('h(Fragment, null, renderList(items, (value,,index) => h("span")))');
         }) */
 
         test('nested', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<ul v-for="item in items"><li v-for="child in item.list">{{child.text}}</li></ul>'
             );
             expect(code).toBe(
@@ -236,7 +236,7 @@ describe('compiler: integration tests', () => {
         });
 
         test('v-if + v-for', () => {
-            const code = baseCompile('<div v-if="ok" v-for="i in list"/>');
+            const code = compile('<div v-if="ok" v-for="i in list"/>');
             expect(code).toBe(
                 'ok ? h(Fragment, null, renderList(list, i => h("div"))) : h(Text, null, "")'
             );
@@ -245,12 +245,12 @@ describe('compiler: integration tests', () => {
 
     describe('v-bind, v-on', () => {
         test('v-bind', () => {
-            const code = baseCompile('<div v-bind:id="id" :class="a" />');
+            const code = compile('<div v-bind:id="id" :class="a" />');
             expect(code).toBe('h("div", { id: id, class: a })');
         });
 
         test('v-on', () => {
-            const code = baseCompile(
+            const code = compile(
                 '<div v-on:click="onClick" @mousedown="onMouseDown" />'
             );
             expect(code).toBe(
@@ -259,19 +259,19 @@ describe('compiler: integration tests', () => {
         });
 
         test('inline statement', () => {
-            const code = baseCompile('<div @click="foo($event, id)"/>');
+            const code = compile('<div @click="foo($event, id)"/>');
             expect(code).toBe(
                 'h("div", { onClick: $event => (foo($event, id)) })'
             );
         });
 
         test('inline statement2', () => {
-            const code = baseCompile('<div @click="() => i++"/>');
+            const code = compile('<div @click="() => i++"/>');
             expect(code).toBe('h("div", { onClick: () => i++ })');
         });
 
         test('compound', () => {
-            const code = baseCompile(`
+            const code = compile(`
             <div :class="class"
                 @click="foo"
                 style="color: red"

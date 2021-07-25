@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-undef
-const { effect, compile: baseCompile } = MiniVue;
+const { effect, compile } = MiniVue;
 
 const sharedEditorOptions = {
     fontSize: 14,
@@ -31,7 +31,7 @@ window.init = () => {
             const errors = [];
             const compileFn = (source) => {
                 // eslint-disable-next-line no-undef
-                return format(baseCompile(source));
+                return format(compile(source));
             };
             const start = performance.now();
             const code = compileFn(source);

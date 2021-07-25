@@ -1,7 +1,7 @@
 import { reactive, effect } from '../reactivity';
 import { normalizeVNode } from './vnode';
 import { queueJob } from './scheduler';
-import { baseCompile } from '../compiler';
+import { compile } from '../compiler';
 
 function updateComponentProps(instance, vnode) {
     const { type: originalComp, props: vnodeProps } = vnode;
@@ -43,7 +43,7 @@ export function mountComponent(vnode, container, anchor, patch) {
             const el = document.querySelector(template);
             template = el ? el.innerHTML : ``;
         }
-        originalComp.render = new Function('ctx', baseCompile(template));
+        originalComp.render = new Function('ctx', compile(template));
         console.log(originalComp.render);
     }
 

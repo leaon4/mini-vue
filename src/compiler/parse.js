@@ -2,7 +2,7 @@ import { camelize } from '../utils';
 import { NodeTypes, createRoot, ElementTypes } from './ast';
 import { isVoidTag, isNativeTag } from './index';
 
-export function baseParse(content) {
+export function parse(content) {
     const context = createParserContext(content);
     return createRoot(parseChildren(context));
 }

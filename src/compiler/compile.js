@@ -1,7 +1,7 @@
-import { baseParse } from './parse';
+import { parse } from './parse';
 import { generate } from './codegen';
 
-export function baseCompile(template) {
-    const ast = baseParse(template);
+export function compile(template) {
+    const ast = parse(template);
     return generate(ast);
 }

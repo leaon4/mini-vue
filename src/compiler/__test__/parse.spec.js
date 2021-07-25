@@ -1,10 +1,10 @@
-import { baseParse } from '../parse';
+import { parse } from '../parse';
 import { NodeTypes, ElementTypes } from '../ast';
 
 describe('compiler: parse', () => {
     describe('Text', () => {
         test('simple text', () => {
-            const ast = baseParse('some text');
+            const ast = parse('some text');
             const text = ast.children[0];
 
             expect(text).toStrictEqual({
@@ -14,7 +14,7 @@ describe('compiler: parse', () => {
         });
 
         test('text with interpolation', () => {
-            const ast = baseParse('some {{ foo + bar }} text');
+            const ast = parse('some {{ foo + bar }} text');
             const text1 = ast.children[0];
             const text2 = ast.children[2];
 
@@ -29,7 +29,7 @@ describe('compiler: parse', () => {
         });
 
         test('text with interpolation which has `<`', () => {
-            const ast = baseParse('some {{ a<b && c>d }} text');
+            const ast = parse('some {{ a<b && c>d }} text');
             const text1 = ast.children[0];
             const text2 = ast.children[2];
 
@@ -44,7 +44,7 @@ describe('compiler: parse', () => {
         });
 
         test('text with interpolation which has `<`', () => {
-            const ast = baseParse('some {{ a<b && c>d }} text');
+            const ast = parse('some {{ a<b && c>d }} text');
             const text1 = ast.children[0];
             const text2 = ast.children[2];
 
@@ -59,7 +59,7 @@ describe('compiler: parse', () => {
         });
 
         test('text with mix of tags and interpolations', () => {
-            const ast = baseParse(
+            const ast = parse(
                 'some <span>{{ foo < bar + foo }} text</span>'
             );
             const text1 = ast.children[0];
@@ -77,7 +77,7 @@ describe('compiler: parse', () => {
     });
     describe('Interpolation', () => {
         test('simple interpolation', () => {
-            const ast = baseParse('{{message}}');
+            const ast = parse('{{message}}');
             const interpolation = ast.children[0];
 
             expect(interpolation).toStrictEqual({
@@ -91,7 +91,7 @@ describe('compiler: parse', () => {
         });
 
         test('it can have tag-like notation', () => {
-            const ast = baseParse('{{ a<b }}');
+            const ast = parse('{{ a<b }}');
             const interpolation = ast.children[0];
 
             expect(interpolation).toStrictEqual({
@@ -105,7 +105,7 @@ describe('compiler: parse', () => {
         });
 
         test('it can have tag-like notation (2)', () => {
-            const ast = baseParse('{{ a<b }}{{ c>d }}');
+            const ast = parse('{{ a<b }}{{ c>d }}');
             const interpolation1 = ast.children[0];
             const interpolation2 = ast.children[1];
 
@@ -129,7 +129,7 @@ describe('compiler: parse', () => {
         });
 
         test('it can have tag-like notation (3)', () => {
-            const ast = baseParse('<div>{{ "</div>" }}</div>');
+            const ast = parse('<div>{{ "</div>" }}</div>');
             const element = ast.children[0];
             const interpolation = element.children[0];
 
@@ -144,7 +144,7 @@ describe('compiler: parse', () => {
         });
 
         test('delimiters', () => {
-            const ast = baseParse('<p>{{msg}}</p>');
+            const ast = parse('<p>{{msg}}</p>');
             const element = ast.children[0];
             const interpolation = element.children[0];
             expect(interpolation).toStrictEqual({
@@ -160,7 +160,7 @@ describe('compiler: parse', () => {
 
     describe('Element', () => {
         test('simple div', () => {
-            const ast = baseParse('<div>hello</div>');
+            const ast = parse('<div>hello</div>');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -180,7 +180,7 @@ describe('compiler: parse', () => {
         });
 
         test('empty', () => {
-            const ast = baseParse('<div></div>');
+            const ast = parse('<div></div>');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -196,7 +196,7 @@ describe('compiler: parse', () => {
         });
 
         test('self closing', () => {
-            const ast = baseParse('<div/>after');
+            const ast = parse('<div/>after');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -212,7 +212,7 @@ describe('compiler: parse', () => {
         });
 
         test('void element', () => {
-            const ast = baseParse('<img>after');
+            const ast = parse('<img>after');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -228,7 +228,7 @@ describe('compiler: parse', () => {
         });
 
         test('native element with `isNativeTag`', () => {
-            const ast = baseParse('<div></div><comp></comp><Comp></Comp>');
+            const ast = parse('<div></div><comp></comp><Comp></Comp>');
 
             expect(ast.children[0]).toMatchObject({
                 type: NodeTypes.ELEMENT,
@@ -250,7 +250,7 @@ describe('compiler: parse', () => {
         });
 
         test('attribute with no value', () => {
-            const ast = baseParse('<div id></div>');
+            const ast = parse('<div id></div>');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -272,7 +272,7 @@ describe('compiler: parse', () => {
         });
 
         test('attribute with empty value, double quote', () => {
-            const ast = baseParse('<div id=""></div>');
+            const ast = parse('<div id=""></div>');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -297,7 +297,7 @@ describe('compiler: parse', () => {
         });
 
         test('attribute with empty value, single quote', () => {
-            const ast = baseParse("<div id=''></div>");
+            const ast = parse("<div id=''></div>");
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -322,7 +322,7 @@ describe('compiler: parse', () => {
         });
 
         test('attribute with value, double quote', () => {
-            const ast = baseParse('<div id=">\'"></div>');
+            const ast = parse('<div id=">\'"></div>');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -347,7 +347,7 @@ describe('compiler: parse', () => {
         });
 
         test('attribute with value, single quote', () => {
-            const ast = baseParse("<div id='>\"'></div>");
+            const ast = parse("<div id='>\"'></div>");
             const element = ast.children[0];
 
             expect(element).toStrictEqual({
@@ -372,7 +372,7 @@ describe('compiler: parse', () => {
         });
 
         test('multiple attributes', () => {
-            const ast = baseParse(
+            const ast = parse(
                 '<div id="a" class="c" inert style=\'\'></div>'
             );
             const element = ast.children[0];
@@ -420,7 +420,7 @@ describe('compiler: parse', () => {
         });
 
         test('directive with no value', () => {
-            const ast = baseParse('<div v-if/>');
+            const ast = parse('<div v-if/>');
             const directive = ast.children[0].directives[0];
 
             expect(directive).toStrictEqual({
@@ -432,7 +432,7 @@ describe('compiler: parse', () => {
         });
 
         test('directive with value', () => {
-            const ast = baseParse('<div v-if="a"/>');
+            const ast = parse('<div v-if="a"/>');
             const directive = ast.children[0].directives[0];
 
             expect(directive).toStrictEqual({
@@ -448,7 +448,7 @@ describe('compiler: parse', () => {
         });
 
         test('directive with argument', () => {
-            const ast = baseParse('<div v-on:click/>');
+            const ast = parse('<div v-on:click/>');
             const directive = ast.children[0].directives[0];
 
             expect(directive).toStrictEqual({
@@ -464,7 +464,7 @@ describe('compiler: parse', () => {
         });
 
         test('v-bind shorthand', () => {
-            const ast = baseParse('<div :a="b" />');
+            const ast = parse('<div :a="b" />');
             const directive = ast.children[0].directives[0];
 
             expect(directive).toStrictEqual({
@@ -484,7 +484,7 @@ describe('compiler: parse', () => {
         });
 
         test('v-on shorthand', () => {
-            const ast = baseParse('<div @a="b" />');
+            const ast = parse('<div @a="b" />');
             const directive = ast.children[0].directives[0];
 
             expect(directive).toStrictEqual({
@@ -504,7 +504,7 @@ describe('compiler: parse', () => {
         });
 
         test('end tags are case-insensitive.', () => {
-            const ast = baseParse('<div>hello</DIV>after');
+            const ast = parse('<div>hello</DIV>after');
             const element = ast.children[0];
             const text = element.children[0];
 
@@ -515,14 +515,14 @@ describe('compiler: parse', () => {
         });
 
         test('self closing single tag', () => {
-            const ast = baseParse('<div :class="{ some: condition }" />');
+            const ast = parse('<div :class="{ some: condition }" />');
 
             expect(ast.children).toHaveLength(1);
             expect(ast.children[0]).toMatchObject({ tag: 'div' });
         });
 
         test('self closing multiple tag', () => {
-            const ast = baseParse(
+            const ast = parse(
                 `<div :class="{ some: condition }" />\n` +
                     `<p v-bind:style="{ color: 'red' }"/>`
             );
@@ -535,7 +535,7 @@ describe('compiler: parse', () => {
         });
 
         test('valid html', () => {
-            const ast = baseParse(
+            const ast = parse(
                 `<div :class="{ some: condition }">\n` +
                     `  <p v-bind:style="{ color: 'red' }"/>\n` +
                     `</div>`
@@ -557,13 +557,13 @@ describe('compiler: parse', () => {
 
     describe('whitespace management when adopting strategy condense', () => {
         it('should remove whitespaces w/ newline between elements', () => {
-            const ast = baseParse(`<div/> \n <div/> \n <div/>`);
+            const ast = parse(`<div/> \n <div/> \n <div/>`);
             expect(ast.children.length).toBe(3);
             expect(ast.children[1].type).toBe(NodeTypes.ELEMENT);
         });
 
         it('should NOT remove whitespaces w/ newline between interpolations', () => {
-            const ast = baseParse(`{{ foo }} \n {{ bar }}`);
+            const ast = parse(`{{ foo }} \n {{ bar }}`);
             expect(ast.children.length).toBe(3);
             expect(ast.children[0].type).toBe(NodeTypes.INTERPOLATION);
             expect(ast.children[1]).toMatchObject({
@@ -574,7 +574,7 @@ describe('compiler: parse', () => {
         });
 
         it('should NOT remove whitespaces w/o newline between elements', () => {
-            const ast = baseParse(`<div/> <div/> <div/>`);
+            const ast = parse(`<div/> <div/> <div/>`);
             expect(ast.children.length).toBe(5);
             expect(ast.children.map((c) => c.type)).toMatchObject([
                 NodeTypes.ELEMENT,
@@ -586,7 +586,7 @@ describe('compiler: parse', () => {
         });
 
         it('should condense consecutive whitespaces in text', () => {
-            const ast = baseParse(`   foo  \n    bar     baz     `);
+            const ast = parse(`   foo  \n    bar     baz     `);
             expect(ast.children[0].content).toBe(` foo bar baz `);
         });
     });
