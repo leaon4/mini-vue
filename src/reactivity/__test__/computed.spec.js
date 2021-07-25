@@ -1,7 +1,7 @@
 import { computed } from '../computed';
 import { effect } from '../effect';
 import { reactive } from '../reactive';
-import { ref } from '../ref'
+import { ref } from '../ref';
 
 describe('computed', () => {
     test('basic use', () => {
@@ -73,61 +73,61 @@ describe('computed', () => {
     });
 
     it('should trigger effect when chained', () => {
-        const value = reactive({ foo: 0 })
-        const getter1 = jest.fn(() => value.foo)
+        const value = reactive({ foo: 0 });
+        const getter1 = jest.fn(() => value.foo);
         const getter2 = jest.fn(() => {
-            return c1.value + 1
-        })
-        const c1 = computed(getter1)
-        const c2 = computed(getter2)
+            return c1.value + 1;
+        });
+        const c1 = computed(getter1);
+        const c2 = computed(getter2);
 
-        let dummy
+        let dummy;
         effect(() => {
-            dummy = c2.value
-        })
-        expect(dummy).toBe(1)
-        expect(getter1).toHaveBeenCalledTimes(1)
-        expect(getter2).toHaveBeenCalledTimes(1)
-        value.foo++
-        expect(dummy).toBe(2)
+            dummy = c2.value;
+        });
+        expect(dummy).toBe(1);
+        expect(getter1).toHaveBeenCalledTimes(1);
+        expect(getter2).toHaveBeenCalledTimes(1);
+        value.foo++;
+        expect(dummy).toBe(2);
         // should not result in duplicate calls
-        expect(getter1).toHaveBeenCalledTimes(2)
-        expect(getter2).toHaveBeenCalledTimes(2)
-    })
+        expect(getter1).toHaveBeenCalledTimes(2);
+        expect(getter2).toHaveBeenCalledTimes(2);
+    });
 
     it('should support setter', () => {
-        const n = ref(1)
+        const n = ref(1);
         const plusOne = computed({
             get: () => n.value + 1,
-            set: val => {
-                n.value = val - 1
-            }
-        })
+            set: (val) => {
+                n.value = val - 1;
+            },
+        });
 
-        expect(plusOne.value).toBe(2)
-        n.value++
-        expect(plusOne.value).toBe(3)
+        expect(plusOne.value).toBe(2);
+        n.value++;
+        expect(plusOne.value).toBe(3);
 
-        plusOne.value = 0
-        expect(n.value).toBe(-1)
-    })
+        plusOne.value = 0;
+        expect(n.value).toBe(-1);
+    });
 
     it('should trigger effect w/ setter', () => {
-        const n = ref(1)
+        const n = ref(1);
         const plusOne = computed({
             get: () => n.value + 1,
-            set: val => {
-                n.value = val - 1
-            }
-        })
+            set: (val) => {
+                n.value = val - 1;
+            },
+        });
 
-        let dummy
+        let dummy;
         effect(() => {
-            dummy = n.value
-        })
-        expect(dummy).toBe(1)
+            dummy = n.value;
+        });
+        expect(dummy).toBe(1);
 
-        plusOne.value = 0
-        expect(dummy).toBe(-1)
-    })
+        plusOne.value = 0;
+        expect(dummy).toBe(-1);
+    });
 });

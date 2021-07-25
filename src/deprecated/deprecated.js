@@ -19,20 +19,17 @@ function patchKeyedChildren(c1, c2, container, anchor) {
             }
         }
         if (!find) {
-            const curAnchor = i === 0
-                ? c1[0].el
-                : c2[i - 1].el.nextSibling;
-            patch(null, next, container, curAnchor)
+            const curAnchor = i === 0 ? c1[0].el : c2[i - 1].el.nextSibling;
+            patch(null, next, container, curAnchor);
         }
     }
     for (let i = 0; i < c1.length; i++) {
         const prev = c1[i];
-        if (!c2.find(next => next.key === prev.key)) {
+        if (!c2.find((next) => next.key === prev.key)) {
             unmount(prev);
         }
     }
 }
-
 
 // 这个版本可以兼容没有key的情况。但没有意义
 function patchKeyedChildren(c1, c2, container, anchor) {
@@ -40,10 +37,11 @@ function patchKeyedChildren(c1, c2, container, anchor) {
     for (let i = 0; i < c2.length; i++) {
         const next = c2[i];
         if (next.key == null) {
-            const curAnchor = i === 0
-                ? c1[0].el
-                : (c2[i - 1].anchor || c2[i - 1].el).nextSibling;
-            patch(null, next, container, curAnchor)
+            const curAnchor =
+                i === 0
+                    ? c1[0].el
+                    : (c2[i - 1].anchor || c2[i - 1].el).nextSibling;
+            patch(null, next, container, curAnchor);
             continue;
         }
         let find = false;
@@ -65,15 +63,16 @@ function patchKeyedChildren(c1, c2, container, anchor) {
             }
         }
         if (!find) {
-            const curAnchor = i === 0
-                ? c1[0].el
-                : (c2[i - 1].anchor || c2[i - 1].el).nextSibling;
-            patch(null, next, container, curAnchor)
+            const curAnchor =
+                i === 0
+                    ? c1[0].el
+                    : (c2[i - 1].anchor || c2[i - 1].el).nextSibling;
+            patch(null, next, container, curAnchor);
         }
     }
     for (let i = 0; i < c1.length; i++) {
         const prev = c1[i];
-        if (!c2.find(next => next.key && next.key === prev.key)) {
+        if (!c2.find((next) => next.key && next.key === prev.key)) {
             unmount(prev);
         }
     }
@@ -89,9 +88,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
     let maxIndex = 0;
     for (let i = 0; i < c2.length; i++) {
         const next = c2[i];
-        const curAnchor = i === 0
-            ? c1[0].el
-            : c2[i - 1].el.nextSibling;
+        const curAnchor = i === 0 ? c1[0].el : c2[i - 1].el.nextSibling;
         if (map.has(next.key)) {
             const { prev, j } = map.get(next.key);
             patch(prev, next, container, anchor);
@@ -102,12 +99,12 @@ function patchKeyedChildren(c1, c2, container, anchor) {
             }
             map.delete(next.key);
         } else {
-            patch(null, next, container, curAnchor)
+            patch(null, next, container, curAnchor);
         }
     }
     map.forEach(({ prev }) => {
         unmount(prev);
-    })
+    });
 }
 
 // dp版
@@ -150,7 +147,8 @@ var lengthOfLIS = function (nums) {
         if (nums[i] > result[result.length - 1]) {
             result.push(nums[i]);
         } else {
-            let l = 0, r = result.length - 1;
+            let l = 0,
+                r = result.length - 1;
             while (l <= r) {
                 let mid = ~~((l + r) / 2);
                 if (nums[i] > result[mid]) {
@@ -162,7 +160,7 @@ var lengthOfLIS = function (nums) {
                     break;
                 }
             }
-            result[l] = nums[i]
+            result[l] = nums[i];
         }
     }
     return result.length;
@@ -172,13 +170,14 @@ var lengthOfLIS = function (nums) {
 // https://blog.csdn.net/ouckitty/article/details/27801843
 function lengthOfLIS(nums) {
     let result = [nums[0]];
-    let position = [0]
+    let position = [0];
     for (let i = 1; i < nums.length; i++) {
         if (nums[i] > result[result.length - 1]) {
             result.push(nums[i]);
-            position.push(result.length - 1)
+            position.push(result.length - 1);
         } else {
-            let l = 0, r = result.length - 1;
+            let l = 0,
+                r = result.length - 1;
             while (l <= r) {
                 let mid = ~~((l + r) / 2);
                 if (nums[i] > result[mid]) {
@@ -190,8 +189,8 @@ function lengthOfLIS(nums) {
                     break;
                 }
             }
-            result[l] = nums[i]
-            position.push(l)
+            result[l] = nums[i];
+            position.push(l);
         }
     }
     let cur = result.length - 1;
@@ -201,12 +200,12 @@ function lengthOfLIS(nums) {
         }
     }
     return result;
-};
+}
 
 // 最终版，略过-1
 function getSequence(nums) {
     let result = [];
-    let position = []
+    let position = [];
     for (let i = 0; i < nums.length; i++) {
         if (nums[i] === -1) {
             continue;
@@ -214,9 +213,10 @@ function getSequence(nums) {
         // result[result.length - 1]可能为undefined，此时nums[i] > undefined为false
         if (nums[i] > result[result.length - 1]) {
             result.push(nums[i]);
-            position.push(result.length - 1)
+            position.push(result.length - 1);
         } else {
-            let l = 0, r = result.length - 1;
+            let l = 0,
+                r = result.length - 1;
             while (l <= r) {
                 let mid = ~~((l + r) / 2);
                 if (nums[i] > result[mid]) {
@@ -228,8 +228,8 @@ function getSequence(nums) {
                     break;
                 }
             }
-            result[l] = nums[i]
-            position.push(l)
+            result[l] = nums[i];
+            position.push(l);
         }
     }
     let cur = result.length - 1;
@@ -240,4 +240,4 @@ function getSequence(nums) {
         }
     }
     return result;
-};
+}

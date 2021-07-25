@@ -9,17 +9,19 @@ const HTML_TAGS =
     'option,output,progress,select,textarea,details,dialog,menu,' +
     'summary,template,blockquote,iframe,tfoot';
 
-const VOID_TAGS = 'area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr';
+const VOID_TAGS =
+    'area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr';
 
 function makeMap(str) {
-    const map = str.split(',').reduce((map, item) => (map[item] = true, map), Object.create(null))
-    return (val) => !!map[val]
+    const map = str
+        .split(',')
+        .reduce((map, item) => ((map[item] = true), map), Object.create(null));
+    return (val) => !!map[val];
 }
 
-export const isVoidTag = makeMap(VOID_TAGS)
-export const isNativeTag = makeMap(HTML_TAGS)
+export const isVoidTag = makeMap(VOID_TAGS);
+export const isNativeTag = makeMap(HTML_TAGS);
 
-
-export { baseParse } from './parse'
-export { NodeTypes } from './ast'
-export { baseCompile } from './compile'
+export { baseParse } from './parse';
+export { NodeTypes } from './ast';
+export { baseCompile } from './compile';

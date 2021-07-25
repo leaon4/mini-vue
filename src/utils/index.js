@@ -15,18 +15,18 @@ export function isString(value) {
 }
 
 export function isNumber(value) {
-    return typeof value === 'number'
+    return typeof value === 'number';
 }
 
 export function hasChanged(value, oldValue) {
     return value !== oldValue && (value === value || oldValue === oldValue);
 }
 
-const camelizeRE = /-(\w)/g
+const camelizeRE = /-(\w)/g;
 export function camelize(str) {
-    return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
+    return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''));
 }
 
 export function capitalize(str) {
-    return str[0].toUpperCase() + str.slice(1)
+    return str[0].toUpperCase() + str.slice(1);
 }

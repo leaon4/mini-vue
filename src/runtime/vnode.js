@@ -1,4 +1,4 @@
-import { isObject } from '../utils'
+import { isObject } from '../utils';
 import { isReactive } from '../reactivity';
 
 export const Text = Symbol('Text');
@@ -11,14 +11,14 @@ export const ShapeFlags = {
     COMPONENT: 1 << 3,
     TEXT_CHILDREN: 1 << 5,
     ARRAY_CHILDREN: 1 << 6,
-    CHILDREN: (1 << 5) | (1 << 6)
+    CHILDREN: (1 << 5) | (1 << 6),
 };
 
 /**
  * vnode有五种类型：dom元素，纯文本，Fragment，状态组件，函数组件
- * @param {string | Text | Fragment | object | Function} type 
- * @param {Record<string,any> | null} props 
- * @param {string | array | null} children 
+ * @param {string | Text | Fragment | object | Function} type
+ * @param {Record<string,any> | null} props
+ * @param {string | array | null} children
  * @returns vnode
  */
 export function h(type, props = null, children = null) {
@@ -59,9 +59,9 @@ export function h(type, props = null, children = null) {
         shapeFlag,
         el: null,
         anchor: null, // fragment专有
-        key: props && props.key || null,
+        key: (props && props.key) || null,
         component: null, // 组件的instance
-        next: null,// 组件更新时，把新vnode暂放在这里
+        next: null, // 组件更新时，把新vnode暂放在这里
     };
 }
 

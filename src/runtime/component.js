@@ -1,7 +1,7 @@
-import { reactive, effect } from '../reactivity'
+import { reactive, effect } from '../reactivity';
 import { normalizeVNode } from './vnode';
 import { queueJob } from './scheduler';
-import { baseCompile } from '../compiler'
+import { baseCompile } from '../compiler';
 
 function updateComponentProps(instance, vnode) {
     const { type: originalComp, props: vnodeProps } = vnode;
@@ -33,65 +33,74 @@ export function mountComponent(vnode, container, anchor, patch) {
 
     updateComponentProps(instance, vnode);
 
-    instance.setupState = originalComp.setup?.(instance.props, { attrs: instance.attrs });
+    instance.setupState = originalComp.setup?.(instance.props, {
+        attrs: instance.attrs,
+    });
 
     if (!originalComp.render && originalComp.template) {
         let { template } = originalComp;
         if (template[0] === '#') {
-            const el = document.querySelector(template)
-            template = el ? el.innerHTML : ``
+            const el = document.querySelector(template);
+            template = el ? el.innerHTML : ``;
         }
         originalComp.render = new Function('ctx', baseCompile(template));
-        console.log(originalComp.render)
+        console.log(originalComp.render);
     }
 
     // toThink: ctx需要响应式吗?
     instance.ctx = {
-        ...instance.props,// 解构后应该没有响应式了
-        ...instance.setupState
+        ...instance.props, // 解构后应该没有响应式了
+        ...instance.setupState,
     };
-    instance.update = effect(() => {
-        if (!instance.isMounted) {
-            // mount
-            const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
-            if (Object.keys(instance.attrs)) {
-                subTree.props = {
-                    ...subTree.props,
-                    ...instance.attrs
-                };
-            }
-            patch(null, subTree, container, anchor);
-            instance.isMounted = true;
-            vnode.el = subTree.el;
-        } else {
-            // update
+    instance.update = effect(
+        () => {
+            if (!instance.isMounted) {
+                // mount
+                const subTree = (instance.subTree = normalizeVNode(
+                    originalComp.render(instance.ctx)
+                ));
+                if (Object.keys(instance.attrs)) {
+                    subTree.props = {
+                        ...subTree.props,
+                        ...instance.attrs,
+                    };
+                }
+                patch(null, subTree, container, anchor);
+                instance.isMounted = true;
+                vnode.el = subTree.el;
+            } else {
+                // update
 
-            // instance.next存在，代表是被动更新。否则是主动更新
-            if (instance.next) {
-                vnode = instance.next;
-                instance.next = null;
-                instance.props = reactive(instance.props);
-                updateComponentProps(instance, vnode);
-                instance.ctx = {
-                    ...instance.props,
-                    ...instance.setupState
-                };
-            }
+                // instance.next存在，代表是被动更新。否则是主动更新
+                if (instance.next) {
+                    vnode = instance.next;
+                    instance.next = null;
+                    instance.props = reactive(instance.props);
+                    updateComponentProps(instance, vnode);
+                    instance.ctx = {
+                        ...instance.props,
+                        ...instance.setupState,
+                    };
+                }
 
-            const prev = instance.subTree;
-            const subTree = instance.subTree = normalizeVNode(originalComp.render(instance.ctx));
-            if (Object.keys(instance.attrs)) {
-                subTree.props = {
-                    ...subTree.props,
-                    ...instance.attrs
-                };
+                const prev = instance.subTree;
+                const subTree = (instance.subTree = normalizeVNode(
+                    originalComp.render(instance.ctx)
+                ));
+                if (Object.keys(instance.attrs)) {
+                    subTree.props = {
+                        ...subTree.props,
+                        ...instance.attrs,
+                    };
+                }
+                // anchor may have changed if it's in a fragment
+                patch(prev, subTree, container, anchor);
+                vnode.el = subTree.el;
             }
-            // anchor may have changed if it's in a fragment
-            patch(prev, subTree, container, anchor);
-            vnode.el = subTree.el;
+        },
+        {
+            scheduler: queueJob,
         }
-    }, {
-        scheduler: queueJob
-    });
+    );
     vnode.component = instance;
 }

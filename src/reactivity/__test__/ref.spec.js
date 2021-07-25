@@ -1,5 +1,5 @@
 import { effect } from '../effect';
-import { isRef, ref } from '../ref'
+import { isRef, ref } from '../ref';
 
 describe('ref', () => {
     test('isRef', () => {

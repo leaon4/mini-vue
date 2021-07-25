@@ -1,6 +1,6 @@
-import { render } from './render'
+import { render } from './render';
 import { isFunction, camelize, capitalize } from '../utils';
-import { h } from './vnode'
+import { h } from './vnode';
 
 let components;
 export function createApp(rootComponent) {
@@ -14,10 +14,10 @@ export function createApp(rootComponent) {
             if (!isFunction(rootComponent.render) && !rootComponent.template) {
                 rootComponent.template = rootContainer.innerHTML;
             }
-            rootContainer.innerHTML = ''
+            rootContainer.innerHTML = '';
 
             render(h(rootComponent), rootContainer);
-        }
+        },
     };
     return app;
 }
@@ -28,5 +28,5 @@ export function resolveComponent(name) {
         (components[name] ||
             components[camelize(name)] ||
             components[capitalize(camelize(name))])
-    )
+    );
 }

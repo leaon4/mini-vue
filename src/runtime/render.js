@@ -24,13 +24,13 @@ function patch(n1, n2, container, anchor) {
 
     const { shapeFlag } = n2;
     if (shapeFlag & ShapeFlags.ELEMENT) {
-        processElement(n1, n2, container, anchor)
+        processElement(n1, n2, container, anchor);
     } else if (shapeFlag & ShapeFlags.TEXT) {
-        processText(n1, n2, container, anchor)
+        processText(n1, n2, container, anchor);
     } else if (shapeFlag & ShapeFlags.FRAGMENT) {
-        processFragment(n1, n2, container, anchor)
+        processFragment(n1, n2, container, anchor);
     } else if (shapeFlag & ShapeFlags.COMPONENT) {
-        processComponent(n1, n2, container, anchor)
+        processComponent(n1, n2, container, anchor);
     }
 }
 
@@ -43,25 +43,25 @@ function mountElement(vnode, container, anchor) {
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
         // 这里不能传anchor。因为anchor限制的是当前的element
         // 作为本element的children，不用指定anchor，append就行
-        mountChildren(children, el)
+        mountChildren(children, el);
     }
 
     if (props) {
-        patchProps(el, null, props)
+        patchProps(el, null, props);
     }
 
     vnode.el = el;
-    container.insertBefore(el, anchor || null)
+    container.insertBefore(el, anchor || null);
 }
 
 function mountTextNode(vnode, container, anchor) {
     const textNode = document.createTextNode(vnode.children);
     vnode.el = textNode;
-    container.insertBefore(textNode, anchor || null)
+    container.insertBefore(textNode, anchor || null);
 }
 
 function mountChildren(children, container, anchor) {
-    children.forEach(child => {
+    children.forEach((child) => {
         patch(null, child, container, anchor);
     });
 }
@@ -111,24 +111,24 @@ function processElement(n1, n2, container, anchor) {
 }
 
 function processFragment(n1, n2, container, anchor) {
-    const fragmentStartAnchor = n2.el = n1
+    const fragmentStartAnchor = (n2.el = n1
         ? n1.el
-        : document.createTextNode('')
-    const fragmentEndAnchor = n2.anchor = n1
+        : document.createTextNode(''));
+    const fragmentEndAnchor = (n2.anchor = n1
         ? n1.anchor
-        : document.createTextNode('')
+        : document.createTextNode(''));
     if (n1 == null) {
-        container.insertBefore(fragmentStartAnchor, anchor || null)
-        container.insertBefore(fragmentEndAnchor, anchor || null)
-        mountChildren(n2.children, container, fragmentEndAnchor)
+        container.insertBefore(fragmentStartAnchor, anchor || null);
+        container.insertBefore(fragmentEndAnchor, anchor || null);
+        mountChildren(n2.children, container, fragmentEndAnchor);
     } else {
-        patchChildren(n1, n2, container, fragmentEndAnchor)
+        patchChildren(n1, n2, container, fragmentEndAnchor);
     }
 }
 
 function processText(n1, n2, container, anchor) {
     if (n1 == null) {
-        mountTextNode(n2, container, anchor)
+        mountTextNode(n2, container, anchor);
     } else {
         n2.el = n1.el;
         n2.el.textContent = n2.children;
@@ -145,8 +145,8 @@ function processComponent(n1, n2, container, anchor) {
 
 function patchElement(n1, n2) {
     n2.el = n1.el;
-    patchProps(n2.el, n1.props, n2.props)
-    patchChildren(n1, n2, n2.el)
+    patchProps(n2.el, n1.props, n2.props);
+    patchChildren(n1, n2, n2.el);
 }
 
 function patchChildren(n1, n2, container, anchor) {
@@ -189,7 +189,7 @@ function patchChildren(n1, n2, container, anchor) {
 }
 
 function unmountChildren(children) {
-    children.forEach(child => unmount(child));
+    children.forEach((child) => unmount(child));
 }
 
 function patchUnkeyedChildren(c1, c2, container, anchor) {
@@ -200,14 +200,16 @@ function patchUnkeyedChildren(c1, c2, container, anchor) {
         patch(c1[i], c2[i], container, anchor);
     }
     if (newLength > oldLength) {
-        mountChildren(c2.slice(commonLength), container, anchor)
+        mountChildren(c2.slice(commonLength), container, anchor);
     } else if (newLength < oldLength) {
-        unmountChildren(c1.slice(commonLength))
+        unmountChildren(c1.slice(commonLength));
     }
 }
 
 function patchKeyedChildren(c1, c2, container, anchor) {
-    let i = 0, e1 = c1.length - 1, e2 = c2.length - 1;
+    let i = 0,
+        e1 = c1.length - 1,
+        e2 = c2.length - 1;
     // 1.从左至右依次比对
     // key的判断可能要换成isSameVNodetype
     while (i <= e1 && i <= e2 && c1[i].key === c2[i].key) {
@@ -266,7 +268,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
         // 先刪除多余旧节点
         map.forEach(({ prev }) => {
             unmount(prev);
-        })
+        });
 
         if (move) {
             // 6.需要移动，则采用新的最长上升子序列算法
@@ -303,7 +305,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 
 function getSequence(nums) {
     let result = [];
-    let position = []
+    let position = [];
     for (let i = 0; i < nums.length; i++) {
         if (nums[i] === -1) {
             continue;
@@ -311,9 +313,10 @@ function getSequence(nums) {
         // result[result.length - 1]可能为undefined，此时nums[i] > undefined为false
         if (nums[i] > result[result.length - 1]) {
             result.push(nums[i]);
-            position.push(result.length - 1)
+            position.push(result.length - 1);
         } else {
-            let l = 0, r = result.length - 1;
+            let l = 0,
+                r = result.length - 1;
             while (l <= r) {
                 let mid = ~~((l + r) / 2);
                 if (nums[i] > result[mid]) {
@@ -325,8 +328,8 @@ function getSequence(nums) {
                     break;
                 }
             }
-            result[l] = nums[i]
-            position.push(l)
+            result[l] = nums[i];
+            position.push(l);
         }
     }
     let cur = result.length - 1;

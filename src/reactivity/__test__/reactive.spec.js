@@ -1,4 +1,4 @@
-import { reactive, isReactive } from "../reactive";
+import { reactive, isReactive } from '../reactive';
 
 describe('reactive', () => {
     test('isReactive', () => {
@@ -24,4 +24,4 @@ describe('reactive', () => {
         const observed2 = reactive(original);
         expect(observed).toBe(observed2);
     });
-})
+});

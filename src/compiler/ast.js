@@ -6,12 +6,12 @@ export const NodeTypes = {
     INTERPOLATION: 'INTERPOLATION',
     ATTRIBUTE: 'ATTRIBUTE',
     DIRECTIVE: 'DIRECTIVE',
-}
+};
 
 export const ElementTypes = {
     ELEMENT: 'ELEMENT',
     COMPONENT: 'COMPONENT',
-}
+};
 
 export function createRoot(children) {
     return {
@@ -24,5 +24,5 @@ export function createRoot(children) {
         imports: [],
         cached: 0,
         temps: 0,
-    }
+    };
 }

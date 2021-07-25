@@ -11,14 +11,13 @@ export function effect(fn, option = {}) {
             effectStack.pop();
             activeEffect = effectStack[effectStack.length - 1];
         }
-    }
+    };
     if (!option.lazy) {
         effectFn();
     }
     effectFn.scheduler = option.scheduler;
     return effectFn;
 }
-
 
 const targetMap = new WeakMap();
 
@@ -28,11 +27,11 @@ export function track(target, key) {
     }
     let depsMap = targetMap.get(target);
     if (!depsMap) {
-        targetMap.set(target, depsMap = new Map());
+        targetMap.set(target, (depsMap = new Map()));
     }
     let dep = depsMap.get(key);
     if (!dep) {
-        depsMap.set(key, dep = new Set());
+        depsMap.set(key, (dep = new Set()));
     }
     dep.add(activeEffect);
 }
@@ -46,7 +45,7 @@ export function trigger(target, key) {
     if (!dep) {
         return;
     }
-    dep.forEach(effectFn => {
+    dep.forEach((effectFn) => {
         if (effectFn.scheduler) {
             effectFn.scheduler(effectFn);
         } else {

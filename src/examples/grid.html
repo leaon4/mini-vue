@@ -1,39 +1,34 @@
 <script src="../../dist/mini-vue.js"></script>
 
 <!-- DemoGrid component template -->
-<script type="text/x-template"
-    id="grid-template">
-    <table v-if="filteredData.value.length">
-    <thead>
-      <tr>
-        <th v-for="key in columns"
-          @click="sortBy(key)"
-          :class="state.sortKey == key ? 'active' : ''">
-          {{ capitalize(key) }}
-          <span :class="'arrow ' + (state.sortOrders[key] > 0 ? 'asc' : 'dsc')">
-          </span>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="entry in filteredData.value">
-        <td v-for="key in columns">
-          {{entry[key]}}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <p v-else>No matches found.</p>
+<script type="text/x-template" id="grid-template">
+      <table v-if="filteredData.value.length">
+      <thead>
+        <tr>
+          <th v-for="key in columns"
+            @click="sortBy(key)"
+            :class="state.sortKey == key ? 'active' : ''">
+            {{ capitalize(key) }}
+            <span :class="'arrow ' + (state.sortOrders[key] > 0 ? 'asc' : 'dsc')">
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="entry in filteredData.value">
+          <td v-for="key in columns">
+            {{entry[key]}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p v-else>No matches found.</p>
 </script>
 <!-- DemoGrid component script -->
 <script>
-    const {
-        reactive,
-        computed,
-        ref
-    } = MiniVue
+    const { reactive, computed, ref } = MiniVue;
 
-    const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
     const DemoGrid = {
         template: '#grid-template',
@@ -41,67 +36,70 @@
         setup(props) {
             const state = reactive({
                 sortKey: '',
-                sortOrders: props.columns.reduce((o, key) => (o[key] = 1, o), {})
-            })
+                sortOrders: props.columns.reduce(
+                    (o, key) => ((o[key] = 1), o),
+                    {}
+                ),
+            });
 
             const filteredData = computed(() => {
-                let {
-                    data,
-                    filterKey
-                } = props
+                let { data, filterKey } = props;
                 if (filterKey) {
-                    filterKey = filterKey.toLowerCase()
-                    data = data.filter(row => {
-                        return Object.keys(row).some(key => {
-                            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-                        })
-                    })
+                    filterKey = filterKey.toLowerCase();
+                    data = data.filter((row) => {
+                        return Object.keys(row).some((key) => {
+                            return (
+                                String(row[key])
+                                    .toLowerCase()
+                                    .indexOf(filterKey) > -1
+                            );
+                        });
+                    });
                 }
-                const {
-                    sortKey
-                } = state
+                const { sortKey } = state;
                 if (sortKey) {
-                    const order = state.sortOrders[sortKey]
+                    const order = state.sortOrders[sortKey];
                     data = data.slice().sort((a, b) => {
-                        a = a[sortKey]
-                        b = b[sortKey]
-                        return (a === b ? 0 : a > b ? 1 : -1) * order
-                    })
+                        a = a[sortKey];
+                        b = b[sortKey];
+                        return (a === b ? 0 : a > b ? 1 : -1) * order;
+                    });
                 }
-                return data
-            })
+                return data;
+            });
 
             function sortBy(key) {
-                state.sortKey = key
-                state.sortOrders[key] *= -1
+                state.sortKey = key;
+                state.sortOrders[key] *= -1;
             }
 
             return {
                 state,
                 filteredData,
                 sortBy,
-                capitalize
-            }
-        }
-    }
+                capitalize,
+            };
+        },
+    };
 </script>
 
 <!-- App template (in DOM) -->
 <div id="demo">
     <form id="search">
-        Search <input name="query"
-            v-model="searchQuery.value">
+        Search <input name="query" v-model="searchQuery.value" />
     </form>
-    <demo-grid :data="gridData"
+    <demo-grid
+        :data="gridData"
         :columns="gridColumns"
-        :filter-key="searchQuery.value">
+        :filter-key="searchQuery.value"
+    >
     </demo-grid>
 </div>
 <!-- App script -->
 <script>
     MiniVue.createApp({
         components: {
-            DemoGrid
+            DemoGrid,
         },
         setup() {
             return {
@@ -110,26 +108,27 @@
                 // 而这里修改的是普通值，因此要显示定义为ref
                 searchQuery: ref(''),
                 gridColumns: ['name', 'power'],
-                gridData: [{
+                gridData: [
+                    {
                         name: 'Chuck Norris',
-                        power: Infinity
+                        power: Infinity,
                     },
                     {
                         name: 'Bruce Lee',
-                        power: 9000
+                        power: 9000,
                     },
                     {
                         name: 'Jackie Chan',
-                        power: 7000
+                        power: 7000,
                     },
                     {
                         name: 'Jet Li',
-                        power: 8000
-                    }
-                ]
-            }
+                        power: 8000,
+                    },
+                ],
+            };
         },
-    }).mount('#demo')
+    }).mount('#demo');
 </script>
 
 <style>

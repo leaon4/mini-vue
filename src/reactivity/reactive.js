@@ -36,7 +36,7 @@ export function reactive(target) {
                 }
             }
             return res;
-        }
+        },
     });
     reactiveMap.set(target, proxy);
     return proxy;

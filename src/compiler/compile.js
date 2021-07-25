@@ -1,5 +1,5 @@
-import { baseParse } from './parse'
-import { generate } from './codegen'
+import { baseParse } from './parse';
+import { generate } from './codegen';
 
 export function baseCompile(template) {
     const ast = baseParse(template);

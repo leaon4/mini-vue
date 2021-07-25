@@ -11,12 +11,12 @@ export function patchProps(el, oldProps, newProps) {
         const prev = oldProps[key];
         const next = newProps[key];
         if (prev !== next) {
-            patchDomProp(el, key, prev, next)
+            patchDomProp(el, key, prev, next);
         }
     }
     for (const key in oldProps) {
         if (key !== 'key' && !(key in newProps)) {
-            patchDomProp(el, key, oldProps[key], null)
+            patchDomProp(el, key, oldProps[key], null);
         }
     }
 }
@@ -66,7 +66,7 @@ function patchDomProp(el, key, prev, next) {
                 if (next == null || next === false) {
                     // 例如disabled，设置''时，应该为true。
                     // 但设置为其他falsy值如false时，应该为flase
-                    el.removeAttribute(key)
+                    el.removeAttribute(key);
                 } else {
                     el.setAttribute(key, next);
                 }

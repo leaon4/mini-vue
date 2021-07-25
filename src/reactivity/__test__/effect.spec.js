@@ -1,5 +1,5 @@
-import { effect } from "../effect";
-import { reactive } from "../reactive";
+import { effect } from '../effect';
+import { reactive } from '../reactive';
 
 describe('effect', () => {
     test('basic use', () => {
@@ -56,13 +56,13 @@ describe('effect', () => {
     });
 
     test('嵌套响应式对象', () => {
-        let value
-        const observed = reactive({ nested: { num: 0 } })
-        effect(() => (value = observed.nested.num))
+        let value;
+        const observed = reactive({ nested: { num: 0 } });
+        effect(() => (value = observed.nested.num));
 
-        expect(value).toBe(0)
-        observed.nested.num = 8
-        expect(value).toBe(8)
+        expect(value).toBe(0);
+        observed.nested.num = 8;
+        expect(value).toBe(8);
     });
 
     test('新添加的属性也会被代理', () => {
@@ -71,7 +71,7 @@ describe('effect', () => {
         const observed = reactive(original);
         effect(() => {
             value = observed.anotherValue;
-        })
+        });
         expect(value).toBe(undefined);
         observed.anotherValue = 1;
         expect(value).toBe(1);
@@ -98,7 +98,7 @@ describe('effect', () => {
     test('嵌套effect', () => {
         const nums = reactive({ num1: 0, num2: 10, num3: 100 });
         const dummy = {};
-        const childSpy = jest.fn(() => dummy.num1 = nums.num1);
+        const childSpy = jest.fn(() => (dummy.num1 = nums.num1));
         const childEffect = effect(childSpy);
         const parentSpy = jest.fn(() => {
             dummy.num2 = nums.num2;

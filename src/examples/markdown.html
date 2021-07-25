@@ -3,34 +3,32 @@
 <script src="../../dist/mini-vue.js"></script>
 
 <div id="editor">
-    <textarea :value="input.value"
-        @input="update"></textarea>
+    <textarea :value="input.value" @input="update"></textarea>
     <div v-html="output.value"></div>
 </div>
 
 <script>
-    const {
-        ref,
-        computed
-    } = MiniVue
+    const { ref, computed } = MiniVue;
 
     MiniVue.createApp({
         setup() {
-            const input = ref('# hello')
-            const output = computed(() => marked(input.value, {
-                sanitize: true
-            }))
-            const update = _.debounce(e => {
-                input.value = e.target.value
-            }, 50)
+            const input = ref('# hello');
+            const output = computed(() =>
+                marked(input.value, {
+                    sanitize: true,
+                })
+            );
+            const update = _.debounce((e) => {
+                input.value = e.target.value;
+            }, 50);
 
             return {
                 input,
                 output,
-                update
-            }
-        }
-    }).mount('#editor')
+                update,
+            };
+        },
+    }).mount('#editor');
 </script>
 
 <style>

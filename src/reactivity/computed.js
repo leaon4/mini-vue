@@ -6,8 +6,8 @@ export function computed(getterOrOptions) {
     if (isFunction(getterOrOptions)) {
         getter = getterOrOptions;
         setter = () => {
-            console.warn('Write operation failed: computed value is readonly')
-        }
+            console.warn('Write operation failed: computed value is readonly');
+        };
     } else {
         getter = getterOrOptions.get;
         setter = getterOrOptions.set;
@@ -18,7 +18,7 @@ export function computed(getterOrOptions) {
 
 class ComputedRefImpl {
     constructor(getter, setter) {
-        this._setter = setter
+        this._setter = setter;
         this._value = undefined;
         this._dirty = true;
         this.effect = effect(getter, {
@@ -28,8 +28,8 @@ class ComputedRefImpl {
                     this._dirty = true;
                     trigger(this, 'value');
                 }
-            }
-        })
+            },
+        });
     }
 
     get value() {
@@ -42,6 +42,6 @@ class ComputedRefImpl {
     }
 
     set value(val) {
-        this._setter(val)
+        this._setter(val);
     }
 }

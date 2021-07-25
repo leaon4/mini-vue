@@ -1,60 +1,67 @@
-import { generateReturns } from '../codegen'
+import { generateReturns } from '../codegen';
 import { baseParse } from '../parse';
 function baseCompile(template) {
-    const ast = baseParse(template)
-    return generateReturns(ast)
+    const ast = baseParse(template);
+    return generateReturns(ast);
 }
-
 
 describe('compiler: integration tests', () => {
     describe('text and interpolation', () => {
         test('simple text', () => {
             const code = baseCompile('foo');
             expect(code).toBe('h(Text, null, "foo")');
-        })
+        });
 
         test('no consecutive text', () => {
             const code = baseCompile('{{ foo }}');
             expect(code).toBe('h(Text, null, foo)');
-        })
+        });
 
         test('expression', () => {
             const code = baseCompile('{{ foo + bar }}');
             expect(code).toBe('h(Text, null, foo + bar)');
-        })
+        });
 
         test('consecutive text', () => {
             const code = baseCompile('{{ foo }} bar {{ baz }}');
-            expect(code).toBe('[h(Text, null, foo), h(Text, null, " bar "), h(Text, null, baz)]');
-        })
+            expect(code).toBe(
+                '[h(Text, null, foo), h(Text, null, " bar "), h(Text, null, baz)]'
+            );
+        });
 
         test('consecutive text between elements', () => {
             const code = baseCompile('<div/>{{ foo }} bar {{ baz }}<div/>');
-            expect(code).toBe('[h("div"), h(Text, null, foo), h(Text, null, " bar "), h(Text, null, baz), h("div")]');
-        })
+            expect(code).toBe(
+                '[h("div"), h(Text, null, foo), h(Text, null, " bar "), h(Text, null, baz), h("div")]'
+            );
+        });
 
         test('text between elements (static)', () => {
             const code = baseCompile('<div/>hello<div/>');
             expect(code).toBe('[h("div"), h(Text, null, "hello"), h("div")]');
-        })
+        });
 
         test('consecutive text mixed with elements', () => {
-            const code = baseCompile('<div/>{{ foo }} bar {{ baz }}<div/>hello<div/>');
-            expect(code).toBe('[h("div"), h(Text, null, foo), h(Text, null, " bar "), '
-                + 'h(Text, null, baz), h("div"), h(Text, null, "hello"), h("div")]');
-        })
-    })
+            const code = baseCompile(
+                '<div/>{{ foo }} bar {{ baz }}<div/>hello<div/>'
+            );
+            expect(code).toBe(
+                '[h("div"), h(Text, null, foo), h(Text, null, " bar "), ' +
+                    'h(Text, null, baz), h("div"), h(Text, null, "hello"), h("div")]'
+            );
+        });
+    });
 
     describe('element', () => {
         test('single element', () => {
             const code = baseCompile('<p/>');
             expect(code).toBe('h("p")');
-        })
+        });
 
         test('with text child', () => {
             const code = baseCompile('<div>fine</div>');
             expect(code).toBe('h("div", null, "fine")');
-        })
+        });
 
         // test('import + resolve component', () => {
         //     const code = baseCompile('<Foo/>');
@@ -64,19 +71,19 @@ describe('compiler: integration tests', () => {
         test('static props', () => {
             const code = baseCompile(`<div id="foo" class="bar" />`);
             expect(code).toBe('h("div", { id: "foo", class: "bar" })');
-        })
+        });
 
         test('props + children', () => {
             const code = baseCompile(`<div id="foo"><span/></div>`);
             expect(code).toBe('h("div", { id: "foo" }, [h("span")])');
-        })
-    })
+        });
+    });
 
     describe('v-if', () => {
         test('basic v-if', () => {
             const code = baseCompile('<div v-if="ok"/>');
             expect(code).toBe('ok ? h("div") : h(Text, null, "")');
-        })
+        });
 
         // test('component v-if', () => {
         //     const { node } = parseWithIfTransform(`<Component v-if="ok"></Component>`)
@@ -93,25 +100,34 @@ describe('compiler: integration tests', () => {
         test('v-if + v-else', () => {
             const code = baseCompile('<div v-if="ok"/><p v-else/>');
             expect(code).toBe('ok ? h("div") : h("p")');
-        })
+        });
 
         test('v-if + v-else-if', () => {
             const code = baseCompile('<div v-if="ok"/><p v-else-if="orNot"/>');
-            expect(code).toBe('ok ? h("div") : orNot ? h("p") : h(Text, null, "")');
-        })
+            expect(code).toBe(
+                'ok ? h("div") : orNot ? h("p") : h(Text, null, "")'
+            );
+        });
 
         test('v-if + v-else-if + v-else', () => {
-            const code = baseCompile('<div v-if="ok"/><p v-else-if="orNot"/><h1 v-else>fine</h1>');
-            expect(code).toBe('ok ? h("div") : orNot ? h("p") : h("h1", null, "fine")');
-        })
+            const code = baseCompile(
+                '<div v-if="ok"/><p v-else-if="orNot"/><h1 v-else>fine</h1>'
+            );
+            expect(code).toBe(
+                'ok ? h("div") : orNot ? h("p") : h("h1", null, "fine")'
+            );
+        });
 
         test('with spaces between branches', () => {
-            const code = baseCompile('<div v-if="ok"/> <p v-else-if="no"/> <span v-else/>');
+            const code = baseCompile(
+                '<div v-if="ok"/> <p v-else-if="no"/> <span v-else/>'
+            );
             expect(code).toBe('ok ? h("div") : no ? h("p") : h("span")');
-        })
+        });
 
         test('nested', () => {
-            const code = baseCompile(`
+            const code = baseCompile(
+                `
                 <div v-if="ok">ok</div>
                 <div v-else-if="foo">
                     <h1 v-if="a"></h1>
@@ -124,7 +140,8 @@ describe('compiler: integration tests', () => {
                     </h6>
                 </div>
                 <span v-else></span>
-            `.trim());
+            `.trim()
+            );
 
             /* 
                 ok
@@ -146,40 +163,62 @@ describe('compiler: integration tests', () => {
                         ])
                         : h("span")
              */
-            expect(code).toBe('ok ? h("div", null, "ok") : foo ? h("div", null, [a ? h("h1") : b ? h("h2") : h(Text, null, ""), c ? h("h3") : d ? h("h4") : e ? h("h5") : h("h6", null, [h("div", null, "hello world")])]) : h("span")')
-        })
-    })
+            expect(code).toBe(
+                'ok ? h("div", null, "ok") : foo ? h("div", null, [a ? h("h1") : b ? h("h2") : h(Text, null, ""), c ? h("h3") : d ? h("h4") : e ? h("h5") : h("h6", null, [h("div", null, "hello world")])]) : h("span")'
+            );
+        });
+    });
 
     describe('v-for', () => {
         test('number expression', () => {
             const code = baseCompile('<span v-for="index in 5" />');
-            expect(code).toBe('h(Fragment, null, renderList(5, index => h("span")))');
-        })
+            expect(code).toBe(
+                'h(Fragment, null, renderList(5, index => h("span")))'
+            );
+        });
 
         test('object de-structured value', () => {
-            const code = baseCompile('<span v-for="({ id, value }) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, ({ id, value }) => h("span")))');
-        })
+            const code = baseCompile(
+                '<span v-for="({ id, value }) in items" />'
+            );
+            expect(code).toBe(
+                'h(Fragment, null, renderList(items, ({ id, value }) => h("span")))'
+            );
+        });
 
         test('array de-structured value', () => {
-            const code = baseCompile('<span v-for="([ id, value ]) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, ([ id, value ]) => h("span")))');
-        })
+            const code = baseCompile(
+                '<span v-for="([ id, value ]) in items" />'
+            );
+            expect(code).toBe(
+                'h(Fragment, null, renderList(items, ([ id, value ]) => h("span")))'
+            );
+        });
 
         test('value and key', () => {
             const code = baseCompile('<span v-for="(item, key) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, (item, key) => h("span")))');
-        })
+            expect(code).toBe(
+                'h(Fragment, null, renderList(items, (item, key) => h("span")))'
+            );
+        });
 
         test('value, key and index', () => {
-            const code = baseCompile('<span v-for="(value, key, index) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, (value, key, index) => h("span")))');
-        })
+            const code = baseCompile(
+                '<span v-for="(value, key, index) in items" />'
+            );
+            expect(code).toBe(
+                'h(Fragment, null, renderList(items, (value, key, index) => h("span")))'
+            );
+        });
 
         test('with key', () => {
-            const code = baseCompile('<span v-for="item in items" :key="item.id" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, item => h("span", { key: item.id })))');
-        })
+            const code = baseCompile(
+                '<span v-for="item in items" :key="item.id" />'
+            );
+            expect(code).toBe(
+                'h(Fragment, null, renderList(items, item => h("span", { key: item.id })))'
+            );
+        });
 
         // 不支持
         /* test('skipped key', () => {
@@ -188,36 +227,48 @@ describe('compiler: integration tests', () => {
         }) */
 
         test('nested', () => {
-            const code = baseCompile('<ul v-for="item in items"><li v-for="child in item.list">{{child.text}}</li></ul>');
-            expect(code).toBe('h(Fragment, null, renderList(items, item => h("ul", null, [h(Fragment, null, renderList(item.list, child => h("li", null, child.text)))])))');
-        })
+            const code = baseCompile(
+                '<ul v-for="item in items"><li v-for="child in item.list">{{child.text}}</li></ul>'
+            );
+            expect(code).toBe(
+                'h(Fragment, null, renderList(items, item => h("ul", null, [h(Fragment, null, renderList(item.list, child => h("li", null, child.text)))])))'
+            );
+        });
 
         test('v-if + v-for', () => {
             const code = baseCompile('<div v-if="ok" v-for="i in list"/>');
-            expect(code).toBe('ok ? h(Fragment, null, renderList(list, i => h("div"))) : h(Text, null, "")');
-        })
-    })
+            expect(code).toBe(
+                'ok ? h(Fragment, null, renderList(list, i => h("div"))) : h(Text, null, "")'
+            );
+        });
+    });
 
     describe('v-bind, v-on', () => {
         test('v-bind', () => {
             const code = baseCompile('<div v-bind:id="id" :class="a" />');
             expect(code).toBe('h("div", { id: id, class: a })');
-        })
+        });
 
         test('v-on', () => {
-            const code = baseCompile('<div v-on:click="onClick" @mousedown="onMouseDown" />');
-            expect(code).toBe('h("div", { onClick: onClick, onMousedown: onMouseDown })');
-        })
+            const code = baseCompile(
+                '<div v-on:click="onClick" @mousedown="onMouseDown" />'
+            );
+            expect(code).toBe(
+                'h("div", { onClick: onClick, onMousedown: onMouseDown })'
+            );
+        });
 
         test('inline statement', () => {
             const code = baseCompile('<div @click="foo($event, id)"/>');
-            expect(code).toBe('h("div", { onClick: $event => (foo($event, id)) })');
-        })
+            expect(code).toBe(
+                'h("div", { onClick: $event => (foo($event, id)) })'
+            );
+        });
 
         test('inline statement2', () => {
             const code = baseCompile('<div @click="() => i++"/>');
             expect(code).toBe('h("div", { onClick: () => i++ })');
-        })
+        });
 
         test('compound', () => {
             const code = baseCompile(`
@@ -227,7 +278,9 @@ describe('compiler: integration tests', () => {
                 v-for="item in items"
                 v-if="ok" />
             `);
-            expect(code).toBe('ok ? h(Fragment, null, renderList(items, item => h("div", { style: "color: red", class: class, onClick: foo }))) : h(Text, null, "")');
-        })
-    })
-})
+            expect(code).toBe(
+                'ok ? h(Fragment, null, renderList(items, item => h("div", { style: "color: red", class: class, onClick: foo }))) : h(Text, null, "")'
+            );
+        });
+    });
+});
