@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const { effect, compile: baseCompile } = MiniVue;
 
 const sharedEditorOptions = {
@@ -12,6 +13,7 @@ const sharedEditorOptions = {
 window.init = () => {
     const monaco = window.monaco
 
+    // eslint-disable-next-line no-undef
     monaco.editor.defineTheme('my-theme', theme)
     monaco.editor.setTheme('my-theme')
 
@@ -28,6 +30,7 @@ window.init = () => {
         try {
             const errors = []
             const compileFn = (source)=>{
+                // eslint-disable-next-line no-undef
                 return format(
                     baseCompile(source)
                 )

@@ -1,7 +1,7 @@
 import { computed } from '../computed';
 import { effect } from '../effect';
 import { reactive } from '../reactive';
-import { isRef, ref } from '../ref'
+import { ref } from '../ref'
 
 describe('computed', () => {
     test('basic use', () => {

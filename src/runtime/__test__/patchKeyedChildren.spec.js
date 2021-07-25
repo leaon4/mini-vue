@@ -1,7 +1,7 @@
 // 测试改编自vue3 -> rendererChildren.spec.ts
 
 import { render } from "../render";
-import { h, Text, Fragment } from '../vnode';
+import { h, Fragment } from '../vnode';
 
 function toSpan(content) {
     if (typeof content === 'string') {

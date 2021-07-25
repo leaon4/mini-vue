@@ -43,7 +43,6 @@
             }
 
             function changeType() {
-                console.log('changeType')
                 if (!isFolder.value) {
                     props.model.children = []
                     addChild()
@@ -52,8 +51,6 @@
             }
 
             function addChild() {
-                console.log('addChild')
-                console.log(props)
                 props.model.children.push({
                     name: 'new stuff'
                 })

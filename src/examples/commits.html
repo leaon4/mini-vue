@@ -49,7 +49,6 @@
                 fetch(`${API_URL}${currentBranch.value}`)
                     .then(res => res.json())
                     .then(data => {
-                        console.log(data)
                         commits.value = data
                     })
             })

@@ -1,4 +1,4 @@
-import { h, Text, Fragment, ShapeFlags, normalizeVNode } from './vnode';
+import { ShapeFlags } from './vnode';
 import { patchProps } from './patchProps';
 import { mountComponent } from './component';
 
@@ -170,7 +170,6 @@ function patchChildren(n1, n2, container, anchor) {
                 if (c1[0] && c1[0].key && c2[0] && c2[0].key) {
                     patchKeyedChildren(c1, c2, container, anchor);
                 } else {
-                    // console.warn('请添加一个key')
                     patchUnkeyedChildren(c1, c2, container, anchor);
                 }
             } else {
@@ -338,4 +337,4 @@ function getSequence(nums) {
         }
     }
     return result;
-};
+}

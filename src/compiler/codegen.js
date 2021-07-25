@@ -1,4 +1,3 @@
-import { isString, isArray } from '../utils';
 import { ElementTypes, NodeTypes } from './ast'
 
 export function generate(ast) {
@@ -134,7 +133,7 @@ function resolveElement(node) {
 
                     // 以括号结尾，并且不含'=>'的情况，如 @click="foo()"
                     // 当然，判断很不严谨
-                    if (/\([^\)]*?\)$/.test(exp) && !exp.includes('=>')) {
+                    if (/\([^)]*?\)$/.test(exp) && !exp.includes('=>')) {
                         exp = `$event => (${exp})`
                     }
                     return `${eventName}: ${exp}`;

@@ -1,4 +1,4 @@
-import { isFunction, isObject } from '../utils'
+import { isObject } from '../utils'
 import { isReactive } from '../reactivity';
 
 export const Text = Symbol('Text');

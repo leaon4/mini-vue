@@ -1,5 +1,5 @@
 import { render } from "../render";
-import { h, Text, Fragment } from '../vnode';
+import { h, Text } from '../vnode';
 
 function getTag(el) {
     return el.tagName.toLowerCase();

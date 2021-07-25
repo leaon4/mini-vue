@@ -1,4 +1,4 @@
-const theme = {
+window.theme = {
     base: 'vs-dark',
     inherit: true,
     rules: [
