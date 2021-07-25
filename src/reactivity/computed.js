@@ -1,11 +1,24 @@
+import { isFunction } from '../utils';
 import { track, trigger, effect } from './effect';
 
-export function computed(getter) {
-    return new ComputedRefImpl(getter);
+export function computed(getterOrOptions) {
+    let getter, setter;
+    if (isFunction(getterOrOptions)) {
+        getter = getterOrOptions;
+        setter = () => {
+            console.warn('Write operation failed: computed value is readonly')
+        }
+    } else {
+        getter = getterOrOptions.get;
+        setter = getterOrOptions.set;
+    }
+
+    return new ComputedRefImpl(getter, setter);
 }
 
 class ComputedRefImpl {
-    constructor(getter) {
+    constructor(getter, setter) {
+        this._setter = setter
         this._value = undefined;
         this._dirty = true;
         this.effect = effect(getter, {
@@ -29,6 +42,6 @@ class ComputedRefImpl {
     }
 
     set value(val) {
-        console.warn('computed value is readonly');
+        this._setter(val)
     }
 }
