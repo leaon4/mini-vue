@@ -1,5 +1,5 @@
 import { MiniVue } from '../index'
-const { createApp, reactive, nextTick } = MiniVue;
+const { createApp, reactive, nextTick, ref } = MiniVue;
 
 let root;
 beforeEach(() => {
@@ -160,4 +160,25 @@ test('native event with vue event', () => {
     root.children[0].click()
     expect(window.nativeEvent).toHaveBeenCalledTimes(1)
     expect(vueEvent).toHaveBeenCalledTimes(1)
+})
+
+test('v-html', async () => {
+    const template = `
+        <div v-html="output.value">will not show</div>
+    `;
+    const output = ref('hello')
+    createApp({
+        template: template.trim(),
+        setup() {
+            return {
+                output
+            }
+        }
+    }).mount(root);
+    const div = root.children[0]
+    expect(div.innerHTML).toBe('hello')
+
+    output.value='<ul><li>a</li></ul>'
+    await nextTick()
+    expect(div.innerHTML).toBe('<ul><li>a</li></ul>')
 })
