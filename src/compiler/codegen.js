@@ -144,6 +144,10 @@ function resolveElement(node) {
                         exp = `$event => (${exp})`
                     }
                     return `${eventName}: ${exp}`;
+                case 'html':
+                    return `innerHTML: ${createText(dir.exp)}`
+                default:
+                    return `${dir.name}: ${createText(dir.exp)}`
             }
         })
     ];
