@@ -8,7 +8,7 @@ export function renderList(source, fn) {
     }
   } else if (isString(source) || isArray(source)) {
     for (let i = 0; i < source.length; i++) {
-      vnodes.push(fn(source[i]));
+      vnodes.push(fn(source[i], i));
     }
   } else if (isObject(source)) {
     const keys = Object.keys(source);

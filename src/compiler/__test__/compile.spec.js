@@ -153,32 +153,32 @@ describe('compiler: integration tests', () => {
     describe('v-for', () => {
         test('number expression', () => {
             const code = baseCompile('<span v-for="index in 5" />');
-            expect(code).toBe('h(Fragment, null, renderList(5, (index) => h("span")))');
+            expect(code).toBe('h(Fragment, null, renderList(5, index => h("span")))');
         })
 
         test('object de-structured value', () => {
             const code = baseCompile('<span v-for="({ id, value }) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, (({ id, value })) => h("span")))');
+            expect(code).toBe('h(Fragment, null, renderList(items, ({ id, value }) => h("span")))');
         })
 
         test('array de-structured value', () => {
             const code = baseCompile('<span v-for="([ id, value ]) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, (([ id, value ])) => h("span")))');
+            expect(code).toBe('h(Fragment, null, renderList(items, ([ id, value ]) => h("span")))');
         })
 
         test('value and key', () => {
             const code = baseCompile('<span v-for="(item, key) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, ((item, key)) => h("span")))');
+            expect(code).toBe('h(Fragment, null, renderList(items, (item, key) => h("span")))');
         })
 
         test('value, key and index', () => {
             const code = baseCompile('<span v-for="(value, key, index) in items" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, ((value, key, index)) => h("span")))');
+            expect(code).toBe('h(Fragment, null, renderList(items, (value, key, index) => h("span")))');
         })
 
         test('with key', () => {
             const code = baseCompile('<span v-for="item in items" :key="item.id" />');
-            expect(code).toBe('h(Fragment, null, renderList(items, (item) => h("span", { key: item.id })))');
+            expect(code).toBe('h(Fragment, null, renderList(items, item => h("span", { key: item.id })))');
         })
 
         // 不支持
@@ -189,12 +189,12 @@ describe('compiler: integration tests', () => {
 
         test('nested', () => {
             const code = baseCompile('<ul v-for="item in items"><li v-for="child in item.list">{{child.text}}</li></ul>');
-            expect(code).toBe('h(Fragment, null, renderList(items, (item) => h("ul", null, [h(Fragment, null, renderList(item.list, (child) => h("li", null, child.text)))])))');
+            expect(code).toBe('h(Fragment, null, renderList(items, item => h("ul", null, [h(Fragment, null, renderList(item.list, child => h("li", null, child.text)))])))');
         })
 
         test('v-if + v-for', () => {
             const code = baseCompile('<div v-if="ok" v-for="i in list"/>');
-            expect(code).toBe('ok ? h(Fragment, null, renderList(list, (i) => h("div"))) : h(Text, null, "")');
+            expect(code).toBe('ok ? h(Fragment, null, renderList(list, i => h("div"))) : h(Text, null, "")');
         })
     })
 
@@ -227,7 +227,7 @@ describe('compiler: integration tests', () => {
                 v-for="item in items"
                 v-if="ok" />
             `);
-            expect(code).toBe('ok ? h(Fragment, null, renderList(items, (item) => h("div", { style: "color: red", class: class, onClick: foo }))) : h(Text, null, "")');
+            expect(code).toBe('ok ? h(Fragment, null, renderList(items, item => h("div", { style: "color: red", class: class, onClick: foo }))) : h(Text, null, "")');
         })
     })
 })

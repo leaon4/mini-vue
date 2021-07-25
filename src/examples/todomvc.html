@@ -14,24 +14,21 @@
                 @keyup="addTodo">
         </header>
         <section class="main"
-            v-show="state.todos.length">
+            :style="{display: state.todos.length ? 'block' : 'none'}">
             <input id="toggle-all"
                 class="toggle-all"
                 type="checkbox"
-                value="allDone"
                 v-model="obj.allDone.value">
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
-                <li v-for="todo in obj.filteredTodos.value"
-                    class="todo"
+                <li v-for="(todo, index) in obj.filteredTodos.value"
                     :key="todo.id"
-                    :class="{ completed: todo.completed, editing: todo === state.editedTodo }">
+                    :class="'todo ' + (todo.completed ? 'completed' : '') + (todo === state.editedTodo ? ' editing' : '')">
                     <div class="view">
                         <input class="toggle"
                             type="checkbox"
-                            :value="todo.id"
                             v-model="todo.completed">
-                        <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
+                        <label @dblclick="editTodo(todo, index)">{{ todo.title }}</label>
                         <button class="destroy"
                             @click="removeTodo(todo)"></button>
                     </div>
@@ -43,23 +40,23 @@
             </ul>
         </section>
         <footer class="footer"
-            v-show="state.todos.length">
+            :style="{display: state.todos.length ? 'block' : 'none'}">
             <span class="todo-count">
                 <strong>{{ obj.remaining.value }}</strong>
                 <span>{{ obj.remainingText.value }}</span>
             </span>
             <ul class="filters">
                 <li><a href="#/all"
-                        :class="{ selected: state.visibility === 'all' }">All</a></li>
+                        :class="state.visibility === 'all' ? 'selected' : ''">All</a></li>
                 <li><a href="#/active"
-                        :class="{ selected: state.visibility === 'active' }">Active</a></li>
+                        :class="state.visibility === 'active' ? 'selected' : ''">Active</a></li>
                 <li><a href="#/completed"
-                        :class="{ selected: state.visibility === 'completed' }">Completed</a></li>
+                        :class="state.visibility === 'completed' ? 'selected' : ''">Completed</a></li>
             </ul>
 
             <button class="clear-completed"
                 @click="removeCompleted"
-                v-show="state.todos.length > obj.remaining.value">
+                :style="{display: state.todos.length > obj.remaining.value ? 'block' : 'none'}">
                 Clear completed
             </button>
         </footer>
@@ -72,6 +69,7 @@
         reactive,
         computed,
         effect,
+        nextTick,
     } = MiniVue
 
     const STORAGE_KEY = 'todos-vuejs-3.x'
@@ -150,7 +148,7 @@
                 }),
                 allDone: computed({
                     get: function () {
-                        return obj.remaining.value === 0 ? ['allDone'] : []
+                        return obj.remaining.value === 0
                     },
                     set: function (value) {
                         state.todos.forEach((todo) => {
@@ -189,7 +187,7 @@
             }
 
             function addTodo(e) {
-                if (e.keyCode === 13){
+                if (e.keyCode === 13) {
                     const value = state.newTodo && state.newTodo.trim()
                     if (!value) {
                         return
@@ -207,9 +205,13 @@
                 state.todos.splice(state.todos.indexOf(todo), 1)
             }
 
-            function editTodo(todo) {
+            async function editTodo(todo, index) {
                 state.beforeEditCache = todo.title
                 state.editedTodo = todo
+                await nextTick()
+                const inputs = document.querySelectorAll('input.edit')
+                console.log(inputs, index)
+                inputs[index].focus()
             }
 
             function doneEdit(todo) {

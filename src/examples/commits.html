@@ -12,7 +12,7 @@
     </span>
     <p>leaon4/mini-vue3@{{ currentBranch.value }}</p>
     <ul>
-        <li v-for="{ html_url, sha, author, commit } in commits.value">
+        <li v-for="({ html_url, sha, author, commit }) in commits.value">
             <a :href="html_url"
                 target="_blank"
                 class="commit">{{ sha.slice(0, 7) }}</a>

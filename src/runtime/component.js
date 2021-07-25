@@ -49,7 +49,6 @@ export function mountComponent(vnode, container, anchor, patch) {
         ...instance.props,// 解构后应该没有响应式了
         ...instance.setupState
     };
-    console.log(1)
     instance.update = effect(() => {
         if (!instance.isMounted) {
             // mount

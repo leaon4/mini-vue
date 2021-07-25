@@ -110,7 +110,7 @@ function resolveElementASTNode(node, parent) {
     if (forNode) {
         const { exp } = forNode;
         const [args, source] = exp.content.split(/\sin\s|\sof\s/);
-        return `h(Fragment, null, renderList(${source.trim()}, (${args.trim()}) => ${resolveElementASTNode(node)}))`
+        return `h(Fragment, null, renderList(${source.trim()}, ${args.trim()} => ${resolveElementASTNode(node)}))`
     }
 
     return resolveElement(node);
