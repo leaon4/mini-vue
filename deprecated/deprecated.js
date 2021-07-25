@@ -1,3 +1,5 @@
+/* 记录一些不用但不想删的代码 */
+
 // 原始版本
 function patchKeyedChildren(c1, c2, container, anchor) {
     let maxIndex = 0;
