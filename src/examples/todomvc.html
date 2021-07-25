@@ -18,10 +18,10 @@
             <input id="toggle-all"
                 class="toggle-all"
                 type="checkbox"
-                v-model="obj.allDone.value">
+                v-model="computes.allDone.value">
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
-                <li v-for="(todo, index) in obj.filteredTodos.value"
+                <li v-for="(todo, index) in computes.filteredTodos.value"
                     :key="todo.id"
                     :class="'todo ' + (todo.completed ? 'completed' : '') + (todo === state.editedTodo ? ' editing' : '')">
                     <div class="view">
@@ -35,15 +35,16 @@
                     <input class="edit"
                         type="text"
                         v-model="todo.title"
-                        @blur="doneEdit(todo)">
+                        @blur="doneEdit(todo)"
+                        @keyup="onEditKeyup($event, todo)">
                 </li>
             </ul>
         </section>
         <footer class="footer"
             :style="{display: state.todos.length ? 'block' : 'none'}">
             <span class="todo-count">
-                <strong>{{ obj.remaining.value }}</strong>
-                <span>{{ obj.remainingText.value }}</span>
+                <strong>{{ computes.remaining.value }}</strong>
+                <span>{{ computes.remainingText.value }}</span>
             </span>
             <ul class="filters">
                 <li><a href="#/all"
@@ -56,7 +57,7 @@
 
             <button class="clear-completed"
                 @click="removeCompleted"
-                :style="{display: state.todos.length > obj.remaining.value ? 'block' : 'none'}">
+                :style="{display: state.todos.length > computes.remaining.value ? 'block' : 'none'}">
                 Clear completed
             </button>
         </footer>
@@ -115,40 +116,21 @@
                 newTodo: '',
                 beforeEditCache: '',
                 visibility: 'all',
-                // remaining: computed(() => {
-                //     return filters.active(state.todos).length
-                // }),
-                // remainingText: computed(() => {
-                //     return ` ${pluralize(state.remaining.value)} left`
-                // }),
-                // filteredTodos: computed(() => {
-                //     return filters[state.visibility](state.todos)
-                // }),
-                // allDone: computed({
-                //     get: function () {
-                //         return state.remaining.value === 0
-                //     },
-                //     set: function (value) {
-                //         state.todos.forEach((todo) => {
-                //             todo.completed = value
-                //         })
-                //     }
-                // })
             })
 
-            const obj = {
+            const computes = {
                 remaining: computed(() => {
                     return filters.active(state.todos).length
                 }),
                 remainingText: computed(() => {
-                    return ` ${pluralize(obj.remaining.value)} left`
+                    return ` ${pluralize(computes.remaining.value)} left`
                 }),
                 filteredTodos: computed(() => {
                     return filters[state.visibility](state.todos)
                 }),
                 allDone: computed({
                     get: function () {
-                        return obj.remaining.value === 0
+                        return computes.remaining.value === 0
                     },
                     set: function (value) {
                         state.todos.forEach((todo) => {
@@ -160,16 +142,7 @@
 
             effect(() => {
                 todoStorage.save(state.todos)
-            })
-
-            // onMounted(() => {
-            //     window.addEventListener('hashchange', onHashChange)
-            //     onHashChange()
-            // })
-
-            // onUnmounted(() => {
-            //     window.removeEventListener('hashchange', onHashChange)
-            // })
+            });
 
             window.addEventListener('hashchange', onHashChange)
             setTimeout(() => {
@@ -210,7 +183,6 @@
                 state.editedTodo = todo
                 await nextTick()
                 const inputs = document.querySelectorAll('input.edit')
-                console.log(inputs, index)
                 inputs[index].focus()
             }
 
@@ -234,15 +206,24 @@
                 state.todos = filters.active(state.todos)
             }
 
+            function onEditKeyup(e, todo) {
+                if (e.keyCode === 13) {
+                    doneEdit(todo);
+                } else if (e.keyCode === 27) {
+                    cancelEdit(todo);
+                }
+            }
+
             return {
                 state,
-                obj,
+                computes,
                 addTodo,
                 removeTodo,
                 editTodo,
                 doneEdit,
                 cancelEdit,
-                removeCompleted
+                removeCompleted,
+                onEditKeyup
             }
         }
     }).mount('#app')
