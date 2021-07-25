@@ -32,7 +32,6 @@
   type: NodeTypes.SIMPLE_EXPRESSION,
   content: string,
   // 表达式是否静态。静态可以理解为content就是一段字符串；而动态的content指的是一个变量，或一段js表达式
-  // todo：isStatic为true时和纯文本节点的区别
   isStatic: boolean,
 }
 ```

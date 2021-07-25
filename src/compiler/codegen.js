@@ -15,13 +15,7 @@ export function generateReturns(ast) {
     return traverseNode(ast);
 }
 
-// TODO delete
-let count = 0;
 function traverseNode(node, parent) {
-    count++;
-    if (count > 100) {
-        throw count;
-    }
     switch (node.type) {
         case NodeTypes.ROOT:
             if (node.children.length > 1) {

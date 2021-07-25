@@ -13,6 +13,7 @@ function updateComponentProps(instance, vnode) {
         }
     }
     // toThink: props源码是shallowReactive，确实需要吗?
+    // 需要。否则子组件修改props不会触发更新
     instance.props = reactive(instance.props);
 }
 

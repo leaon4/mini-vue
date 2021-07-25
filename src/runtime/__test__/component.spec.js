@@ -60,8 +60,6 @@ describe('mount component', () => {
         const Comp = {
             setup() {
                 return {
-                    // TODO unref
-                    // ref should auto-unwrap
                     ref: ref('foo'),
                     // object exposed as-is
                     object: reactive({ msg: 'bar' }),
@@ -165,7 +163,6 @@ describe('unmount component', () => {
         expect(root.innerHTML).toBe('')
     });
 
-    // TODO: test lifeCircle
     test('unmount nested components', () => {
         const Comp = {
             render() {
@@ -517,8 +514,6 @@ describe('update component trigger by others', () => {
         anotherText.value = 'b';
         await nextTick()
         expect(root.innerHTML).toBe('b<div id="id">text</div>')
-        // TODO: shouldComponentUpdate
-        // expect(renderCount).toBe(1)
     })
 
     test('switch child', async () => {
