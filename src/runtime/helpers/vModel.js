@@ -9,7 +9,6 @@ export function withModel(tag, props, getter, setter) {
                 props.onChange = (e) => setter(e.target.value);
                 break;
             case 'checkbox':
-                console.log(1)
                 const modelValue = getter();
                 if (isArray(modelValue)) {
                     props.checked = modelValue.includes(props.value);
@@ -21,11 +20,13 @@ export function withModel(tag, props, getter, setter) {
                         } else {
                             values.add(value);
                         }
+                        props.checked = values.has(props.value);
                         setter([...values]);
                     };
                 } else {
                     props.checked = modelValue;
                     props.onChange = (e) => {
+                        props.checked = e.target.checked;
                         setter(e.target.checked);
                     };
                 }

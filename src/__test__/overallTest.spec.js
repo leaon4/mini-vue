@@ -105,7 +105,6 @@ describe('v-model', () => {
         expect(c3.checked).toBe(false);
 
         c2.click();
-        // 真实web中，直接click有效，但在这里必须要补个dispatchEvent
         const e = new Event('change');
         c2.dispatchEvent(e);
         await nextTick();
@@ -160,7 +159,6 @@ describe('v-model', () => {
         expect(c1.checked).toBe(true);
 
         c1.click();
-        // 真实web中，直接click有效，但在这里必须要补个dispatchEvent
         const e = new Event('change');
         c1.dispatchEvent(e);
         await nextTick();
@@ -171,6 +169,35 @@ describe('v-model', () => {
         await nextTick();
         expect(div.textContent).toBe('true');
         expect(c1.checked).toBe(true);
+    });
+
+    test('input[type = checkbox], bind boolean value', async () => {
+        const template = `
+            <input v-for="(item,i) in model" type="checkbox" v-model="model[i]"/>
+        `;
+        const model = reactive([false, false, false]);
+        createApp({
+            template: template.trim(),
+            setup() {
+                return {
+                    model,
+                };
+            },
+        }).mount(root);
+        let [c1, c2, c3] = root.children;
+        expect(c1.checked).toBe(false);
+        expect(c2.checked).toBe(false);
+        expect(c3.checked).toBe(false);
+
+        c1.click();
+        const e = new Event('change');
+        c1.dispatchEvent(e);
+        model.shift();
+        await nextTick();
+        [c1, c2] = root.children;
+        expect(root.children.length).toBe(2);
+        expect(c1.checked).toBe(false);
+        expect(c2.checked).toBe(false);
     });
 });
 

@@ -178,18 +178,14 @@ describe('compiler: integration tests', () => {
         });
 
         test('object de-structured value', () => {
-            const code = compile(
-                '<span v-for="({ id, value }) in items" />'
-            );
+            const code = compile('<span v-for="({ id, value }) in items" />');
             expect(code).toBe(
                 'h(Fragment, null, renderList(items, ({ id, value }) => h("span")))'
             );
         });
 
         test('array de-structured value', () => {
-            const code = compile(
-                '<span v-for="([ id, value ]) in items" />'
-            );
+            const code = compile('<span v-for="([ id, value ]) in items" />');
             expect(code).toBe(
                 'h(Fragment, null, renderList(items, ([ id, value ]) => h("span")))'
             );

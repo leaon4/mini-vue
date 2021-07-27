@@ -59,9 +59,7 @@ describe('compiler: parse', () => {
         });
 
         test('text with mix of tags and interpolations', () => {
-            const ast = parse(
-                'some <span>{{ foo < bar + foo }} text</span>'
-            );
+            const ast = parse('some <span>{{ foo < bar + foo }} text</span>');
             const text1 = ast.children[0];
             const text2 = ast.children[1].children[1];
 
@@ -372,9 +370,7 @@ describe('compiler: parse', () => {
         });
 
         test('multiple attributes', () => {
-            const ast = parse(
-                '<div id="a" class="c" inert style=\'\'></div>'
-            );
+            const ast = parse('<div id="a" class="c" inert style=\'\'></div>');
             const element = ast.children[0];
 
             expect(element).toStrictEqual({

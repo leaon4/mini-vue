@@ -108,7 +108,6 @@
             todos.forEach((todo, index) => {
                 todo.id = index;
             });
-            console.log(todos)
             todoStorage.uid = todos.length;
             return todos;
         },
@@ -171,7 +170,6 @@
 
             effect(() => {
                 todoStorage.save(state.todos);
-                console.log(state.todos)
             });
 
             window.addEventListener('hashchange', onHashChange);
