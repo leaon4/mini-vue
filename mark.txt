@@ -24,6 +24,7 @@
 
 todo:
 .watchEffect                       不做了，effect基本能替代
+.todomvc bug
 
 feature:
 . v-on 只支持 @click="foo", @click="foo($event,id):两种
