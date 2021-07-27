@@ -167,7 +167,7 @@ function patchChildren(n1, n2, container, anchor) {
             if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
                 // c2 is array
                 // 简单认为头一个元素有key就都有key
-                if (c1[0] && c1[0].key && c2[0] && c2[0].key) {
+                if (c1[0] && c1[0].key != null && c2[0] && c2[0].key != null) {
                     patchKeyedChildren(c1, c2, container, anchor);
                 } else {
                     patchUnkeyedChildren(c1, c2, container, anchor);
