@@ -6,18 +6,14 @@ Object {
   "children": Array [
     Object {
       "children": Array [],
-      "codegenNode": undefined,
-      "isSelfClosing": true,
-      "props": Array [
+      "directives": Array [
         Object {
           "arg": Object {
-            "constType": "CAN_STRINGIFY",
             "content": "class",
             "isStatic": true,
             "type": "SIMPLE_EXPRESSION",
           },
           "exp": Object {
-            "constType": "NOT_CONSTANT",
             "content": "{ some: condition }",
             "isStatic": false,
             "type": "SIMPLE_EXPRESSION",
@@ -26,28 +22,22 @@ Object {
           "type": "DIRECTIVE",
         },
       ],
+      "isSelfClosing": true,
+      "props": Array [],
       "tag": "div",
       "tagType": "ELEMENT",
       "type": "ELEMENT",
     },
     Object {
-      "content": " ",
-      "type": "TEXT",
-    },
-    Object {
       "children": Array [],
-      "codegenNode": undefined,
-      "isSelfClosing": true,
-      "props": Array [
+      "directives": Array [
         Object {
           "arg": Object {
-            "constType": "CAN_STRINGIFY",
             "content": "style",
             "isStatic": true,
             "type": "SIMPLE_EXPRESSION",
           },
           "exp": Object {
-            "constType": "NOT_CONSTANT",
             "content": "{ color: 'red' }",
             "isStatic": false,
             "type": "SIMPLE_EXPRESSION",
@@ -56,12 +46,13 @@ Object {
           "type": "DIRECTIVE",
         },
       ],
+      "isSelfClosing": true,
+      "props": Array [],
       "tag": "p",
       "tagType": "ELEMENT",
       "type": "ELEMENT",
     },
   ],
-  "codegenNode": undefined,
   "components": Array [],
   "directives": Array [],
   "helpers": Array [],
@@ -80,18 +71,14 @@ Object {
       "children": Array [
         Object {
           "children": Array [],
-          "codegenNode": undefined,
-          "isSelfClosing": true,
-          "props": Array [
+          "directives": Array [
             Object {
               "arg": Object {
-                "constType": "CAN_STRINGIFY",
                 "content": "style",
                 "isStatic": true,
                 "type": "SIMPLE_EXPRESSION",
               },
               "exp": Object {
-                "constType": "NOT_CONSTANT",
                 "content": "{ color: 'red' }",
                 "isStatic": false,
                 "type": "SIMPLE_EXPRESSION",
@@ -100,23 +87,21 @@ Object {
               "type": "DIRECTIVE",
             },
           ],
+          "isSelfClosing": true,
+          "props": Array [],
           "tag": "p",
           "tagType": "ELEMENT",
           "type": "ELEMENT",
         },
       ],
-      "codegenNode": undefined,
-      "isSelfClosing": false,
-      "props": Array [
+      "directives": Array [
         Object {
           "arg": Object {
-            "constType": "CAN_STRINGIFY",
             "content": "class",
             "isStatic": true,
             "type": "SIMPLE_EXPRESSION",
           },
           "exp": Object {
-            "constType": "NOT_CONSTANT",
             "content": "{ some: condition }",
             "isStatic": false,
             "type": "SIMPLE_EXPRESSION",
@@ -125,12 +110,13 @@ Object {
           "type": "DIRECTIVE",
         },
       ],
+      "isSelfClosing": false,
+      "props": Array [],
       "tag": "div",
       "tagType": "ELEMENT",
       "type": "ELEMENT",
     },
   ],
-  "codegenNode": undefined,
   "components": Array [],
   "directives": Array [],
   "helpers": Array [],

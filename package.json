@@ -1,29 +1,29 @@
 {
-    "name": "mini-vue3",
-    "version": "1.0.0",
-    "description": "",
-    "main": "src/index.js",
-    "scripts": {
-        "test": "jest",
-        "build": "webpack",
-        "dev": "webpack serve --open",
-        "format": "prettier --write ."
-    },
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {
-        "@babel/core": "^7.13.8",
-        "@babel/preset-env": "^7.13.8",
-        "@babel/preset-typescript": "^7.13.0",
-        "@types/jest": "^26.0.23",
-        "babel-jest": "^26.6.3",
-        "eslint": "^7.31.0",
-        "html-webpack-plugin": "^5.3.2",
-        "jest": "^27.0.5",
-        "prettier": "2.3.2",
-        "webpack": "^5.40.0",
-        "webpack-cli": "^4.7.2",
-        "webpack-dev-server": "^3.11.2"
-    },
-    "dependencies": {}
+  "name": "mini-vue3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack",
+    "dev": "webpack serve --open",
+    "format": "prettier --write ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.13.8",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.23",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.31.0",
+    "html-webpack-plugin": "^5.3.2",
+    "jest": "^27.0.5",
+    "prettier": "2.3.2",
+    "webpack": "^5.40.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {}
 }

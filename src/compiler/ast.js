@@ -1,28 +1,28 @@
 export const NodeTypes = {
-    ROOT: 'ROOT',
-    ELEMENT: 'ELEMENT',
-    TEXT: 'TEXT',
-    SIMPLE_EXPRESSION: 'SIMPLE_EXPRESSION',
-    INTERPOLATION: 'INTERPOLATION',
-    ATTRIBUTE: 'ATTRIBUTE',
-    DIRECTIVE: 'DIRECTIVE',
+  ROOT: 'ROOT',
+  ELEMENT: 'ELEMENT',
+  TEXT: 'TEXT',
+  SIMPLE_EXPRESSION: 'SIMPLE_EXPRESSION',
+  INTERPOLATION: 'INTERPOLATION',
+  ATTRIBUTE: 'ATTRIBUTE',
+  DIRECTIVE: 'DIRECTIVE',
 };
 
 export const ElementTypes = {
-    ELEMENT: 'ELEMENT',
-    COMPONENT: 'COMPONENT',
+  ELEMENT: 'ELEMENT',
+  COMPONENT: 'COMPONENT',
 };
 
 export function createRoot(children) {
-    return {
-        type: NodeTypes.ROOT,
-        children,
-        helpers: [],
-        components: [],
-        directives: [],
-        hoists: [],
-        imports: [],
-        cached: 0,
-        temps: 0,
-    };
+  return {
+    type: NodeTypes.ROOT,
+    children,
+    helpers: [],
+    components: [],
+    directives: [],
+    hoists: [],
+    imports: [],
+    cached: 0,
+    temps: 0,
+  };
 }
