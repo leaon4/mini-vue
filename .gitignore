@@ -3,3 +3,4 @@ src/assets/
 *.log
 coverage/
 *.snap
+dist/

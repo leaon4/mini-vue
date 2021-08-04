@@ -1,30 +1,15 @@
-import { compile } from './compiler/compile';
-import {
-  createApp,
-  render,
-  h,
-  Text,
-  Fragment,
-  renderList,
-  resolveComponent,
-  withModel,
-  nextTick,
-} from './runtime';
-import { reactive, ref, computed, effect } from './reactivity';
+// import { reactive } from './reacitve/reactive';
+// import { effect } from './reacitve/effect';
+import { ref } from './reacitve/ref';
+import { computed } from './reacitve/computed';
 
-export const MiniVue = (window.MiniVue = {
-  createApp,
-  render,
-  h,
-  Text,
-  Fragment,
-  renderList,
-  resolveComponent,
-  withModel,
-  nextTick,
-  reactive,
-  ref,
-  computed,
-  effect,
-  compile,
-});
+const num = (window.num = ref(0));
+const c = (window.c = computed({
+  get() {
+    console.log('get')
+    return num.value * 2;
+  },
+  set(newVal) {
+    num.value = newVal;
+  },
+}));

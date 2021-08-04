@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible"
+    content="IE=edge">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../vue.global.js"></script>
+</head>
+
+<body>
+  <script>
+    const {
+      reactive,
+      watchEffect: effect,
+      ref,
+      computed
+    } = Vue;
+
+    const observed1 = reactive({
+      count1: 0,
+      count2: 10,
+      obj:{
+        obj:{
+          
+        }
+      }
+    });
+
+    const observed2 = reactive({
+      count: 100,
+    });
+
+    effect(() => {
+      console.log('sum is:', observed1.count1 + observed1.count2 + observed2.count);
+    });
+
+    effect(() => {
+      console.log('sum is:', observed1.count1 + observed1.count2 + observed2.count);
+    });
+
+  </script>
+</body>
+
+</html>

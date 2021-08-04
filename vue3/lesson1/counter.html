@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible"
+    content="IE=edge">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div>{{counter.num}}</div>
+    <button @click="add">click</button>
+  </div>
+  <script>
+    const { reactive, createApp } = Vue;
+    createApp({
+      setup() {
+        const counter = reactive({ num: 0 });
+        const add = () => {
+          counter.num++;
+        };
+        return {
+          counter,
+          add
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>
