@@ -15,7 +15,7 @@ export const ShapeFlags = {
 };
 
 /**
- * vnode有五种类型：dom元素，纯文本，Fragment，状态组件，函数组件
+ * vnode有五种类型：dom元素，纯文本，Fragment，组件
  * @param {string | Text | Fragment | object | Function} type
  * @param {Record<string,any> | null} props
  * @param {string | array | null} children
@@ -41,6 +41,7 @@ export function h(type, props = null, children = null) {
   }
 
   if (props) {
+    // 一方面是为了mutation，另一方面是在patchProps的时候防止跳过比较
     // for reactive or proxy objects, we need to clone it to enable mutation.
     if (isReactive(props)) {
       props = Object.assign({}, props);
