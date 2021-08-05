@@ -1,4 +1,4 @@
-import { render, h, Text, Fragment } from './runtime';
+import { render, h, Text } from './runtime';
 
 const vnode = h(
   'div',
@@ -9,7 +9,6 @@ const vnode = h(
       fontSize: '14px',
     },
     onClick: () => console.log('click'),
-    id: 'foo',
     checked: '',
     custom: false,
   },
@@ -18,10 +17,21 @@ const vnode = h(
       h('li', { style: { color: 'red' } }, 1),
       h('li', null, 2),
       h('li', { style: { color: 'blue' } }, 3),
-      h(Fragment, null, [h('li', null, '4'), h('li')]),
       h('li', null, [h(Text, null, 'hello world')]),
     ]),
   ]
 );
 
 render(vnode, document.body);
+
+{
+  /* <style>
+  .a {
+    background-color: aqua;
+  }
+
+  .b {
+    padding: 20px;
+  }
+</style> */
+}
