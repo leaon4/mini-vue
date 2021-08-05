@@ -9,7 +9,7 @@ function mount(vnode, container) {
   if (shapeFlag & ShapeFlags.ELEMENT) {
     mountElement(vnode, container);
   } else if (shapeFlag & ShapeFlags.TEXT) {
-    mountText(vnode, container);
+    mountTextNode(vnode, container);
   } else if (shapeFlag & ShapeFlags.FRAGMENT) {
     mountFragment(vnode, container);
   } else {
@@ -18,34 +18,35 @@ function mount(vnode, container) {
 }
 
 function mountElement(vnode, container) {
-  const { type, props, children, shapeFlag } = vnode;
+  const { type, props } = vnode;
   const el = document.createElement(type);
   mountProps(props, el);
-  mountChildren(children, el);
+  mountChildren(vnode, el);
   container.appendChild(el);
 }
 
-function mountText(vnode, container) {
+function mountTextNode(vnode, container) {
   const el = document.createTextNode(vnode.children);
   container.appendChild(el);
 }
 
-function mountFragment(vnode, container) {}
+function mountFragment(vnode, container) {
+  mountChildren(vnode, container);
+}
 
 function mountComponent(vnode, container) {}
 
-/* 
-  {
-    class: 'a b',
-    style: {
-      color: 'red',
-      fontSize: '14px',
-    },
-    onClick: () => console.log('click'),
-
-  }
- */
-const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
+/* {
+  class: 'a b',
+  style: {
+    color: 'red',
+    fontSize: '14px',
+  },
+  onClick: () => console.log('click'),
+  checked: '',
+  custom: false
+} */
+const domPropsRE = /[A-Z]|^(value|checked|selected|muted|disabled)$/;
 function mountProps(props, el) {
   for (const key in props) {
     let value = props[key];
@@ -66,11 +67,13 @@ function mountProps(props, el) {
           const eventName = key.slice(2).toLowerCase();
           el.addEventListener(eventName, value);
         } else if (domPropsRE.test(key)) {
+          // domProp
           if (value === '' && typeof el[key] === 'boolean') {
             value = true;
           }
           el[key] = value;
         } else {
+          // attr
           if (value == null || value === false) {
             el.removeAttribute(key);
           } else {
@@ -82,4 +85,13 @@ function mountProps(props, el) {
   }
 }
 
-function mountChildren(children, container) {}
+function mountChildren(vnode, container) {
+  const { shapeFlag, children } = vnode;
+  if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    mountTextNode(vnode, container);
+  } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+    children.forEach((child) => {
+      mount(child, container);
+    });
+  }
+}

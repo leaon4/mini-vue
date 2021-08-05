@@ -1,4 +1,4 @@
-import { isArray, isString } from '../utils';
+import { isArray, isNumber, isString } from '../utils';
 
 export const ShapeFlags = {
   ELEMENT: 1, // 00000001
@@ -32,8 +32,9 @@ export function h(type, props = null, children = null) {
     shapeFlag = ShapeFlags.ELEMENT;
   }
 
-  if (isString(children)) {
+  if (isString(children) || isNumber(children)) {
     shapeFlag |= ShapeFlags.TEXT_CHILDREN;
+    children = children.toString();
   } else if (isArray(children)) {
     shapeFlag |= ShapeFlags.ARRAY_CHILDREN;
   }

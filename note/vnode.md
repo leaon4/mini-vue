@@ -127,6 +127,21 @@ let flag = ShapeFlags.ELEMENT | ShapeFlags.ARRAY_CHILDREN;
 
 ## props
 
+举例：
+
+```javascript
+{
+  class: 'a b',
+  style: {
+    color: 'red',
+    fontSize: '14px',
+  },
+  onClick: () => console.log('click'),
+  checked: '',
+  custom: false
+}
+```
+
 先偷个懒，限定 class 只能是字符串类型，style 只能是对象类型，vue 事件只能是以 on 开头，事件名第一个字母大写的形式，如：`onClick`
 
 #### Attributes 和 DOM Properties
@@ -134,7 +149,8 @@ let flag = ShapeFlags.ELEMENT | ShapeFlags.ARRAY_CHILDREN;
 [HcySunYang-渲染器之挂载](http://hcysun.me/vue-design/zh/renderer.html#attributes-%E5%92%8C-dom-properties)
 
 ```javascript
-const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
+// 还要增加一个disabled
+const domPropsRE = /[A-Z]|^(value|checked|selected|muted|disabled)$/;
 
 if (domPropsRE.test(key)) {
   // 满足上面正则的，作为domProp赋值
@@ -172,10 +188,10 @@ if (domPropsRE.test(key)) {
 }
 ```
 
-再例如 disabled，如果我们传了一段 props，希望置 disabled 为 false
+再例如一个布尔类型的自定义属性 custom，如果我们传了一段 props，希望置 custom 为 false
 
 ```json
-{ "disabled": false }
+{ "custom": false }
 ```
 
 这时候采用`setAttribute`会让`false`成为`"false"`，其结果仍然为 true，
@@ -185,12 +201,14 @@ if (domPropsRE.test(key)) {
 if (domPropsRE.test(key)) {
   //
 } else {
+  // 例如自定义属性{custom: ''}，应该用setAttribute设置为<input custom />
+  // 而{custom: null}，应用removeAttribute设置为<input />
   if (value == null || value === false) {
-    // 例如disabled，设置''时，应该为true。
-    // 但设置为其他falsy值如false时，应该为flase
     el.removeAttribute(key);
   } else {
     el.setAttribute(key, value);
   }
 }
 ```
+
+做到这样，已经能应付大部分常见的情况，但还是不能应付所有的情况。最完整的实现还是要去看源码。

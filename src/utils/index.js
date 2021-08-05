@@ -17,3 +17,7 @@ export function hasChanged(oldValue, value) {
 export function isString(target) {
   return typeof target === 'string';
 }
+
+export function isNumber(target) {
+  return typeof target === 'number';
+}
