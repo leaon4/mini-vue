@@ -21,7 +21,7 @@ export function patchProps(el, oldProps, newProps) {
   }
 }
 
-const domPropsRE = /[A-Z]|^(value|checked|selected|muted)$/;
+const domPropsRE = /[A-Z]|^(value|checked|selected|muted|disabled)$/;
 function patchDomProp(el, key, prev, next) {
   switch (key) {
     case 'class':
@@ -63,9 +63,9 @@ function patchDomProp(el, key, prev, next) {
         }
         el[key] = next;
       } else {
+        // 例如自定义属性{custom: ''}，应该用setAttribute设置为<input custom />
+        // 而{custom: null}，应用removeAttribute设置为<input />
         if (next == null || next === false) {
-          // 例如disabled，设置''时，应该为true。
-          // 但设置为其他falsy值如false时，应该为flase
           el.removeAttribute(key);
         } else {
           el.setAttribute(key, next);

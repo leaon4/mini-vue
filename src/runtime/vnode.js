@@ -1,4 +1,4 @@
-import { isObject } from '../utils';
+import { isObject, isString } from '../utils';
 import { isReactive } from '../reactivity';
 
 export const Text = Symbol('Text');
@@ -9,21 +9,21 @@ export const ShapeFlags = {
   TEXT: 1 << 1,
   FRAGMENT: 1 << 2,
   COMPONENT: 1 << 3,
-  TEXT_CHILDREN: 1 << 5,
-  ARRAY_CHILDREN: 1 << 6,
-  CHILDREN: (1 << 5) | (1 << 6),
+  TEXT_CHILDREN: 1 << 4,
+  ARRAY_CHILDREN: 1 << 5,
+  CHILDREN: (1 << 4) | (1 << 5),
 };
 
 /**
- * vnode有五种类型：dom元素，纯文本，Fragment，组件
- * @param {string | Text | Fragment | object | Function} type
- * @param {Record<string,any> | null} props
+ * vnode有四种类型：dom元素，纯文本，Fragment，组件
+ * @param {string | Text | Fragment | Object } type
+ * @param {Object | null} props
  * @param {string | array | null} children
- * @returns vnode
+ * @returns VNode
  */
 export function h(type, props = null, children = null) {
   let shapeFlag = 0;
-  if (typeof type === 'string') {
+  if (isString(type)) {
     shapeFlag = ShapeFlags.ELEMENT;
   } else if (type === Text) {
     shapeFlag = ShapeFlags.TEXT;
@@ -41,7 +41,8 @@ export function h(type, props = null, children = null) {
   }
 
   if (props) {
-    // 一方面是为了mutation，另一方面是在patchProps的时候防止跳过比较
+    // 其实是因为，vnode要求immutable，这里如果直接赋值的话是浅引用
+    // 如果使用者复用了props的话，就不再immutable了，因此这里要复制一下。style同理
     // for reactive or proxy objects, we need to clone it to enable mutation.
     if (isReactive(props)) {
       props = Object.assign({}, props);
