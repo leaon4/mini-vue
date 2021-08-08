@@ -58,7 +58,6 @@ function mountChildren(vnode, container) {
   checked: '',
   custom: false
 } */
-
 const domPropsRE = /[A-Z]|^(value|checked|selected|muted|disabled)$/;
 function mountProps(props, el) {
   for (const key in props) {
@@ -83,6 +82,7 @@ function mountProps(props, el) {
           }
           el[key] = value;
         } else {
+          // attr
           if (value == null || value === false) {
             el.removeAttribute(key);
           } else {
