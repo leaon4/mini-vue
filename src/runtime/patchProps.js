@@ -24,7 +24,8 @@ export function patchProps(oldProps, newProps, el) {
 function patchDomProp(el, key, prev, next) {
   switch (key) {
     case 'class':
-      el.className = next;
+      // next可能为null，会变成'null'，因此要设成''
+      el.className = next || '';
       break;
     case 'style':
       if (!next) {
