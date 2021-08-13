@@ -17,6 +17,7 @@ export function render(vnode, container) {
 // n1可能为null，n2不可能为null
 function patch(n1, n2, container, anchor) {
   if (n1 && !isSameVNodeType(n1, n2)) {
+    // n1被卸载后，n2将会创建，因此anchor至关重要。需要将它设置为n1的下一个兄弟节点
     anchor = (n1.anchor || n1.el).nextSibling;
     unmount(n1);
     n1 = null;

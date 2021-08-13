@@ -26,6 +26,7 @@ function patchDomProp(el, key, prev, next) {
   switch (key) {
     case 'class':
       // 暂时认为class就是字符串
+      // next可能为null，会变成'null'，因此要设成''
       el.className = next || '';
       break;
     case 'style':
