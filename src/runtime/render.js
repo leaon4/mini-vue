@@ -51,13 +51,13 @@ function mountElement(vnode, container, anchor) {
   }
 
   vnode.el = el;
-  container.insertBefore(el, anchor || null);
+  container.insertBefore(el, anchor);
 }
 
 function mountTextNode(vnode, container, anchor) {
   const textNode = document.createTextNode(vnode.children);
   vnode.el = textNode;
-  container.insertBefore(textNode, anchor || null);
+  container.insertBefore(textNode, anchor);
 }
 
 function mountChildren(children, container, anchor) {
@@ -118,8 +118,8 @@ function processFragment(n1, n2, container, anchor) {
     ? n1.anchor
     : document.createTextNode(''));
   if (n1 == null) {
-    container.insertBefore(fragmentStartAnchor, anchor || null);
-    container.insertBefore(fragmentEndAnchor, anchor || null);
+    container.insertBefore(fragmentStartAnchor, anchor);
+    container.insertBefore(fragmentEndAnchor, anchor);
     mountChildren(n2.children, container, fragmentEndAnchor);
   } else {
     patchChildren(n1, n2, container, fragmentEndAnchor);
