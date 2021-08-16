@@ -13,6 +13,10 @@
 
 vue3 原 examples 除 svg 以外全部能移植使用
 
+## B站视频
+
+[B站视频](https://www.bilibili.com/video/BV1564y1s7s5)
+
 ## 本地运行
 
 ```bash
