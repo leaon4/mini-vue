@@ -244,7 +244,8 @@ function patchKeyedChildren(c1, c2, container, anchor) {
       const prev = c1[j];
       map.set(prev.key, { prev, j });
     }
-    let maxIndex = 0;
+    // used to track whether any node has moved
+    let maxNewIndexSoFar = 0;
     let move = false;
     let toMounted = [];
     const source = new Array(e2 - i + 1).fill(-1);
@@ -253,10 +254,10 @@ function patchKeyedChildren(c1, c2, container, anchor) {
       if (map.has(next.key)) {
         const { prev, j } = map.get(next.key);
         patch(prev, next, container, anchor);
-        if (j < maxIndex) {
+        if (j < maxNewIndexSoFar) {
           move = true;
         } else {
-          maxIndex = j;
+          maxNewIndexSoFar = j;
         }
         source[k] = j;
         map.delete(next.key);
@@ -272,7 +273,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
     });
 
     if (move) {
-      // 6.需要移动，则采用新的最长上升子序列算法
+      // 5.需要移动，则采用新的最长上升子序列算法
       const seq = getSequence(source);
       let j = seq.length - 1;
       for (let k = source.length - 1; k >= 0; k--) {
@@ -293,7 +294,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
         }
       }
     } else if (toMounted.length) {
-      // 7.不需要移动，但还有未添加的元素
+      // 6.不需要移动，但还有未添加的元素
       for (let k = toMounted.length - 1; k >= 0; k--) {
         const pos = toMounted[k];
         const nextPos = pos + 1;
