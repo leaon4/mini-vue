@@ -62,11 +62,11 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 
 #### 不需要移动
 
-![](./assets/diff-react-1.7b07877f.png)
+<img src="./assets/diff-react-1.7b07877f.png" width = "500" />
 
 #### 需要移动
 
-![](./assets/diff-react-2.e6cef98d.png)
+<img src="./assets/diff-react-2.e6cef98d.png" width = "500" />
 
 `let maxNewIndexSoFar = 0`
 设置一个变量 `maxNewIndexSoFar`，记录当前的 `next` 在 `c1` 中找到的 `index` 的最大值。
@@ -74,11 +74,11 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 若 `index` 小于 `maxNewIndexSoFar`，说明需要移动。它应该移动到上一个 `next` 之后。因此 `anchor` 设置为 `c2[i-1].el.nextSibling`。
 
 再考虑没 `c1` 中没有找到相同 `key` 的情况，如：
-![](./assets/diff-react-5.d12b2ed9.png)
+<img src="./assets/diff-react-5.d12b2ed9.png" width = "500" />
 这时候说明 `c2` 的这个 `next` 节点是新增的，对它执行 `mount` 操作
 
 再考虑 c1 中有需要移除节点的情况
-![](./assets/diff-react-6.4ad1a4c1.png)
+<img src="./assets/diff-react-6.4ad1a4c1.png" width = "500" />
 
 ```javascript
 function patchKeyedChildren(c1, c2, container, anchor) {
@@ -149,7 +149,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 
 ### react diff 算法的缺点
 
-![](./assets/diff-react-2.e6cef98d.png)
+<img src="./assets/diff-react-2.e6cef98d.png" width = "500" />
 
 如上图，肉眼就可以看出，最佳的方案是只需要移动一次 li-c 节点。但 react 算法对于这种情况会移动两次。
 
@@ -157,7 +157,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 
 vue2 采用的是双端比较的算法，源自 **snabbdom**
 先分别对四个端点进行比较和移动，如果都不行，再逐个比较
-![](./assets/diff-vue2-3.933b8708.png)
+<img src="./assets/diff-vue2-3.933b8708.png" width = "500" />
 
 ## vue3 的 diff 算法
 
@@ -167,16 +167,16 @@ http://hcysun.me/vue-design/zh/renderer-diff.html#%E7%A7%BB%E9%99%A4%E4%B8%8D%E5
 1. **从左至右依次比对**
 
 2. **从右至左依次比对**
-   ![](./assets/diff2.469b3f9b.png)
+   <img src="./assets/diff2.469b3f9b.png" width = "500" />
 
 3. **经过 1、2 直接将旧结点比对完，则剩下的新结点直接 `mount`，此时 `i > e1`**
-   ![](./assets/diff5.edd80c32.png)
+   <img src="./assets/diff5.edd80c32.png" width = "500" />
    经过 1、2 直接将新结点比对完，则剩下的旧结点直接 `unmount`，此时 `i > e2`
-   ![](./assets/diff7.df9450ee.png)
+   <img src="./assets/diff7.df9450ee.png" width = "500" />
 4. **若不满足 3，采用传统 `diff` 算法，但不真的添加和移动，只做标记和删除**
    取得一个 `source` 数组
-   ![](./assets/diff11.48afbeb3.png)
-   ![](./assets/diff12.566f24a9.png)
+   <img src="./assets/diff11.48afbeb3.png" width = "600" />
+   <img src="./assets/diff12.566f24a9.png" width = "600" />
 
 5. **需要移动，则采用新的最长上升子序列算法**
 
@@ -192,7 +192,7 @@ http://hcysun.me/vue-design/zh/renderer-diff.html#%E7%A7%BB%E9%99%A4%E4%B8%8D%E5
 >
 > 当然答案可能有多种情况，例如：[0, 4, 12] 也是可以的
 
-![](./assets/diff15.087a1726.png)
+<img src="./assets/diff15.087a1726.png" width = "600" />
 `seq` 记录的是 `source` 数组的下标，-1 不算。
 它的意义是：`seq` 中的元素都不需要再移动，而没有在 `seq` 中的元素都需要进行移动。
 因此得到以下算法：
@@ -214,3 +214,119 @@ http://hcysun.me/vue-design/zh/renderer-diff.html#%E7%A7%BB%E9%99%A4%E4%B8%8D%E5
 `toMounted` 记录待新增的元素的下标
 
 ## 最长上升子序列
+
+dp 版
+O(n^2)
+
+```javascript
+var lengthOfLIS = function (nums) {
+  let dp = new Array(nums.length).fill(1);
+  let max = 1;
+  for (let i = 1; i < nums.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (nums[i] > nums[j]) {
+        dp[i] = Math.max(dp[i], dp[j] + 1);
+      }
+    }
+    max = Math.max(max, dp[i]);
+  }
+  return max;
+};
+```
+
+贪心算法
+O(n^2)
+
+```javascript
+var lengthOfLIS = function (nums) {
+  let arr = [nums[0]];
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i] > arr[arr.length - 1]) {
+      arr.push(nums[i]);
+    } else {
+      for (let j = 0; j < arr.length; j++) {
+        if (nums[i] <= arr[j]) {
+          arr[j] = nums[i];
+          break;
+        }
+      }
+    }
+  }
+  return arr.length;
+};
+```
+
+贪心算法+二分
+O(nlogn)
+
+```javascript
+var lengthOfLIS = function (nums) {
+  let arr = [nums[0]];
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i] > arr[arr.length - 1]) {
+      arr.push(nums[i]);
+    } else {
+      let l = 0,
+        r = arr.length - 1;
+      while (l <= r) {
+        let mid = ~~((l + r) / 2);
+        if (nums[i] > arr[mid]) {
+          l = mid + 1;
+        } else if (nums[i] < arr[mid]) {
+          r = mid - 1;
+        } else {
+          l = mid;
+          break;
+        }
+      }
+      arr[l] = nums[i];
+    }
+  }
+  return arr.length;
+};
+```
+
+最终版，略过-1，返回子序列
+
+```javascript
+function getSequence(nums) {
+  let arr = [];
+  let position = [];
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] === -1) {
+      continue;
+    }
+    // arr[arr.length - 1]可能为undefined，此时nums[i] > undefined为false
+    if (nums[i] > arr[arr.length - 1]) {
+      arr.push(nums[i]);
+      position.push(arr.length - 1);
+    } else {
+      let l = 0,
+        r = arr.length - 1;
+      while (l <= r) {
+        let mid = ~~((l + r) / 2);
+        if (nums[i] > arr[mid]) {
+          l = mid + 1;
+        } else if (nums[i] < arr[mid]) {
+          r = mid - 1;
+        } else {
+          l = mid;
+          break;
+        }
+      }
+      arr[l] = nums[i];
+      position.push(l);
+    }
+  }
+  let cur = arr.length - 1;
+  // 这里复用了arr，它本身已经没用了
+  for (let i = position.length - 1; i >= 0 && cur >= 0; i--) {
+    if (position[i] === cur) {
+      arr[cur--] = i;
+    }
+  }
+  return arr;
+}
+```
+
+## 处理 key
