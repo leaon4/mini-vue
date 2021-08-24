@@ -8,6 +8,9 @@ export function patchProps(oldProps, newProps, el) {
   newProps = newProps || {};
   oldProps = oldProps || {};
   for (const key in newProps) {
+    if (key === 'key') {
+      continue;
+    }
     const next = newProps[key];
     const prev = oldProps[key];
     if (next !== prev) {
@@ -15,7 +18,7 @@ export function patchProps(oldProps, newProps, el) {
     }
   }
   for (const key in oldProps) {
-    if (newProps[key] == null) {
+    if (key !== 'key' && newProps[key] == null) {
       patchDomProp(el, key, oldProps[key], null);
     }
   }

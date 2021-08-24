@@ -232,4 +232,30 @@ describe('patchChildren', () => {
     render(h('div', null, 'text'), root);
     expect(root.innerHTML).toBe('<div>text</div>');
   });
+
+  test('keyed children', () => {
+    render(
+      h(Fragment, null, [
+        h('input', { key: 0, checked: true }),
+        h('input', { key: 1, checked: false }),
+        h('input', { key: 2, checked: false }),
+      ]),
+      root
+    );
+    expect(root.innerHTML).toBe('<input><input><input>');
+    expect(root.children[0].checked).toBe(true);
+    expect(root.children[1].checked).toBe(false);
+    expect(root.children[2].checked).toBe(false);
+
+    render(
+      h(Fragment, null, [
+        h('input', { key: 1, checked: false }),
+        h('input', { key: 2, checked: false }),
+      ]),
+      root
+    );
+    expect(root.innerHTML).toBe('<input><input>');
+    expect(root.children[0].checked).toBe(false);
+    expect(root.children[1].checked).toBe(false);
+  });
 });
