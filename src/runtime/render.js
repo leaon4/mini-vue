@@ -277,7 +277,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
       const seq = getSequence(source);
       let j = seq.length - 1;
       for (let k = source.length - 1; k >= 0; k--) {
-        if (k === seq[j] && source[k] !== -1) {
+        if (k === seq[j]) {
           // 不用移动
           j--;
         } else {
