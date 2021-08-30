@@ -12,9 +12,6 @@ function updateComponentProps(instance, vnode) {
       instance.attrs[key] = vnodeProps[key];
     }
   }
-  // toThink: props源码是shallowReactive，确实需要吗?
-  // 需要。否则子组件修改props不会触发更新
-  instance.props = reactive(instance.props);
 }
 
 export function mountComponent(vnode, container, anchor, patch) {
@@ -26,13 +23,13 @@ export function mountComponent(vnode, container, anchor, patch) {
     attrs: {},
     setupState: null,
     ctx: null,
-    // 源码：instance.setupState = proxyRefs(setupResult)
     update: null,
     isMounted: false,
   };
-
+  
   updateComponentProps(instance, vnode);
-
+  
+  // 源码：instance.setupState = proxyRefs(setupResult)
   instance.setupState = originalComp.setup?.(instance.props, {
     attrs: instance.attrs,
   });
@@ -47,7 +44,6 @@ export function mountComponent(vnode, container, anchor, patch) {
     console.log(originalComp.render);
   }
 
-  // toThink: ctx需要响应式吗?
   instance.ctx = {
     ...instance.props, // 解构后应该没有响应式了
     ...instance.setupState,
@@ -59,7 +55,7 @@ export function mountComponent(vnode, container, anchor, patch) {
         const subTree = (instance.subTree = normalizeVNode(
           originalComp.render(instance.ctx)
         ));
-        if (Object.keys(instance.attrs)) {
+        if (Object.keys(instance.attrs).length) {
           subTree.props = {
             ...subTree.props,
             ...instance.attrs,
@@ -87,13 +83,12 @@ export function mountComponent(vnode, container, anchor, patch) {
         const subTree = (instance.subTree = normalizeVNode(
           originalComp.render(instance.ctx)
         ));
-        if (Object.keys(instance.attrs)) {
+        if (Object.keys(instance.attrs).length) {
           subTree.props = {
             ...subTree.props,
             ...instance.attrs,
           };
         }
-        // anchor may have changed if it's in a fragment
         patch(prev, subTree, container, anchor);
         vnode.el = subTree.el;
       }
