@@ -3,64 +3,73 @@ import { normalizeVNode } from './vnode';
 import { queueJob } from './scheduler';
 import { compile } from '../compiler';
 
-function updateComponentProps(instance, vnode) {
-  const { type: originalComp, props: vnodeProps } = vnode;
+function updateProps(instance, vnode) {
+  const { type: Component, props: vnodeProps } = vnode;
   for (const key in vnodeProps) {
-    if (originalComp.props && originalComp.props.includes(key)) {
+    if (Component.props && Component.props.includes(key)) {
       instance.props[key] = vnodeProps[key];
     } else {
       instance.attrs[key] = vnodeProps[key];
     }
   }
+  // toThink: props源码是shallowReactive，确实需要吗?
+  // 需要。否则子组件修改props不会触发更新
+  instance.props = reactive(instance.props);
 }
 
 export function mountComponent(vnode, container, anchor, patch) {
-  const { type: originalComp } = vnode;
+  const { type: Component } = vnode;
 
+  // createComponentInstance
   const instance = {
-    // type: originalComp, // 和vue3一致，但暂时没用
     props: {},
     attrs: {},
     setupState: null,
     ctx: null,
     update: null,
     isMounted: false,
+    subTree: null,
   };
-  
-  updateComponentProps(instance, vnode);
-  
+
+  // setupComponent
+  updateProps(instance, vnode);
+
   // 源码：instance.setupState = proxyRefs(setupResult)
-  instance.setupState = originalComp.setup?.(instance.props, {
+  instance.setupState = Component.setup?.(instance.props, {
     attrs: instance.attrs,
   });
 
-  if (!originalComp.render && originalComp.template) {
-    let { template } = originalComp;
+  instance.ctx = {
+    ...instance.props,
+    ...instance.setupState,
+  };
+
+  if (!Component.render && Component.template) {
+    let { template } = Component;
     if (template[0] === '#') {
       const el = document.querySelector(template);
       template = el ? el.innerHTML : ``;
     }
-    originalComp.render = new Function('ctx', compile(template));
-    console.log(originalComp.render);
+    Component.render = new Function('ctx', compile(template));
   }
 
-  instance.ctx = {
-    ...instance.props, // 解构后应该没有响应式了
-    ...instance.setupState,
-  };
+  // setupRenderEffect
   instance.update = effect(
     () => {
       if (!instance.isMounted) {
         // mount
         const subTree = (instance.subTree = normalizeVNode(
-          originalComp.render(instance.ctx)
+          Component.render(instance.ctx)
         ));
+
+        // attr fallthrough
         if (Object.keys(instance.attrs).length) {
           subTree.props = {
             ...subTree.props,
             ...instance.attrs,
           };
         }
+
         patch(null, subTree, container, anchor);
         instance.isMounted = true;
         vnode.el = subTree.el;
@@ -72,7 +81,7 @@ export function mountComponent(vnode, container, anchor, patch) {
           vnode = instance.next;
           instance.next = null;
           instance.props = reactive(instance.props);
-          updateComponentProps(instance, vnode);
+          updateProps(instance, vnode);
           instance.ctx = {
             ...instance.props,
             ...instance.setupState,
@@ -81,7 +90,7 @@ export function mountComponent(vnode, container, anchor, patch) {
 
         const prev = instance.subTree;
         const subTree = (instance.subTree = normalizeVNode(
-          originalComp.render(instance.ctx)
+          Component.render(instance.ctx)
         ));
         if (Object.keys(instance.attrs).length) {
           subTree.props = {
