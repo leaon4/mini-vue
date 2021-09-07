@@ -5,11 +5,13 @@ import { compile } from '../compiler';
 
 function updateProps(instance, vnode) {
   const { type: Component, props: vnodeProps } = vnode;
+  const props = (instance.props = {});
+  const attrs = (instance.attrs = {});
   for (const key in vnodeProps) {
-    if (Component.props && Component.props.includes(key)) {
-      instance.props[key] = vnodeProps[key];
+    if (Component.props?.includes(key)) {
+      props[key] = vnodeProps[key];
     } else {
-      instance.attrs[key] = vnodeProps[key];
+      attrs[key] = vnodeProps[key];
     }
   }
   // toThink: props源码是shallowReactive，确实需要吗?
@@ -17,11 +19,20 @@ function updateProps(instance, vnode) {
   instance.props = reactive(instance.props);
 }
 
+function fallThrough(instance, subTree) {
+  if (Object.keys(instance.attrs).length) {
+    subTree.props = {
+      ...subTree.props,
+      ...instance.attrs,
+    };
+  }
+}
+
 export function mountComponent(vnode, container, anchor, patch) {
   const { type: Component } = vnode;
 
   // createComponentInstance
-  const instance = {
+  const instance = (vnode.component = {
     props: {},
     attrs: {},
     setupState: null,
@@ -29,7 +40,8 @@ export function mountComponent(vnode, container, anchor, patch) {
     update: null,
     isMounted: false,
     subTree: null,
-  };
+    next: null, // 组件更新时，把新vnode暂放在这里
+  });
 
   // setupComponent
   updateProps(instance, vnode);
@@ -62,13 +74,7 @@ export function mountComponent(vnode, container, anchor, patch) {
           Component.render(instance.ctx)
         ));
 
-        // attr fallthrough
-        if (Object.keys(instance.attrs).length) {
-          subTree.props = {
-            ...subTree.props,
-            ...instance.attrs,
-          };
-        }
+        fallThrough(instance, subTree);
 
         patch(null, subTree, container, anchor);
         instance.isMounted = true;
@@ -80,7 +86,6 @@ export function mountComponent(vnode, container, anchor, patch) {
         if (instance.next) {
           vnode = instance.next;
           instance.next = null;
-          instance.props = reactive(instance.props);
           updateProps(instance, vnode);
           instance.ctx = {
             ...instance.props,
@@ -92,12 +97,9 @@ export function mountComponent(vnode, container, anchor, patch) {
         const subTree = (instance.subTree = normalizeVNode(
           Component.render(instance.ctx)
         ));
-        if (Object.keys(instance.attrs).length) {
-          subTree.props = {
-            ...subTree.props,
-            ...instance.attrs,
-          };
-        }
+
+        fallThrough(instance, subTree);
+
         patch(prev, subTree, container, anchor);
         vnode.el = subTree.el;
       }
@@ -106,5 +108,4 @@ export function mountComponent(vnode, container, anchor, patch) {
       scheduler: queueJob,
     }
   );
-  vnode.component = instance;
 }
