@@ -92,7 +92,7 @@ createApp({
 - 都有一个 `render` 函数
 - 都通过 `render` 函数产出 `VNode`
 - 都有一套更新策略，以重新执行 `render` 函数
-- 在此基础上附加各种能力，如生命周期，通信机制，`slot`，依赖注入等等
+- 在此基础上附加各种能力，如生命周期，通信机制，`slot`，`provide inject`等等
 
 因此，创建一个组件需要以下几个步骤：
 
@@ -119,7 +119,7 @@ createApp({
 const Comp = {
   props: ['foo'],
   render(ctx) {
-    return h('div', { class: 'a' }, ctx.foo);
+    return h('div', { class: 'a' }, ctx.foo + ctx.bar);
   },
 };
 
@@ -129,10 +129,43 @@ const vnodeProps = {
 };
 
 const vnode = h(Comp, vnodeProps);
-render(vnode, root)// 渲染为<div class="a" bar="bar">foo</div>
+render(vnode, root); // 渲染为<div class="a" bar="bar">foo</div>
 ```
 
 > 组件产物的 vnode 命名为 subTree
 
 `Comp.props` 决它接收哪些外部传入的 `vnodeProps`，把它放入 `instance.props`，而其他属性会添加进 `instance.attrs`。
 `render` 中的 `ctx` 只会使用 `instance.props`。`render` 的产物 `subTree` 的 `subTreeProps`，除使用`{class: 'a'}`以外，还会继承 `instance.attrs`
+
+## normalizeVNode
+
+方便函数能直接返回数组，字符串，数字
+
+## 更新
+
+### 主动更新
+
+只需要重新执行 `render` 函数，再 `patch`
+
+### atr fallthrough
+
+https://v3.cn.vuejs.org/guide/component-attrs.html#attribute-%E7%BB%A7%E6%89%BF
+
+### 被动更新
+
+被动更新发生的场景
+...
+可以看出被动更新时，`vnode.type` 是完全相等的，改变的只可能是 `vnodeProps`
+
+因此，被动更新的流程为：
+`instance` 不用改变，让新 `vnode` 继承
+`vnodeProps` 可能会改变，所以 `instance.props` 要更新
+`props` 更新了以后，`ctx` 要更新（因为我们的实现问题）
+`setup` 方法不用再执行，沿用 `setupState`
+`vnode` 也要更新，因此存入 `next` 中带过去
+
+#### shouldComponentUpdate
+
+## 组件的卸载
+
+简单起见，直接 `unmount subTree`
