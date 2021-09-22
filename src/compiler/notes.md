@@ -6,13 +6,6 @@
 {
   type: NodeTypes.ROOT,
   children: [],
-  helpers: [],
-  components: [],
-  directives: [],
-  hoists: [],
-  imports: [],
-  cached: 0,
-  temps: 0,
 }
 ```
 
