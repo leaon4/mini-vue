@@ -24,7 +24,7 @@ export function reactive(target) {
     },
     set(target, key, value, receiver) {
       const oldValue = target[key];
-      let oldLength = target.length;
+      const oldLength = target.length;
       const res = Reflect.set(target, key, value, receiver);
       if (hasChanged(value, oldValue)) {
         trigger(target, key);

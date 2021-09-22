@@ -7,7 +7,7 @@ describe('computed', () => {
   test('basic use', () => {
     const observed = reactive({ count: 0 });
     const r = ref(10);
-    let c = computed(() => r.value + observed.count);
+    const c = computed(() => r.value + observed.count);
     expect(c.value).toBe(10);
 
     observed.count++;

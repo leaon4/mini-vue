@@ -12,5 +12,6 @@ module.exports = {
   },
   rules: {
     'no-case-declarations': 0,
+    'prefer-const': 1
   },
 };

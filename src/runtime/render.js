@@ -90,9 +90,10 @@ function unmountComponent(vnode) {
 }
 
 function unmountFragment(vnode) {
+  // eslint-disable-next-line prefer-const
   let { el: cur, anchor: end } = vnode;
   while (cur !== end) {
-    let next = cur.nextSibling;
+    const next = cur.nextSibling;
     cur.parentNode.removeChild(cur);
     cur = next;
   }
@@ -247,7 +248,7 @@ function patchKeyedChildren(c1, c2, container, anchor) {
     // used to track whether any node has moved
     let maxNewIndexSoFar = 0;
     let move = false;
-    let toMounted = [];
+    const toMounted = [];
     const source = new Array(e2 - i + 1).fill(-1);
     for (let k = 0; k < e2 - i + 1; k++) {
       const next = c2[k + i];
@@ -306,8 +307,8 @@ function patchKeyedChildren(c1, c2, container, anchor) {
 }
 
 function getSequence(nums) {
-  let result = [];
-  let position = [];
+  const result = [];
+  const position = [];
   for (let i = 0; i < nums.length; i++) {
     if (nums[i] === -1) {
       continue;
@@ -320,7 +321,7 @@ function getSequence(nums) {
       let l = 0,
         r = result.length - 1;
       while (l <= r) {
-        let mid = ~~((l + r) / 2);
+        const mid = ~~((l + r) / 2);
         if (nums[i] > result[mid]) {
           l = mid + 1;
         } else if (nums[i] < result[mid]) {

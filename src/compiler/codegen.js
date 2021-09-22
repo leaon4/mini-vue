@@ -18,7 +18,7 @@ function traverseNode(node, parent) {
   switch (node.type) {
     case NodeTypes.ROOT:
       if (node.children.length > 1) {
-        let result = traverseChildren(node);
+        const result = traverseChildren(node);
         if (node.children.length > 1) {
           return `[${result}]`;
         }
@@ -54,7 +54,7 @@ function traverseChildren(node) {
     }
   }
 
-  let results = [];
+  const results = [];
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
     results.push(traverseNode(child, node));
@@ -64,7 +64,7 @@ function traverseChildren(node) {
 }
 
 function resolveElementASTNode(node, parent) {
-  let ifNode =
+  const ifNode =
     pluck(node.directives, 'if') || pluck(node.directives, 'else-if');
 
   if (ifNode) {
@@ -83,7 +83,7 @@ function resolveElementASTNode(node, parent) {
           continue;
         }
         if (sibling.type === NodeTypes.ELEMENT) {
-          let elseNode = children[i];
+          const elseNode = children[i];
           if (pluck(sibling.directives, 'else')) {
             alternate = resolveElementASTNode(elseNode, parent);
             children.splice(i, 1);
@@ -99,7 +99,7 @@ function resolveElementASTNode(node, parent) {
     return `${exp.content} ? ${consequent} : ${alternate || createTextVNode()}`;
   }
 
-  let forNode = pluck(node.directives, 'for');
+  const forNode = pluck(node.directives, 'for');
   if (forNode) {
     const { exp } = forNode;
     const [args, source] = exp.content.split(/\sin\s|\sof\s/);
@@ -182,7 +182,7 @@ function pluck(directives, name, remove = true) {
 
 // node只接收text和simpleExpresstion
 function createTextVNode(node) {
-  let child = createText(node);
+  const child = createText(node);
   return `h(Text, null, ${child})`;
 }
 

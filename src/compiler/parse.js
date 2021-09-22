@@ -155,14 +155,14 @@ function parseTag(context) {
   advanceSpaces(context);
 
   // Attributes.
-  let { props, directives } = parseAttributes(context);
+  const { props, directives } = parseAttributes(context);
 
   // Tag close.
-  let isSelfClosing = context.source.startsWith('/>');
+  const isSelfClosing = context.source.startsWith('/>');
 
   advanceBy(context, isSelfClosing ? 2 : 1);
 
-  let tagType = isComponent(tag, context)
+  const tagType = isComponent(tag, context)
     ? ElementTypes.COMPONENT
     : ElementTypes.ELEMENT;
 
@@ -286,7 +286,7 @@ function parseAttributeValue(context) {
   advanceBy(context, 1);
 
   const endIndex = context.source.indexOf(quote);
-  let content = parseTextData(context, endIndex);
+  const content = parseTextData(context, endIndex);
 
   advanceBy(context, 1);
 

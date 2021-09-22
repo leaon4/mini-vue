@@ -184,6 +184,7 @@ describe('v-model', () => {
         };
       },
     }).mount(root);
+    // eslint-disable-next-line prefer-const
     let [c1, c2, c3] = root.children;
     expect(c1.checked).toBe(false);
     expect(c2.checked).toBe(false);
