@@ -1,3 +1,4 @@
+import { createApp } from '../createApp';
 import { render } from '../render';
 import { h, Text, Fragment } from '../vnode';
 
@@ -129,5 +130,18 @@ describe('mount', () => {
     expect(div.id).toBe('a');
     expect(div.name).toBe(undefined);
     expect(div.getAttribute('name')).toBe('b');
+  });
+});
+
+describe('createApp', () => {
+  test('createApp', () => {
+    const Comp = {
+      render() {
+        return h('div', null, 'createApp');
+      },
+    };
+    const root = document.createElement('div');
+    createApp(Comp).mount(root);
+    expect(root.innerHTML).toBe('<div>createApp</div>');
   });
 });

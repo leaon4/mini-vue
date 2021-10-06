@@ -1,12 +1,13 @@
-import { render, h, Text, Fragment } from './runtime';
+import { render, h, Text, Fragment, nextTick, createApp } from './runtime';
 import { ref } from './reacitve';
 
-const Comp = {
+createApp({
   setup() {
     const count = ref(0);
     const add = () => {
       count.value++;
-      console.log(count.value);
+      count.value++;
+      count.value++;
     };
     return {
       count,
@@ -14,18 +15,28 @@ const Comp = {
     };
   },
   render(ctx) {
+    console.log('render');
     return [
-      h('div', null, ctx.count.value),
+      h('div', { id: 'div' }, ctx.count.value),
       h(
         'button',
         {
+          id: 'btn',
           onClick: ctx.add,
         },
         'add'
       ),
     ];
   },
-};
+}).mount(document.body);
 
-const vnode = h(Comp);
-render(vnode, document.body); // 渲染为<div class="a" bar="bar">foo</div>
+const div = document.getElementById('div');
+const btn = document.getElementById('btn');
+console.log(div.innerHTML);
+
+btn.click();
+console.log(div.innerHTML);
+
+nextTick(() => {
+  console.log(div.innerHTML);
+});

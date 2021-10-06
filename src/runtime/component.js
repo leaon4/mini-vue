@@ -1,5 +1,6 @@
 import { reactive, effect } from '../reacitve';
 import { normalizeVNode } from './vnode';
+import { queueJob } from './scheduler';
 
 function updateProps(instance, vnode) {
   const { type: Component, props: vnodeProps } = vnode;
@@ -50,41 +51,46 @@ export function mountComponent(vnode, container, anchor, patch) {
     ...instance.setupState,
   };
 
-  instance.update = effect(() => {
-    if (!instance.isMounted) {
-      // mount
-      const subTree = (instance.subTree = normalizeVNode(
-        Component.render(instance.ctx)
-      ));
+  instance.update = effect(
+    () => {
+      if (!instance.isMounted) {
+        // mount
+        const subTree = (instance.subTree = normalizeVNode(
+          Component.render(instance.ctx)
+        ));
 
-      fallThrough(instance, subTree);
+        fallThrough(instance, subTree);
 
-      patch(null, subTree, container, anchor);
-      vnode.el = subTree.el;
-      instance.isMounted = true;
-    } else {
-      // update
+        patch(null, subTree, container, anchor);
+        vnode.el = subTree.el;
+        instance.isMounted = true;
+      } else {
+        // update
 
-      if (instance.next) {
-        // 被动更新
-        vnode = instance.next;
-        instance.next = null;
-        updateProps(instance, vnode);
-        instance.ctx = {
-          ...instance.props,
-          ...instance.setupState,
-        };
+        if (instance.next) {
+          // 被动更新
+          vnode = instance.next;
+          instance.next = null;
+          updateProps(instance, vnode);
+          instance.ctx = {
+            ...instance.props,
+            ...instance.setupState,
+          };
+        }
+
+        const prev = instance.subTree;
+        const subTree = (instance.subTree = normalizeVNode(
+          Component.render(instance.ctx)
+        ));
+
+        fallThrough(instance, subTree);
+
+        patch(prev, subTree, container, anchor);
+        vnode.el = subTree.el;
       }
-
-      const prev = instance.subTree;
-      const subTree = (instance.subTree = normalizeVNode(
-        Component.render(instance.ctx)
-      ));
-
-      fallThrough(instance, subTree);
-
-      patch(prev, subTree, container, anchor);
-      vnode.el = subTree.el;
+    },
+    {
+      scheduler: queueJob,
     }
-  });
+  );
 }

@@ -1,4 +1,5 @@
 import { isArray, isNumber, isObject, isString } from '../utils';
+import { isReactive } from '../reacitve';
 
 export const ShapeFlags = {
   ELEMENT: 1, // 00000001
@@ -37,6 +38,20 @@ export function h(type, props, children) {
     children = children.toString();
   } else if (isArray(children)) {
     shapeFlag |= ShapeFlags.ARRAY_CHILDREN;
+  }
+
+  if (props) {
+    // 其实是因为，vnode要求immutable，这里如果直接赋值的话是浅引用
+    // 如果使用者复用了props的话，就不再immutable了，因此这里要复制一下。style同理
+    // for reactive or proxy objects, we need to clone it to enable mutation.
+    if (isReactive(props)) {
+      props = Object.assign({}, props);
+    }
+    // reactive state objects need to be cloned since they are likely to be
+    // mutated
+    if (isReactive(props.style)) {
+      props.style = Object.assign({}, props.style);
+    }
   }
 
   return {
