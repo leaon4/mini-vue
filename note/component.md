@@ -119,7 +119,7 @@ createApp({
 const Comp = {
   props: ['foo'],
   render(ctx) {
-    return h('div', { class: 'a' }, ctx.foo + ctx.bar);
+    return h('div', { class: 'a', id: ctx.bar }, ctx.foo);
   },
 };
 
@@ -154,7 +154,31 @@ https://v3.cn.vuejs.org/guide/component-attrs.html#attribute-%E7%BB%A7%E6%89%BF
 ### 被动更新
 
 被动更新发生的场景
-...
+
+```javascript
+const Child = {
+  props: ['foo'],
+  render(ctx) {
+    return h('div', { class: 'a', id: ctx.bar }, ctx.foo);
+  },
+};
+
+const Parent = {
+  setup() {
+    const vnodeProps = reactive({
+      foo: 'foo',
+      bar: 'bar',
+    });
+    return { vnodeProps };
+  },
+  render(ctx) {
+    return h(Child, ctx.vnodeProps);
+  },
+};
+
+render(h(Parent), root);
+```
+
 可以看出被动更新时，`vnode.type` 是完全相等的，改变的只可能是 `vnodeProps`
 
 因此，被动更新的流程为：

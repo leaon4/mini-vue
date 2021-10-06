@@ -1,5 +1,6 @@
 import { ShapeFlags } from './vnode';
 import { patchProps } from './patchProps';
+import { mountComponent } from './component';
 
 export function render(vnode, container) {
   const prevVNode = container._vnode;
@@ -25,7 +26,7 @@ function unmount(vnode) {
 }
 
 function unmountComponent(vnode) {
-  // todo
+  unmount(vnode.component.subTree);
 }
 
 function unmountChildren(children) {
@@ -46,12 +47,22 @@ function unmountFragment(vnode) {
 }
 
 function processComponent(n1, n2, container, anchor) {
-  // todo
+  if (n1) {
+    // shouldComponentUpdate
+    updateComponent(n1, n2);
+  } else {
+    mountComponent(n2, container, anchor, patch);
+  }
+}
+
+function updateComponent(n1, n2) {
+  n2.component = n1.component;
+  n2.component.next = n2;
+  n2.component.update();
 }
 
 function patch(n1, n2, container, anchor) {
   if (n1 && !isSameVNode(n1, n2)) {
-    // todo
     anchor = (n1.anchor || n1.el).nextSibling;
     unmount(n1);
     n1 = null;

@@ -1,22 +1,31 @@
 import { render, h, Text, Fragment } from './runtime';
+import { ref } from './reacitve';
 
-render(
-  h('ul', null, [
-    h('li', null, 'first'),
-    h(Fragment, null, []),
-    h('li', null, 'last'),
-  ]),
-  document.body
-);
-setTimeout(() => {
-  render(
-    h('ul', null, [
-      h('li', null, 'first'),
-      h(Fragment, null, [
-        h('li', null, 'middle'),
-      ]),
-      h('li', null, 'last'),
-    ]),
-    document.body
-  );
-}, 2000);
+const Comp = {
+  setup() {
+    const count = ref(0);
+    const add = () => {
+      count.value++;
+      console.log(count.value);
+    };
+    return {
+      count,
+      add,
+    };
+  },
+  render(ctx) {
+    return [
+      h('div', null, ctx.count.value),
+      h(
+        'button',
+        {
+          onClick: ctx.add,
+        },
+        'add'
+      ),
+    ];
+  },
+};
+
+const vnode = h(Comp);
+render(vnode, document.body); // 渲染为<div class="a" bar="bar">foo</div>
