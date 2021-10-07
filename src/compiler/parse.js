@@ -35,14 +35,6 @@ function parseChildren(context) {
     nodes.push(node);
   }
 
-  // 缩减空白
-  // nodes.forEach(node => {
-  //     if (node.type === NodeTypes.TEXT) {
-  //         node.content = node.content.replace(/[\t\r\n\f ]+/g, ' ')
-  //     }
-  // });
-  // return nodes;
-
   let removedWhitespace = false;
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
@@ -109,6 +101,7 @@ function parseTextData(context, length) {
   return rawText;
 }
 
+// 不支持文本节点中带有'<'符号
 function parseText(context) {
   const endTokens = ['<', context.options.delimiters[0]];
 
@@ -179,10 +172,7 @@ function parseTag(context) {
 
 function isComponent(tag, context) {
   const { options } = context;
-  if (options.isNativeTag && !options.isNativeTag(tag)) {
-    return true;
-  }
-  return false;
+  return !options.isNativeTag(tag);
 }
 
 function advanceSpaces(context) {
@@ -201,17 +191,11 @@ function parseAttributes(context) {
     !context.source.startsWith('/>')
   ) {
     const attr = parseAttribute(context);
-    // if (attr.type === NodeTypes.DIRECTIVE && attr.name === 'if' || attr.name === 'for'){
-    //     directives.push(attr);
-    // } else {
-    //     props.push(attr);
-    // }
     if (attr.type === NodeTypes.ATTRIBUTE) {
       props.push(attr);
     } else {
       directives.push(attr);
     }
-    advanceSpaces(context);
   }
   return { props, directives };
 }
