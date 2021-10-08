@@ -1,8 +1,8 @@
-import { generateReturns } from '../codegen';
+import { traverseNode } from '../codegen';
 import { parse } from '../parse';
 function compile(template) {
   const ast = parse(template);
-  return generateReturns(ast);
+  return traverseNode(ast);
 }
 
 describe('compiler: integration tests', () => {

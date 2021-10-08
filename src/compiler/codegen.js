@@ -10,11 +10,7 @@ with (ctx) {
   return code;
 }
 
-export function generateReturns(ast) {
-  return traverseNode(ast);
-}
-
-function traverseNode(node, parent) {
+export function traverseNode(node, parent) {
   switch (node.type) {
     case NodeTypes.ROOT:
       if (node.children.length > 1) {

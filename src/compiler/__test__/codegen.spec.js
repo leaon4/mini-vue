@@ -1,5 +1,5 @@
 import { NodeTypes } from '../ast';
-import { generateReturns as generate } from '../codegen';
+import { traverseNode as generate } from '../codegen';
 
 function createAst(node) {
   return {
