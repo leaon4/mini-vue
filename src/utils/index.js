@@ -25,3 +25,7 @@ export function isFunction(target) {
 export function hasChanged(oldValue, value) {
   return oldValue !== value && !(Number.isNaN(oldValue) && Number.isNaN(value));
 }
+
+export function camelize(str) {
+  return str.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
+}
