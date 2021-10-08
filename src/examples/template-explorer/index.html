@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini-Vue3 Template Explorer</title>
+    <link
+      rel="stylesheet"
+      data-name="vs/editor/editor.main"
+      href="../node_modules/monaco-editor/min/vs/editor/editor.main.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="header"></div>
+    <div id="source" class="editor"></div>
+    <div id="output" class="editor"></div>
+
+    <script src="../node_modules/monaco-editor/min/vs/loader.js"></script>
+    <script>
+      require.config({
+        paths: {
+          vs: '../node_modules/monaco-editor/min/vs',
+        },
+      });
+    </script>
+    <script type="module">
+      import prettier from '../node_modules/prettier/esm/standalone.mjs';
+      import babel from '../node_modules/prettier/esm/parser-babel.mjs';
+
+      window.format = function (code) {
+        return prettier.format(code, {
+          plugins: [babel],
+        });
+      };
+    </script>
+    <script src="/dist/mini-vue.js"></script>
+    <script src="theme.js"></script>
+    <script src="index.js"></script>
+    <script>
+      require(['vs/editor/editor.main'], init /* injected by build */);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../../dist/mini-vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      <div>{{model.text}}</div>
+      <input type="text" v-model="model.text" />
+      <hr />
+      <div>{{model.radio}}</div>
+      <label>
+        <input
+          type="radio"
+          name="radio"
+          value="first"
+          v-model="model.radio"
+        />first
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="radio"
+          value="second"
+          v-model="model.radio"
+        />second
+      </label>
+      <hr />
+      <div>{{model.checkbox.toString()}}</div>
+      <label>
+        <input
+          type="checkbox"
+          name="checkbox"
+          value="one"
+          v-model="model.checkbox"
+        />one
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          name="checkbox"
+          value="two"
+          v-model="model.checkbox"
+        />two
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          name="checkbox"
+          value="three"
+          v-model="model.checkbox"
+        />three
+      </label>
+      <hr />
+      <div>{{model.singleCheckbox.toString()}}</div>
+      <label>
+        <input type="checkbox" v-model="model.singleCheckbox" />singleCheckbox
+      </label>
+      <hr />
+    </div>
+    <script>
+      const { createApp, ref, reactive } = MiniVue;
+      const model = reactive({
+        text: 'text',
+        radio: 'second',
+        checkbox: ['one', 'three'],
+        singleCheckbox: true,
+      });
+      createApp({
+        setup() {
+          return {
+            model,
+          };
+        },
+      }).mount('#app');
+    </script>
+  </body>
+</html>

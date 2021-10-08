@@ -1,5 +1,5 @@
 import { isArray, isNumber, isObject, isString } from '../utils';
-import { isReactive } from '../reacitve';
+import { isReactive } from '../reactivity';
 
 export const ShapeFlags = {
   ELEMENT: 1, // 00000001

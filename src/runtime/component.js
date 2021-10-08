@@ -1,4 +1,4 @@
-import { reactive, effect } from '../reacitve';
+import { reactive, effect } from '../reactivity';
 import { normalizeVNode } from './vnode';
 import { queueJob } from './scheduler';
 
