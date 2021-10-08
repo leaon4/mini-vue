@@ -1,4 +1,5 @@
 import { ElementTypes, NodeTypes } from './ast';
+import { capitalize } from '../utils';
 
 export function generate(ast) {
   const returns = traverseNode(ast);
@@ -13,16 +14,11 @@ with (ctx) {
 export function traverseNode(node, parent) {
   switch (node.type) {
     case NodeTypes.ROOT:
-      if (node.children.length > 1) {
-        const result = traverseChildren(node);
-        if (node.children.length > 1) {
-          return `[${result}]`;
-        }
-        return result;
-      } else if (node.children.length === 1) {
+      if (node.children.length === 1) {
         return traverseNode(node.children[0], node);
       }
-      break;
+      const result = traverseChildren(node);
+      return node.children.length > 1 ? `[${result}]` : result;
     case NodeTypes.ELEMENT:
       return resolveElementASTNode(node, parent);
     case NodeTypes.TEXT:
@@ -34,19 +30,14 @@ export function traverseNode(node, parent) {
 
 function traverseChildren(node) {
   const { children } = node;
-  if (!children.length) {
-    return;
-  }
 
   if (children.length === 1) {
     const child = children[0];
     if (child.type === NodeTypes.TEXT) {
-      // isStatic = true，静态加引号
-      return JSON.stringify(child.content);
+      return createText(child);
     }
     if (child.type === NodeTypes.INTERPOLATION) {
-      // isStatic = false，动态不加引号
-      return child.content.content;
+      return createText(child.content);
     }
   }
 
@@ -104,11 +95,11 @@ function resolveElementASTNode(node, parent) {
     )}))`;
   }
 
-  return resolveElement(node);
+  return createElementVNode(node);
 }
 
-function resolveElement(node) {
-  const { children, props, directives } = node;
+function createElementVNode(node) {
+  const { children, directives } = node;
 
   const tag =
     node.tagType === ElementTypes.ELEMENT
@@ -117,32 +108,7 @@ function resolveElement(node) {
 
   const vModel = pluck(directives, 'model');
 
-  const propArr = [
-    ...props.map((prop) => {
-      return `${prop.name}: ${createText(prop.value)}`;
-    }),
-    ...directives.map((dir) => {
-      const content = dir.arg?.content;
-      switch (dir.name) {
-        case 'bind':
-          return `${content}: ${createText(dir.exp)}`;
-        case 'on':
-          const eventName = `on${content[0].toUpperCase()}${content.slice(1)}`;
-          let exp = dir.exp.content;
-
-          // 以括号结尾，并且不含'=>'的情况，如 @click="foo()"
-          // 当然，判断很不严谨
-          if (/\([^)]*?\)$/.test(exp) && !exp.includes('=>')) {
-            exp = `$event => (${exp})`;
-          }
-          return `${eventName}: ${exp}`;
-        case 'html':
-          return `innerHTML: ${createText(dir.exp)}`;
-        default:
-          return `${dir.name}: ${createText(dir.exp)}`;
-      }
-    }),
-  ];
+  const propArr = createPropArr(node);
 
   let propStr = propArr.length ? `{ ${propArr.join(', ')} }` : 'null';
 
@@ -160,10 +126,38 @@ function resolveElement(node) {
   }
 
   let childrenStr = traverseChildren(node);
-  if (children.length > 1 || children[0].type === NodeTypes.ELEMENT) {
+  if (children[0].type === NodeTypes.ELEMENT) {
     childrenStr = `[${childrenStr}]`;
   }
   return `h(${tag}, ${propStr}, ${childrenStr})`;
+}
+
+function createPropArr(node) {
+  const { props, directives } = node;
+  return [
+    ...props.map((prop) => `${prop.name}: ${createText(prop.value)}`),
+    ...directives.map((dir) => {
+      const content = dir.arg?.content;
+      switch (dir.name) {
+        case 'bind':
+          return `${content}: ${createText(dir.exp)}`;
+        case 'on':
+          const eventName = `on${capitalize(content)}`;
+          let exp = dir.exp.content;
+
+          // 以括号结尾，并且不含'=>'的情况，如 @click="foo()"
+          // 当然，判断很不严谨，比如不支持 @click="i++"
+          if (/\([^)]*?\)$/.test(exp) && !exp.includes('=>')) {
+            exp = `$event => (${exp})`;
+          }
+          return `${eventName}: ${exp}`;
+        case 'html':
+          return `innerHTML: ${createText(dir.exp)}`;
+        default:
+          return `${dir.name}: ${createText(dir.exp)}`;
+      }
+    }),
+  ];
 }
 
 // 可以不remove吗？不可以

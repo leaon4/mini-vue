@@ -60,7 +60,7 @@ export function mountComponent(vnode, container, anchor, patch) {
     let { template } = Component;
     if (template[0] === '#') {
       const el = document.querySelector(template);
-      template = el ? el.innerHTML : ``;
+      template = el ? el.innerHTML : '';
     }
     Component.render = new Function('ctx', compile(template));
   }
