@@ -231,16 +231,6 @@ function parseAttribute(context) {
       [dirName, argContent] = name.slice(2).split(':');
     }
 
-    // 不支持动态参数
-    let arg;
-    if (argContent) {
-      arg = {
-        type: NodeTypes.SIMPLE_EXPRESSION,
-        content: camelize(argContent),
-        isStatic: true,
-      };
-    }
-
     return {
       type: NodeTypes.DIRECTIVE,
       name: dirName,
@@ -249,7 +239,11 @@ function parseAttribute(context) {
         content: value.content,
         isStatic: false,
       },
-      arg,
+      arg: argContent && {
+        type: NodeTypes.SIMPLE_EXPRESSION,
+        content: camelize(argContent),
+        isStatic: true,
+      }
     };
   }
 
