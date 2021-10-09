@@ -1,6 +1,7 @@
 import { reactive, effect } from '../reactivity';
 import { normalizeVNode } from './vnode';
 import { queueJob } from './scheduler';
+import { compile } from '../compiler';
 
 function updateProps(instance, vnode) {
   const { type: Component, props: vnodeProps } = vnode;
@@ -50,6 +51,17 @@ export function mountComponent(vnode, container, anchor, patch) {
     ...instance.props,
     ...instance.setupState,
   };
+
+  if (!Component.render && Component.template) {
+    let { template } = Component;
+    if (template[0] === '#') {
+      const el = document.querySelector(template);
+      template = el ? el.innerHTML : '';
+    }
+    const code = compile(template);
+    Component.render = new Function('ctx', code);
+    console.log(Component.render);
+  }
 
   instance.update = effect(
     () => {
