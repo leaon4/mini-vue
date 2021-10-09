@@ -13,23 +13,38 @@
 
 <body>
   <div id="app">
-    Counter
-    <div>{{counter.value}}</div>
-    <button @click="add">click</button>
+    <div>{{test.value}}</div>
+    <input v-model="test.value">
   </div>
   <script>
     const {
       createApp,
-      ref
+      ref,
+      reactive
     } = MiniVue;
 
     createApp({
       setup() {
+        const items = reactive([{
+            name: 'foo'
+          },
+          {
+            name: 'bar'
+          },
+        ])
         const counter = ref(0);
         const add = () => counter.value++;
+        const ok = ref(true)
+        const toggle = () => ok.value = !ok.value
+
+        const test = ref('hello')
         return {
           counter,
-          add
+          add,
+          items,
+          ok,
+          toggle,
+          test
         }
       }
     }).mount('#app')

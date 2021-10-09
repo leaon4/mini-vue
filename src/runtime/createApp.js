@@ -1,7 +1,9 @@
 import { h, render } from '.';
-import { isString } from '../utils';
+import { camelize, capitalize, isString } from '../utils';
 
+let components;
 export function createApp(rootComponent) {
+  components = rootComponent.components || {};
   const app = {
     mount(rootContainer) {
       if (isString(rootContainer)) {
@@ -17,4 +19,13 @@ export function createApp(rootComponent) {
     },
   };
   return app;
+}
+
+export function resolveComponent(name) {
+  return (
+    components &&
+    (components[name] ||
+      components[camelize(name)] ||
+      components[capitalize(camelize(name))])
+  );
 }
