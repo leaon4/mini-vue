@@ -70,23 +70,21 @@ function resolveElementASTNode(node, parent) {
       // <div v-if="ok"/> <p v-else-if="no"/> <span v-else/>
       // 为了处理上面的例子，需要将空节点删除
       // 也因此，才需要用上for循环
-      if (sibling.type === NodeTypes.TEXT && !sibling.content.trim().length) {
+      if (sibling.type === NodeTypes.TEXT && !sibling.content.trim()) {
         children.splice(i, 1);
         i--;
         continue;
       }
 
-      if (sibling.type === NodeTypes.ELEMENT) {
-        const elseNode = children[i];
-        if (pluck(sibling.directives, 'else')) {
-          alternate = resolveElementASTNode(elseNode, parent);
-          children.splice(i, 1);
-        } else if (pluck(sibling.directives, 'else-if', false)) {
+      if (
+        sibling.type === NodeTypes.ELEMENT &&
+        (pluck(sibling.directives, 'else') ||
           // else-if 既是上一个条件语句的 alternate，又是新语句的 condition
           // 因此pluck时不删除指令，下一次循环时当作ifNode处理
-          alternate = resolveElementASTNode(elseNode, parent);
-          children.splice(i, 1);
-        }
+          pluck(sibling.directives, 'else-if', false))
+      ) {
+        alternate = resolveElementASTNode(sibling, parent);
+        children.splice(i, 1);
       }
       // 只用向前寻找一个相临的元素，因此for循环到这里可以立即退出
       break;
