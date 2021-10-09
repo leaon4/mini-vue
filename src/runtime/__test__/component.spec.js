@@ -1,6 +1,6 @@
 import { render } from '../render';
 import { h, Text, Fragment } from '../vnode';
-import { ref, reactive, computed } from '../../reacitve';
+import { ref, reactive, computed } from '../../reactivity';
 import { nextTick } from '../scheduler';
 
 let root;

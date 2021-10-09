@@ -126,13 +126,16 @@ function mountTextNode(vnode, container, anchor) {
 function mountElement(vnode, container, anchor) {
   const { type, props, shapeFlag, children } = vnode;
   const el = document.createElement(type);
-  patchProps(null, props, el);
 
   if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
     mountTextNode(vnode, el);
   } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
     // 这里不用传anchor，因为这里的el是新建的，anchor等同于最后一个
     mountChildren(children, el);
+  }
+
+  if (props) {
+    patchProps(null, props, el);
   }
 
   container.insertBefore(el, anchor);
