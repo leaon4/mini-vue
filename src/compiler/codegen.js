@@ -50,6 +50,7 @@ function traverseChildren(node) {
   return results.join(', ');
 }
 
+// 这里parent是必然存在的
 function resolveElementASTNode(node, parent) {
   const ifNode =
     pluck(node.directives, 'if') || pluck(node.directives, 'else-if');
@@ -59,29 +60,38 @@ function resolveElementASTNode(node, parent) {
     // 所以处理指令时，移除当下指令也是必须的
     const consequent = resolveElementASTNode(node, parent);
     let alternate;
-    if (parent) {
-      const { children } = parent;
-      let i = children.findIndex((child) => child === node) + 1;
-      for (; i < children.length; i++) {
-        const sibling = children[i];
-        if (sibling.type === NodeTypes.TEXT && !sibling.content.trim().length) {
-          children.splice(i, 1);
-          i--;
-          continue;
-        }
-        if (sibling.type === NodeTypes.ELEMENT) {
-          const elseNode = children[i];
-          if (pluck(sibling.directives, 'else')) {
-            alternate = resolveElementASTNode(elseNode, parent);
-            children.splice(i, 1);
-          } else if (pluck(sibling.directives, 'else-if', false)) {
-            alternate = resolveElementASTNode(elseNode, parent);
-            children.splice(i, 1);
-          }
-        }
-        break;
+
+    // 如果有ifNode，则需要看它的下一个元素节点是否有else-if或else
+    const { children } = parent;
+    let i = children.findIndex((child) => child === node) + 1;
+    for (; i < children.length; i++) {
+      const sibling = children[i];
+
+      // <div v-if="ok"/> <p v-else-if="no"/> <span v-else/>
+      // 为了处理上面的例子，需要将空节点删除
+      // 也因此，才需要用上for循环
+      if (sibling.type === NodeTypes.TEXT && !sibling.content.trim().length) {
+        children.splice(i, 1);
+        i--;
+        continue;
       }
+
+      if (sibling.type === NodeTypes.ELEMENT) {
+        const elseNode = children[i];
+        if (pluck(sibling.directives, 'else')) {
+          alternate = resolveElementASTNode(elseNode, parent);
+          children.splice(i, 1);
+        } else if (pluck(sibling.directives, 'else-if', false)) {
+          // else-if 既是上一个条件语句的 alternate，又是新语句的 condition
+          // 因此pluck时不删除指令，下一次循环时当作ifNode处理
+          alternate = resolveElementASTNode(elseNode, parent);
+          children.splice(i, 1);
+        }
+      }
+      // 只用向前寻找一个相临的元素，因此for循环到这里可以立即退出
+      break;
     }
+
     const { exp } = ifNode;
     return `${exp.content} ? ${consequent} : ${alternate || createTextVNode()}`;
   }
@@ -106,12 +116,10 @@ function createElementVNode(node) {
       ? `"${node.tag}"`
       : `resolveComponent("${node.tag}")`;
 
-  const vModel = pluck(directives, 'model');
-
   const propArr = createPropArr(node);
-
   let propStr = propArr.length ? `{ ${propArr.join(', ')} }` : 'null';
 
+  const vModel = pluck(directives, 'model');
   if (vModel) {
     const getter = `() => ${createText(vModel.exp)}`;
     const setter = `value => ${createText(vModel.exp)} = value`;
